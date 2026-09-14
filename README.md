@@ -113,3 +113,55 @@ Cancellation is handled with `AbortController` so obsolete requests do not updat
 4. Add configurable time ranges such as `24h` and `7d`.
 5. Add periodic refresh, retry backoff, and monitoring alerts.
 6. Expand the dashboard with packet loss visualization and summary metrics.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 22.x
+- npm
+
+### Installation
+
+```bash
+git clone https://github.com/AndresMolina-Sys/network-monitoring-dashboard.git
+cd network-monitoring-dashboard
+nvm use 22.23.2
+npm ci
+```
+
+### Development
+
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:5173/`.
+
+### Demo States
+
+The mock service supports dedicated demo scenarios:
+
+- `http://localhost:5173/?demo=slow` — Simulates a slow response.
+- `http://localhost:5173/?demo=error` — Simulates a failed request.
+- `http://localhost:5173/?demo=empty` — Simulates an empty response.
+
+### Available Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Vite development server. |
+| `npm run format` | Format the source files with Prettier. |
+| `npm run format:check` | Check formatting without modifying files. |
+| `npm run lint` | Run ESLint. |
+| `npm run test` | Run unit, component, and Storybook tests. |
+| `npm run storybook` | Start the Storybook development server. |
+| `npm run build` | Type-check and create the production build. |
+
+### Continuous Integration
+
+Every push to `main` and every pull request runs formatting checks, linting, tests, and the production build through GitHub Actions.
+
+### Deployment
+
+The frontend is deployed on Vercel and uses `vercel.json` to support client-side routes handled by React Router.
