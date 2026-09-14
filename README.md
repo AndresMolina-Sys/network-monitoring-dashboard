@@ -45,3 +45,44 @@ This project explores how to build that experience with a typed React frontend, 
 The application currently uses a typed mock monitoring service so the frontend can run autonomously in Vercel.
 
 The service boundary is designed to be replaced later by an ASP.NET Core Web API without coupling the UI components to the data source.
+
+## Architecture
+
+The application is organized around a small service boundary:
+
+```text
+src/
+├── app/                         # Router and fallback page
+├── domain/                      # Shared network contracts
+├── features/
+│   └── network-monitoring/
+│       ├── components/          # UI and Storybook stories
+│       ├── hooks/               # Async state orchestration
+│       └── pages/               # Route-level screens
+├── mocks/                       # Typed local monitoring fixtures
+├── services/                    # Monitoring service interface and mock implementation
+└── test/                        # Shared test setup
+```
+
+### Data Flow
+
+1. A route renders the dashboard or a node details page.
+2. A feature hook calls the `NetworkMonitoringService` contract.
+3. The current mock implementation simulates latency, failures, empty responses, and request cancellation.
+4. Components render the result without depending directly on the data source.
+5. The same service contract can later be implemented by an ASP.NET Core Web API.
+
+This keeps data access replaceable and prevents UI components from becoming coupled to the mock implementation.
+
+## Async State Model
+
+The frontend handles each request explicitly:
+
+| State     | User-facing behavior                                              |
+| --------- | ----------------------------------------------------------------- |
+| `loading` | Render skeleton or loading feedback while the request is pending. |
+| `success` | Render nodes, metrics chart, and accessible metrics table.        |
+| `empty`   | Explain that no monitored data is available.                      |
+| `error`   | Explain the failure and offer a retry action.                     |
+
+Cancellation is handled with `AbortController` so obsolete requests do not update unmounted or outdated screens.
