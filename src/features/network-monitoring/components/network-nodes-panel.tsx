@@ -3,9 +3,14 @@ import { NetworkNodeCard } from './network-node-card'
 import { NetworkNodesEmptyState } from './network-nodes-empty-state'
 import { NetworkNodesErrorState } from './network-nodes-error-state'
 import { NetworkNodesSkeleton } from './network-nodes-skeleton'
+import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 
-export function NetworkNodesPanel() {
-  const { status, nodes, retry } = useNetworkNodes()
+interface NetworkNodesPanelProps {
+  readonly service?: NetworkMonitoringService
+}
+
+export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
+  const { status, nodes, retry } = useNetworkNodes(service)
 
   if (status === 'loading') {
     return <NetworkNodesSkeleton />
