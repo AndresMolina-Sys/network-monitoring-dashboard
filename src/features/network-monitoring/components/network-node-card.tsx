@@ -12,32 +12,41 @@ const STATUS_LABELS: Record<NetworkNode['status'], string> = {
 
 export function NetworkNodeCard({ node }: NetworkNodeCardProps) {
   const titleId = `network-node-${node.id}`
+  const statusClassName = [
+    'network-node-card__status',
+    `network-node-card__status--${node.status}`,
+  ].join(' ')
 
   return (
-    <article aria-labelledby={titleId}>
-      <header>
+    <article className="network-node-card" aria-labelledby={titleId}>
+      <header className="network-node-card__header">
         <div>
-          <p>Network node</p>
-          <h3 id={titleId}>{node.name}</h3>
+          <p className="network-node-card__eyebrow">Network node</p>
+
+          <h3 className="network-node-card__title" id={titleId}>
+            {node.name}
+          </h3>
         </div>
 
-        <span data-status={node.status}>{STATUS_LABELS[node.status]}</span>
+        <span className={statusClassName} data-status={node.status}>
+          {STATUS_LABELS[node.status]}
+        </span>
       </header>
 
-      <dl>
-        <div>
+      <dl className="network-node-card__details">
+        <div className="network-node-card__detail">
           <dt>Address</dt>
           <dd>
             <code>{node.address}</code>
           </dd>
         </div>
 
-        <div>
+        <div className="network-node-card__detail">
           <dt>Location</dt>
           <dd>{node.location}</dd>
         </div>
 
-        <div>
+        <div className="network-node-card__detail">
           <dt>Last checked</dt>
           <dd>
             <time dateTime={node.lastCheckedAt}>{node.lastCheckedAt}</time>
