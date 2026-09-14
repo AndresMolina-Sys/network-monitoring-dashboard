@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { networkMonitoringService } from '../../../services'
 import { useNodeMetrics } from '../hooks/use-node-metrics'
+import { NodeLatencyChart } from '../components/node-latency-chart'
 
 interface NetworkNodeDetailsPageProps {
   readonly service?: NetworkMonitoringService
@@ -58,6 +59,7 @@ export function NetworkNodeDetailsPage({
         <section className="network-metrics" aria-labelledby="metrics-title">
           <p className="network-node-state__eyebrow">Network metrics</p>
           <h2 id="metrics-title">Last hour performance ({metrics.range})</h2>
+          <NodeLatencyChart metrics={metrics} />
 
           <table>
             <caption>Latency and packet loss measurements for {nodeId}</caption>

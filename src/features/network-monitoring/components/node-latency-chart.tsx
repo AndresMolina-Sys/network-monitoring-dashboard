@@ -28,7 +28,7 @@ export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
 
   return (
     <figure className="node-latency-chart" aria-labelledby="latency-chart-title">
-      <figcaption id="latency-chart-title">Latency trend for {metrics.nodeId}</figcaption>
+      <figcaption id="latency-chart-title">Latency trend for {metrics.nodeId} (UTC)</figcaption>
 
       <div className="node-latency-chart__canvas">
         <ResponsiveContainer width="100%" height={280}>
@@ -70,8 +70,10 @@ export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
 }
 
 function formatMetricTime(timestamp: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'UTC',
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   }).format(new Date(timestamp))
 }

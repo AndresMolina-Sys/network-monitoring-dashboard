@@ -291,3 +291,23 @@
     animation: none;
   }
 }
+
+.node-latency-chart {
+  margin: 2rem 0;
+  padding: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.node-latency-chart figcaption {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.node-latency-chart__canvas {
+  width: 100%;
+  min-height: 280px;
+}
