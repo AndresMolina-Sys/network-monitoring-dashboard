@@ -86,3 +86,30 @@ The frontend handles each request explicitly:
 | `error`   | Explain the failure and offer a retry action.                     |
 
 Cancellation is handled with `AbortController` so obsolete requests do not update unmounted or outdated screens.
+
+## Technical Decisions
+
+- Use React with TypeScript and Vite to keep the frontend fast, explicit, and easy to deploy.
+- Keep data access behind the `NetworkMonitoringService` contract so the UI is independent from the current mock implementation.
+- Use React Router for dashboard, node details, and fallback routes.
+- Lazy-load the node details route to keep the initial dashboard bundle smaller.
+- Use Recharts for visual latency trends while keeping a semantic HTML table for accessible data inspection.
+- Use Vitest, React Testing Library, Storybook, and browser-based tests to validate behavior and visual states.
+- Deploy the frontend autonomously on Vercel before introducing a live backend.
+
+## Current Limitations
+
+- Monitoring data is simulated locally and is not connected to real network devices.
+- There is no authentication or role-based access control.
+- Node data is static and is not persisted in a database.
+- The dashboard does not yet support real-time polling or notifications.
+- The current chart focuses on latency; packet loss is available in the table but is not visualized yet.
+
+## Roadmap
+
+1. Implement an ASP.NET Core Web API using the existing monitoring service contract.
+2. Replace the mock service with an environment-based API implementation.
+3. Persist monitored nodes and measurements in SQL Server.
+4. Add configurable time ranges such as `24h` and `7d`.
+5. Add periodic refresh, retry backoff, and monitoring alerts.
+6. Expand the dashboard with packet loss visualization and summary metrics.
