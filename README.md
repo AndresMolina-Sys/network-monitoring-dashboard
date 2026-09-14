@@ -148,15 +148,15 @@ The mock service supports dedicated demo scenarios:
 
 ### Available Commands
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the Vite development server. |
-| `npm run format` | Format the source files with Prettier. |
-| `npm run format:check` | Check formatting without modifying files. |
-| `npm run lint` | Run ESLint. |
-| `npm run test` | Run unit, component, and Storybook tests. |
-| `npm run storybook` | Start the Storybook development server. |
-| `npm run build` | Type-check and create the production build. |
+| Command                | Purpose                                     |
+| ---------------------- | ------------------------------------------- |
+| `npm run dev`          | Start the Vite development server.          |
+| `npm run format`       | Format the source files with Prettier.      |
+| `npm run format:check` | Check formatting without modifying files.   |
+| `npm run lint`         | Run ESLint.                                 |
+| `npm run test`         | Run unit, component, and Storybook tests.   |
+| `npm run storybook`    | Start the Storybook development server.     |
+| `npm run build`        | Type-check and create the production build. |
 
 ### Continuous Integration
 
