@@ -7,22 +7,26 @@ const DEFAULT_LATENCY_MS = 350
 export interface MockNetworkMonitoringServiceOptions {
   readonly latencyMs?: number
   readonly shouldFail?: () => boolean
+  readonly nodes?: readonly NetworkNode[]
 }
 
 export class MockNetworkMonitoringService implements NetworkMonitoringService {
   private readonly latencyMs: number
   private readonly shouldFail: () => boolean
+  private readonly nodes: readonly NetworkNode[]
 
   constructor(options: MockNetworkMonitoringServiceOptions = {}) {
     this.latencyMs = Math.max(0, options.latencyMs ?? DEFAULT_LATENCY_MS)
+
     this.shouldFail = options.shouldFail ?? (() => false)
+    this.nodes = options.nodes ?? NETWORK_NODES
   }
 
   async listNodes(signal?: AbortSignal): Promise<readonly NetworkNode[]> {
     await waitForResponse(this.latencyMs, signal)
     this.throwIfFailureConfigured()
 
-    return NETWORK_NODES
+    return this.nodes
   }
 
   async getNodeMetrics(
