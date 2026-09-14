@@ -25,11 +25,17 @@ export const NETWORK_NODES = [
     status: 'offline',
     lastCheckedAt: '2026-09-13T17:45:00Z',
   },
-] satisfies readonly NetworkNode[]
+] as const satisfies readonly NetworkNode[]
 
 type FixtureNodeId = (typeof NETWORK_NODES)[number]['id']
 
-export const NETWORK_NODE_METRICS = {
+type FixtureNodeMetrics = {
+  readonly [NodeId in FixtureNodeId]: Omit<NodeMetrics, 'nodeId'> & {
+    readonly nodeId: NodeId
+  }
+}
+
+const NETWORK_NODE_METRICS_FIXTURE = {
   'core-router': {
     nodeId: 'core-router',
     range: '1h',
@@ -108,4 +114,7 @@ export const NETWORK_NODE_METRICS = {
       },
     ],
   },
-} satisfies Record<FixtureNodeId, NodeMetrics>
+} satisfies FixtureNodeMetrics
+
+export const NETWORK_NODE_METRICS: Readonly<Record<string, NodeMetrics>> =
+  NETWORK_NODE_METRICS_FIXTURE
