@@ -1,7 +1,6 @@
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import App from '../App'
-import { NetworkNodeDetailsPage } from '../features/network-monitoring/pages/network-node-details-page'
 import { NotFoundPage } from './not-found-page'
 
 const router = createBrowserRouter([
@@ -11,7 +10,14 @@ const router = createBrowserRouter([
   },
   {
     path: '/nodes/:nodeId',
-    element: <NetworkNodeDetailsPage />,
+    lazy: async () => {
+      const { NetworkNodeDetailsPage } =
+        await import('../features/network-monitoring/pages/network-node-details-page')
+
+      return {
+        Component: NetworkNodeDetailsPage,
+      }
+    },
   },
   {
     path: '*',
