@@ -1,73 +1,47 @@
-# React + TypeScript + Vite
+# Network Monitoring Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![CI](https://github.com/AndresMolina-Sys/network-monitoring-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/AndresMolina-Sys/network-monitoring-dashboard/actions/workflows/ci.yml)
 
-Currently, two official plugins are available:
+A frontend monitoring dashboard for reviewing network availability and latency across monitored devices.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Live Demo
 
-## React Compiler
+[Open the live demo](https://network-monitoring-dashboard-zeta.vercel.app/)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Problem
 
-## Expanding the ESLint configuration
+Network operations teams need a clear way to identify monitored devices, review their current status, and inspect recent performance measurements.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+This project explores how to build that experience with a typed React frontend, explicit asynchronous states, reusable components, and a service layer that can later connect to an ASP.NET Core Web API.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Features
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Display monitored network nodes and their current status.
+- Support online, degraded, and offline states.
+- Show loading, empty, error, and successful data states.
+- Retry failed monitoring requests.
+- Review node latency and packet loss measurements.
+- Visualize latency trends with a responsive chart.
+- Keep a semantic metrics table as an accessible data representation.
+- Navigate between the dashboard, node details, and fallback 404 page.
+- Simulate latency, failures, cancellation, and empty responses locally.
+- Run unit, component, accessibility, and browser-based Storybook tests.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Technology Stack
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+- React
+- TypeScript
+- Vite
+- React Router
+- Recharts
+- Vitest
+- React Testing Library
+- Storybook
+- GitHub Actions
+- Vercel
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Current Scope
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+The application currently uses a typed mock monitoring service so the frontend can run autonomously in Vercel.
+
+The service boundary is designed to be replaced later by an ASP.NET Core Web API without coupling the UI components to the data source.
