@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { NETWORK_NODES } from '../../../mocks/network-fixtures'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NetworkNodesPanel } from './network-nodes-panel'
+import { MemoryRouter } from 'react-router'
 
 describe('NetworkNodesPanel', () => {
   it('renders the loading state while nodes are pending', () => {
@@ -12,7 +13,11 @@ describe('NetworkNodesPanel', () => {
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 
-    render(<NetworkNodesPanel service={service} />)
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={service} />
+      </MemoryRouter>,
+    )
 
     const loadingStatus = screen.getByRole('status')
 
@@ -25,8 +30,11 @@ describe('NetworkNodesPanel', () => {
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 
-    render(<NetworkNodesPanel service={service} />)
-
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={service} />
+      </MemoryRouter>,
+    )
     expect(
       await screen.findByRole('heading', {
         name: 'Monitored nodes',
@@ -46,7 +54,11 @@ describe('NetworkNodesPanel', () => {
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 
-    render(<NetworkNodesPanel service={service} />)
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={service} />
+      </MemoryRouter>,
+    )
 
     expect(
       await screen.findByRole('heading', {
@@ -68,7 +80,11 @@ describe('NetworkNodesPanel', () => {
 
     const user = userEvent.setup()
 
-    render(<NetworkNodesPanel service={service} />)
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={service} />
+      </MemoryRouter>,
+    )
 
     expect(
       await screen.findByRole('heading', {
