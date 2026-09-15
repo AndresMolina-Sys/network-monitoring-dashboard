@@ -1,6 +1,7 @@
 import type { MetricsRange, NetworkNode, NodeMetrics } from '../domain/network'
 import { NETWORK_NODE_METRICS, NETWORK_NODES } from '../mocks/network-fixtures'
 import type { NetworkMonitoringService } from './network-monitoring-service'
+import { NetworkNodeNotFoundError, NetworkRequestError } from './network-monitoring-errors'
 
 const DEFAULT_LATENCY_MS = 350
 
@@ -40,7 +41,7 @@ export class MockNetworkMonitoringService implements NetworkMonitoringService {
     const metrics = NETWORK_NODE_METRICS[nodeId]
 
     if (!metrics) {
-      throw new Error(`No metrics found for node: ${nodeId}`)
+      throw new NetworkNodeNotFoundError(nodeId)
     }
 
     if (metrics.range !== range) {
@@ -52,7 +53,7 @@ export class MockNetworkMonitoringService implements NetworkMonitoringService {
 
   private throwIfFailureConfigured(): void {
     if (this.shouldFail()) {
-      throw new Error('Mock network request failed')
+      throw new NetworkRequestError('Mock network request failed')
     }
   }
 }

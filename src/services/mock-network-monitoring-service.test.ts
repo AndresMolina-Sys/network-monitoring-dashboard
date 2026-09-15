@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { NETWORK_NODES } from '../mocks/network-fixtures'
+import { NetworkNodeNotFoundError, NetworkRequestError } from './network-monitoring-errors'
 import { MockNetworkMonitoringService } from './mock-network-monitoring-service'
 
 describe('MockNetworkMonitoringService', () => {
@@ -26,13 +27,23 @@ describe('MockNetworkMonitoringService', () => {
     expect(metrics.points).not.toHaveLength(0)
   })
 
-  it('rejects when failure is configured', async () => {
+  it('rejects with a typed error when failure is configured', async () => {
     const service = new MockNetworkMonitoringService({
       latencyMs: 0,
       shouldFail: () => true,
     })
 
-    await expect(service.listNodes()).rejects.toThrow('Mock network request failed')
+    await expect(service.listNodes()).rejects.toBeInstanceOf(NetworkRequestError)
+  })
+
+  it('rejects with a not-found error for an unknown node', async () => {
+    const service = new MockNetworkMonitoringService({
+      latencyMs: 0,
+    })
+
+    await expect(service.getNodeMetrics('unknown-node', '1h')).rejects.toBeInstanceOf(
+      NetworkNodeNotFoundError,
+    )
   })
 
   it('rejects when the request is aborted', async () => {
