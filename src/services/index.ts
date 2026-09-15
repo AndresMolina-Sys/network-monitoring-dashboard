@@ -1,16 +1,21 @@
 import { createMockNetworkMonitoringService } from './mock-network-monitoring-service'
+import { HttpNetworkMonitoringService } from './http-network-monitoring-service'
 import type { NetworkMonitoringService } from './network-monitoring-service'
 
 type MockDemoMode = 'normal' | 'empty' | 'error' | 'slow'
 
 const mockDemoMode = getMockDemoMode()
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
-export const networkMonitoringService: NetworkMonitoringService =
-  createMockNetworkMonitoringService({
-    latencyMs: mockDemoMode === 'slow' ? 2000 : undefined,
-    nodes: mockDemoMode === 'empty' ? [] : undefined,
-    shouldFail: () => mockDemoMode === 'error',
-  })
+const shouldUseMock = mockDemoMode !== 'normal' || !apiBaseUrl
+
+export const networkMonitoringService: NetworkMonitoringService = shouldUseMock
+  ? createMockNetworkMonitoringService({
+      latencyMs: mockDemoMode === 'slow' ? 2000 : undefined,
+      nodes: mockDemoMode === 'empty' ? [] : undefined,
+      shouldFail: () => mockDemoMode === 'error',
+    })
+  : new HttpNetworkMonitoringService(apiBaseUrl)
 
 function getMockDemoMode(): MockDemoMode {
   if (!import.meta.env.DEV) {
