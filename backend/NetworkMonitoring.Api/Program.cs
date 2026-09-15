@@ -1,8 +1,25 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("LocalFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "http://localhost:4173",
+                "http://127.0.0.1:4173"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseCors("LocalFrontend");
 
 if (app.Environment.IsDevelopment())
 {
@@ -46,26 +63,10 @@ var metricsByNode = new Dictionary<string, NodeMetrics>(
         "1h",
         new[]
         {
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:00:00Z"),
-                18,
-                0
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:20:00Z"),
-                20,
-                0
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:40:00Z"),
-                17,
-                0.2
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T18:00:00Z"),
-                19,
-                0
-            ),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:00:00Z"), 18, 0),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:20:00Z"), 20, 0),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:40:00Z"), 17, 0.2),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T18:00:00Z"), 19, 0),
         }
     ),
     ["access-switch-01"] = new NodeMetrics(
@@ -73,26 +74,10 @@ var metricsByNode = new Dictionary<string, NodeMetrics>(
         "1h",
         new[]
         {
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:00:00Z"),
-                34,
-                0
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:20:00Z"),
-                35,
-                0.5
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:40:00Z"),
-                40,
-                1.2
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T18:00:00Z"),
-                38,
-                0.6
-            ),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:00:00Z"), 34, 0),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:20:00Z"), 35, 0.5),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:40:00Z"), 40, 1.2),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T18:00:00Z"), 38, 0.6),
         }
     ),
     ["branch-gateway"] = new NodeMetrics(
@@ -100,26 +85,10 @@ var metricsByNode = new Dictionary<string, NodeMetrics>(
         "1h",
         new[]
         {
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:00:00Z"),
-                125,
-                2.5
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:20:00Z"),
-                140,
-                3
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T17:40:00Z"),
-                152,
-                4.2
-            ),
-            new MetricPoint(
-                DateTimeOffset.Parse("2026-09-13T18:00:00Z"),
-                148,
-                3.1
-            ),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:00:00Z"), 125, 2.5),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:20:00Z"), 140, 3),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T17:40:00Z"), 152, 4.2),
+            new MetricPoint(DateTimeOffset.Parse("2026-09-13T18:00:00Z"), 148, 3.1),
         }
     ),
 };
