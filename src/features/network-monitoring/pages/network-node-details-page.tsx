@@ -3,6 +3,7 @@ import type { NetworkMonitoringService } from '../../../services/network-monitor
 import { networkMonitoringService } from '../../../services'
 import { useNodeMetrics } from '../hooks/use-node-metrics'
 import { NodeLatencyChart } from '../components/node-latency-chart'
+import { NetworkNodeNotFoundState } from '../components/network-node-not-found-state'
 
 interface NetworkNodeDetailsPageProps {
   readonly service?: NetworkMonitoringService
@@ -35,6 +36,8 @@ export function NetworkNodeDetailsPage({
           <h2 id="metrics-loading-title">Loading node metrics...</h2>
         </section>
       )}
+
+      {status === 'not-found' && <NetworkNodeNotFoundState nodeId={nodeId} />}
 
       {status === 'error' && (
         <section className="network-node-state" role="alert" aria-labelledby="metrics-error-title">
