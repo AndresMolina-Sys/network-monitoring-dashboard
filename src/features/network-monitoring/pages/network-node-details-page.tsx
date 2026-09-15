@@ -6,9 +6,16 @@ import { NodeLatencyChart } from '../components/node-latency-chart'
 import { NetworkNodeNotFoundState } from '../components/network-node-not-found-state'
 import { useNetworkNode } from '../hooks/use-network-node'
 import { useNodeMetrics } from '../hooks/use-node-metrics'
+import type { NetworkNode } from '../../../domain/network'
 
 interface NetworkNodeDetailsPageProps {
   readonly service?: NetworkMonitoringService
+}
+
+const NODE_STATUS_LABELS: Record<NetworkNode['status'], string> = {
+  online: 'Online',
+  degraded: 'Degraded',
+  offline: 'Offline',
 }
 
 export function NetworkNodeDetailsPage({
@@ -16,7 +23,7 @@ export function NetworkNodeDetailsPage({
 }: NetworkNodeDetailsPageProps) {
   const { nodeId = 'unknown' } = useParams()
 
-  const { status: nodeStatus, retry: retryNode } = useNetworkNode(nodeId, service)
+  const { status: nodeStatus, node, retry: retryNode } = useNetworkNode(nodeId, service)
 
   const {
     status: metricsStatus,
@@ -45,6 +52,41 @@ export function NetworkNodeDetailsPage({
           Review health and performance for <code>{nodeId}</code>.
         </p>
       </header>
+
+      {nodeStatus === 'success' && node ? (
+        <section className="network-node-summary" aria-labelledby="node-summary-title">
+          <p className="network-node-state__eyebrow">Node overview</p>
+          <h2 id="node-summary-title">{node.name}</h2>
+
+          <dl className="network-node-summary__details">
+            <div>
+              <dt>Status</dt>
+              <dd>
+                <span data-status={node.status}>{NODE_STATUS_LABELS[node.status]}</span>
+              </dd>
+            </div>
+
+            <div>
+              <dt>Address</dt>
+              <dd>
+                <code>{node.address}</code>
+              </dd>
+            </div>
+
+            <div>
+              <dt>Location</dt>
+              <dd>{node.location}</dd>
+            </div>
+
+            <div>
+              <dt>Last checked</dt>
+              <dd>
+                <time dateTime={node.lastCheckedAt}>{formatNodeDate(node.lastCheckedAt)}</time>
+              </dd>
+            </div>
+          </dl>
+        </section>
+      ) : null}
 
       {isNotFound && <NetworkNodeNotFoundState nodeId={nodeId} />}
 
@@ -115,4 +157,12 @@ export function NetworkNodeDetailsPage({
       ) : null}
     </main>
   )
+}
+
+function formatNodeDate(timestamp: string): string {
+  return `${new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'UTC',
+  }).format(new Date(timestamp))} UTC`
 }
