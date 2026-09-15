@@ -1,4 +1,5 @@
 import type { NetworkNode } from '../../../domain/network'
+import { Link } from 'react-router'
 
 interface NetworkNodeCardProps {
   readonly node: NetworkNode
@@ -18,41 +19,50 @@ export function NetworkNodeCard({ node }: NetworkNodeCardProps) {
   ].join(' ')
 
   return (
-    <article className="network-node-card" aria-labelledby={titleId}>
-      <header className="network-node-card__header">
-        <div>
-          <p className="network-node-card__eyebrow">Network node</p>
+    <Link
+      to={`/nodes/${node.id}`}
+      className="network-node-card-link"
+      aria-label={`View metrics for ${node.name}`}
+    >
+      <article className="network-node-card" aria-labelledby={titleId}>
+        <header className="network-node-card__header">
+          <div>
+            <p className="network-node-card__eyebrow">Network node</p>
 
-          <h3 className="network-node-card__title" id={titleId}>
-            {node.name}
-          </h3>
-        </div>
+            <h3 className="network-node-card__title" id={titleId}>
+              {node.name}
+            </h3>
+          </div>
 
-        <span className={statusClassName} data-status={node.status}>
-          {STATUS_LABELS[node.status]}
+          <span className={statusClassName} data-status={node.status}>
+            {STATUS_LABELS[node.status]}
+          </span>
+        </header>
+
+        <dl className="network-node-card__details">
+          <div className="network-node-card__detail">
+            <dt>Address</dt>
+            <dd>
+              <code>{node.address}</code>
+            </dd>
+          </div>
+
+          <div className="network-node-card__detail">
+            <dt>Location</dt>
+            <dd>{node.location}</dd>
+          </div>
+
+          <div className="network-node-card__detail">
+            <dt>Last checked</dt>
+            <dd>
+              <time dateTime={node.lastCheckedAt}>{node.lastCheckedAt}</time>
+            </dd>
+          </div>
+        </dl>
+        <span className="network-node-card__action" aria-hidden="true">
+          View metrics →
         </span>
-      </header>
-
-      <dl className="network-node-card__details">
-        <div className="network-node-card__detail">
-          <dt>Address</dt>
-          <dd>
-            <code>{node.address}</code>
-          </dd>
-        </div>
-
-        <div className="network-node-card__detail">
-          <dt>Location</dt>
-          <dd>{node.location}</dd>
-        </div>
-
-        <div className="network-node-card__detail">
-          <dt>Last checked</dt>
-          <dd>
-            <time dateTime={node.lastCheckedAt}>{node.lastCheckedAt}</time>
-          </dd>
-        </div>
-      </dl>
-    </article>
+      </article>
+    </Link>
   )
 }

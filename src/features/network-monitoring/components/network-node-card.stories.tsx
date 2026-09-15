@@ -1,10 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { NETWORK_NODES } from '../../../mocks/network-fixtures'
 import { NetworkNodeCard } from './network-node-card'
+import { MemoryRouter } from 'react-router'
 
 const meta = {
   title: 'Network Monitoring/NetworkNodeCard',
   component: NetworkNodeCard,
+  decorators: [
+    (Story) => (
+      <MemoryRouter initialEntries={['/']}>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
 } satisfies Meta<typeof NetworkNodeCard>
 
 export default meta

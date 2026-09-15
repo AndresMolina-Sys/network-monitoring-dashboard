@@ -9,7 +9,7 @@ const dirname = import.meta.dirname
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: ['recharts'],
+    include: ['recharts', 'react-router'],
   },
   test: {
     projects: [
