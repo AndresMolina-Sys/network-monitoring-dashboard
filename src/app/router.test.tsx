@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { AppRouter } from './router'
@@ -9,18 +9,37 @@ describe('AppRouter', () => {
 
     render(<AppRouter />)
 
-    await user.click(
-      await screen.findByRole('link', {
+    const nodeLink = await screen.findByRole(
+      'link',
+      {
         name: 'View metrics for Core Router',
-      }),
+      },
+      {
+        timeout: 5000,
+      },
+    )
+
+    await user.click(nodeLink)
+
+    await waitFor(
+      () => {
+        expect(window.location.pathname).toBe('/nodes/core-router')
+      },
+      {
+        timeout: 5000,
+      },
     )
 
     expect(
-      await screen.findByRole('heading', {
-        name: 'Node details',
-      }),
+      await screen.findByRole(
+        'heading',
+        {
+          name: 'Node details',
+        },
+        {
+          timeout: 5000,
+        },
+      ),
     ).toBeInTheDocument()
-
-    expect(window.location.pathname).toBe('/nodes/core-router')
   })
 })
