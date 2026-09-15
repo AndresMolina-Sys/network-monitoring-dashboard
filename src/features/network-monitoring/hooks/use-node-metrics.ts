@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react'
 import type { MetricsRange, NetworkNode, NodeMetrics } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
+import { NetworkNodeNotFoundError } from '../../../services/network-monitoring-errors'
 
-export type NodeMetricsStatus = 'loading' | 'success' | 'empty' | 'error'
+export type NodeMetricsStatus = 'loading' | 'success' | 'empty' | 'not-found' | 'error'
 
 export interface UseNodeMetricsState {
   readonly status: NodeMetricsStatus
@@ -51,8 +52,15 @@ export function useNodeMetrics(
         setMetrics(result)
         setError(null)
         setStatus('success')
-      } catch (cause) {
+      } catch (cause: unknown) {
         if (!isActive || isAbortError(cause)) {
+          return
+        }
+
+        if (cause instanceof NetworkNodeNotFoundError) {
+          setMetrics(null)
+          setError(null)
+          setStatus('not-found')
           return
         }
 
