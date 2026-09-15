@@ -25,6 +25,7 @@ describe('NetworkNodeDetailsPage', () => {
 
     const service: NetworkMonitoringService = {
       listNodes: vi.fn(),
+      getNode: vi.fn(),
       getNodeMetrics,
     }
 
@@ -53,6 +54,7 @@ describe('NetworkNodeDetailsPage', () => {
 
     const service: NetworkMonitoringService = {
       listNodes: vi.fn(),
+      getNode: vi.fn(),
       getNodeMetrics,
     }
 
@@ -73,6 +75,7 @@ describe('NetworkNodeDetailsPage', () => {
 
     const service: NetworkMonitoringService = {
       listNodes: vi.fn(),
+      getNode: vi.fn(),
       getNodeMetrics,
     }
 
@@ -94,6 +97,7 @@ describe('NetworkNodeDetailsPage', () => {
 
     const service: NetworkMonitoringService = {
       listNodes: vi.fn(),
+      getNode: vi.fn(),
       getNodeMetrics,
     }
 

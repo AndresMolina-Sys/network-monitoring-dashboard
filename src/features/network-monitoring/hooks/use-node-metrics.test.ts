@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { NodeMetrics } from '../../../domain/network'
+import { NetworkNodeNotFoundError } from '../../../services/network-monitoring-errors'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { useNodeMetrics } from './use-node-metrics'
 
@@ -52,6 +53,23 @@ describe('useNodeMetrics', () => {
     expect(result.current.error).toBeNull()
   })
 
+  it('exposes not-found when the node does not exist', async () => {
+    const getNodeMetrics = vi
+      .fn<NetworkMonitoringService['getNodeMetrics']>()
+      .mockRejectedValue(new NetworkNodeNotFoundError('unknown-node'))
+
+    const service = createService(getNodeMetrics)
+
+    const { result } = renderHook(() => useNodeMetrics('unknown-node', '1h', service))
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('not-found')
+    })
+
+    expect(result.current.metrics).toBeNull()
+    expect(result.current.error).toBeNull()
+  })
+
   it('recovers from error after retry', async () => {
     const getNodeMetrics = vi
       .fn<NetworkMonitoringService['getNodeMetrics']>()
@@ -59,6 +77,7 @@ describe('useNodeMetrics', () => {
       .mockResolvedValueOnce(METRICS)
 
     const service = createService(getNodeMetrics)
+
     const { result } = renderHook(() => useNodeMetrics('core-router', '1h', service))
 
     await waitFor(() => {
@@ -109,7 +128,8 @@ function createService(
   getNodeMetrics: NetworkMonitoringService['getNodeMetrics'],
 ): NetworkMonitoringService {
   return {
-    listNodes: async () => [],
-    getNodeMetrics,
+    listNodes: () => Promise.resolve([]),
+    getNode: vi.fn(),
+    getNodeMetrics: (nodeId, range, signal) => getNodeMetrics(nodeId, range, signal),
   }
 }

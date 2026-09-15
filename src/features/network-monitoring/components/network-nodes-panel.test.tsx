@@ -8,8 +8,11 @@ import { MemoryRouter } from 'react-router'
 
 describe('NetworkNodesPanel', () => {
   it('renders the loading state while nodes are pending', () => {
+    const listNodes = vi.fn().mockReturnValue(new Promise(() => undefined))
+
     const service = {
-      listNodes: vi.fn().mockReturnValue(new Promise(() => undefined)),
+      listNodes,
+      getNode: vi.fn(),
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 
@@ -25,8 +28,11 @@ describe('NetworkNodesPanel', () => {
   })
 
   it('renders monitored nodes after a successful response', async () => {
+    const listNodes = vi.fn().mockResolvedValue(NETWORK_NODES)
+
     const service = {
-      listNodes: vi.fn().mockResolvedValue(NETWORK_NODES),
+      listNodes,
+      getNode: vi.fn(),
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 
@@ -49,8 +55,11 @@ describe('NetworkNodesPanel', () => {
   })
 
   it('renders the empty state when no nodes are returned', async () => {
+    const listNodes = vi.fn().mockResolvedValue([])
+
     const service = {
-      listNodes: vi.fn().mockResolvedValue([]),
+      listNodes,
+      getNode: vi.fn(),
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 
@@ -75,6 +84,7 @@ describe('NetworkNodesPanel', () => {
 
     const service = {
       listNodes,
+      getNode: vi.fn(),
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 

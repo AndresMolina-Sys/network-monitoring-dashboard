@@ -30,6 +30,19 @@ export class MockNetworkMonitoringService implements NetworkMonitoringService {
     return this.nodes
   }
 
+  async getNode(nodeId: NetworkNode['id'], signal?: AbortSignal): Promise<NetworkNode> {
+    await waitForResponse(this.latencyMs, signal)
+    this.throwIfFailureConfigured()
+
+    const node = this.nodes.find((candidate) => candidate.id === nodeId)
+
+    if (!node) {
+      throw new NetworkNodeNotFoundError(nodeId)
+    }
+
+    return node
+  }
+
   async getNodeMetrics(
     nodeId: NetworkNode['id'],
     range: MetricsRange,

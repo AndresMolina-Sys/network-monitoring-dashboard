@@ -7,8 +7,10 @@ import { useNetworkNodes } from './use-network-nodes'
 describe('useNetworkNodes', () => {
   it('transitions from loading to success', async () => {
     const listNodes = vi.fn().mockResolvedValue(NETWORK_NODES)
+
     const service = {
       listNodes,
+      getNode: vi.fn(),
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 
@@ -25,8 +27,11 @@ describe('useNetworkNodes', () => {
   })
 
   it('exposes empty when the service returns no nodes', async () => {
+    const listNodes = vi.fn().mockResolvedValue([])
+
     const service = {
-      listNodes: vi.fn().mockResolvedValue([]),
+      listNodes,
+      getNode: vi.fn(),
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 
@@ -48,6 +53,7 @@ describe('useNetworkNodes', () => {
 
     const service = {
       listNodes,
+      getNode: vi.fn(),
       getNodeMetrics: vi.fn(),
     } satisfies NetworkMonitoringService
 

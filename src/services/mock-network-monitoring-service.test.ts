@@ -12,6 +12,17 @@ describe('MockNetworkMonitoringService', () => {
     await expect(service.listNodes()).resolves.toEqual(NETWORK_NODES)
   })
 
+  it('returns a known network node', async () => {
+    const service = new MockNetworkMonitoringService({
+      latencyMs: 0,
+    })
+
+    await expect(service.getNode('core-router')).resolves.toMatchObject({
+      id: 'core-router',
+      name: 'Core Router',
+    })
+  })
+
   it('returns metrics for a known node', async () => {
     const service = new MockNetworkMonitoringService({
       latencyMs: 0,
