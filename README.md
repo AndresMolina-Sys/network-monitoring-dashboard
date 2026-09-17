@@ -213,4 +213,15 @@ Every push to `main` and every pull request runs formatting checks, linting, uni
 
 The frontend is deployed on Vercel and uses `vercel.json` to support client-side routes handled by React Router.
 
-The Vercel deployment uses the mock service by default. Once the API is hosted publicly, configure `VITE_API_BASE_URL` in the Vercel project environment variables to connect the production frontend to the backend.
+The backend is deployed as an ASP.NET Core API on Render using Docker and HTTPS.
+
+- Frontend: [Vercel live demo](https://network-monitoring-dashboard-zeta.vercel.app/)
+- Backend health check: [Render API](https://network-monitoring-api-m8a3.onrender.com/health)
+
+The production frontend uses the following Vercel environment variable:
+
+`VITE_API_BASE_URL=https://network-monitoring-api-m8a3.onrender.com/api`
+
+The frontend falls back to the mock service when this variable is not configured. The deployed production environment is configured to consume the Render API.
+
+The Render Free plan may put the API to sleep after inactivity, so the first request after a period without traffic can take longer.
