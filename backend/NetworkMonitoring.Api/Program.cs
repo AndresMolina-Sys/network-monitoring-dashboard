@@ -1,15 +1,24 @@
 var builder = WebApplication.CreateBuilder(args);
 
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .GetChildren()
+    .Select(section => section.Value ?? string.Empty)
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .ToArray();
+
+if (allowedOrigins.Length == 0)
+{
+    throw new InvalidOperationException(
+        "At least one CORS origin must be configured."
+    );
+}
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("LocalFrontend", policy =>
+    options.AddPolicy("Frontend", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:5173",
-                "http://127.0.0.1:5173",
-                "http://localhost:4173",
-                "http://127.0.0.1:4173"
-            )
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -19,7 +28,7 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-app.UseCors("LocalFrontend");
+app.UseCors("Frontend");
 
 if (app.Environment.IsDevelopment())
 {
