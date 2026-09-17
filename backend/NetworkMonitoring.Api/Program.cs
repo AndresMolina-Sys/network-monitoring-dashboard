@@ -26,9 +26,14 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 app.UseCors("Frontend");
+
+app.MapHealthChecks("/health")
+    .WithName("HealthCheck");
 
 if (app.Environment.IsDevelopment())
 {
