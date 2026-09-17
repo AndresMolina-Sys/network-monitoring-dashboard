@@ -111,6 +111,49 @@ public sealed class NetworkMonitoringApiTests
         );
     }
 
+    [Fact]
+    public async Task Vercel_frontend_origin_receives_cors_header()
+    {
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/nodes"
+        );
+
+        request.Headers.TryAddWithoutValidation(
+            "Origin",
+            "https://network-monitoring-dashboard-zeta.vercel.app"
+        );
+
+        var response = await client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(
+            "https://network-monitoring-dashboard-zeta.vercel.app",
+            response.Headers.GetValues("Access-Control-Allow-Origin").Single()
+        );
+    }
+
+    [Fact]
+    public async Task Unauthorized_origin_does_not_receive_cors_header()
+    {
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/api/nodes"
+        );
+
+        request.Headers.TryAddWithoutValidation(
+            "Origin",
+            "https://unauthorized.example"
+        );
+
+        var response = await client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.False(
+            response.Headers.Contains("Access-Control-Allow-Origin")
+        );
+    }
+
     private sealed record NetworkNodeResponse(
         string Id,
         string Name,
