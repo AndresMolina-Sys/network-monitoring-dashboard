@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:full-stack": "playwright test --config=playwright.full-stack.config.ts"
   },
   "dependencies": {
     "react": "^19.2.8",
