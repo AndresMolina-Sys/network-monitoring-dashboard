@@ -57,3 +57,6 @@ jobs:
 
       - name: Build API
         run: dotnet build backend/NetworkMonitoring.Api/NetworkMonitoring.Api.csproj --configuration Release
+
+      - name: Test API
+        run: dotnet test backend/NetworkMonitoring.Api.Tests/NetworkMonitoring.Api.Tests.csproj --configuration Release
