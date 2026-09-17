@@ -60,3 +60,6 @@ jobs:
 
       - name: Test API
         run: dotnet test backend/NetworkMonitoring.Api.Tests/NetworkMonitoring.Api.Tests.csproj --configuration Release
+
+      - name: Build backend container
+        run: docker build --tag network-monitoring-api:ci ./backend/NetworkMonitoring.Api
