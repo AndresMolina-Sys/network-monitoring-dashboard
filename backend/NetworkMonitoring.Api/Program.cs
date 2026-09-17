@@ -154,6 +154,10 @@ app.MapGet(
 
 app.Run();
 
+public partial class Program
+{
+}
+
 public record NetworkNode(
     string Id,
     string Name,
