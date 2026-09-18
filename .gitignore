@@ -37,3 +37,7 @@ blob-report/
 .env.local
 .env.*.local
 !.env.example
+
+graphify-out/.graphify_*
+graphify-out/cache/
+graphify-out/manifest.json
