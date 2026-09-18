@@ -200,6 +200,7 @@ The mock service supports dedicated demo scenarios:
 | `npm run lint`                                                                       | Run ESLint.                                          |
 | `npm run test`                                                                       | Run unit, component, and Storybook tests.            |
 | `npm run test:e2e`                                                                   | Run Playwright end-to-end tests.                     |
+| `npm run test:e2e:full-stack`                                                        | Run full-stack tests with the local API.             |
 | `npm run storybook`                                                                  | Start the Storybook development server.              |
 | `npm run build-storybook`                                                            | Build Storybook for production.                      |
 | `npm run build`                                                                      | Type-check and create the frontend production build. |
@@ -208,7 +209,7 @@ The mock service supports dedicated demo scenarios:
 
 ### Continuous Integration
 
-Every push to main and every pull request runs formatting, linting, frontend tests, Playwright E2E tests, Storybook and production builds, ASP.NET Core compilation, and eight xUnit integration tests using WebApplicationFactory.
+Every push to main and every pull request runs formatting, linting, frontend tests, Playwright E2E tests, full-stack Playwright smoke tests against the local ASP.NET Core API, Storybook and production builds, ASP.NET Core compilation, ten xUnit integration tests using `WebApplicationFactory`, and a Docker build for the backend container.
 
 ### Deployment
 
