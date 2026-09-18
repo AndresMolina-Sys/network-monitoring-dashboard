@@ -42,3 +42,7 @@ graphify-out/.graphify_*
 graphify-out/cache/
 graphify-out/manifest.json
 graphify-out/20??-??-??/
+
+# Local agent skills
+.agents/
+skills-lock.json
