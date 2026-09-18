@@ -1,5 +1,5 @@
-import type { NetworkNode } from '../../../domain/network'
 import { Link } from 'react-router'
+import type { NetworkNode } from '../../../domain/network'
 
 interface NetworkNodeCardProps {
   readonly node: NetworkNode
@@ -17,6 +17,7 @@ export function NetworkNodeCard({ node }: NetworkNodeCardProps) {
     'network-node-card__status',
     `network-node-card__status--${node.status}`,
   ].join(' ')
+  const cardClassName = ['network-node-card', `network-node-card--${node.status}`].join(' ')
 
   return (
     <Link
@@ -24,10 +25,12 @@ export function NetworkNodeCard({ node }: NetworkNodeCardProps) {
       className="network-node-card-link"
       aria-label={`View metrics for ${node.name}`}
     >
-      <article className="network-node-card" aria-labelledby={titleId}>
+      <article className={cardClassName} aria-labelledby={titleId}>
         <header className="network-node-card__header">
           <div>
-            <p className="network-node-card__eyebrow">Network node</p>
+            <p className="network-node-card__eyebrow">
+              Node / <span>{node.id}</span>
+            </p>
 
             <h3 className="network-node-card__title" id={titleId}>
               {node.name}
@@ -35,6 +38,7 @@ export function NetworkNodeCard({ node }: NetworkNodeCardProps) {
           </div>
 
           <span className={statusClassName} data-status={node.status}>
+            <span className="network-node-card__status-mark" aria-hidden="true" />
             {STATUS_LABELS[node.status]}
           </span>
         </header>
@@ -59,8 +63,9 @@ export function NetworkNodeCard({ node }: NetworkNodeCardProps) {
             </dd>
           </div>
         </dl>
+
         <span className="network-node-card__action" aria-hidden="true">
-          View metrics →
+          Open metrics
         </span>
       </article>
     </Link>

@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
 import { Link, useParams } from 'react-router'
+import type { NetworkNode } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NodeLatencyChart } from '../components/node-latency-chart'
 import { NetworkNodeNotFoundState } from '../components/network-node-not-found-state'
 import { useNetworkNode } from '../hooks/use-network-node'
 import { useNodeMetrics } from '../hooks/use-node-metrics'
-import type { NetworkNode } from '../../../domain/network'
 
 interface NetworkNodeDetailsPageProps {
   readonly service?: NetworkMonitoringService
@@ -37,32 +37,47 @@ export function NetworkNodeDetailsPage({
   }, [retryMetrics, retryNode])
 
   const isNotFound = nodeStatus === 'not-found' || metricsStatus === 'not-found'
-
   const hasError = nodeStatus === 'error' || metricsStatus === 'error'
-
   const isLoading = nodeStatus === 'loading' || metricsStatus === 'loading'
 
   return (
     <main className="app-shell">
-      <header className="app-header">
-        <Link to="/">Back to dashboard</Link>
-        <p className="app-eyebrow">Network node</p>
+      <header className="app-header app-header--detail">
+        <div className="app-header__topline">
+          <Link className="network-node-back-link" to="/">
+            Back to dashboard
+          </Link>
+          <p className="app-eyebrow">Network node</p>
+        </div>
+
         <h1>Node details</h1>
-        <p>
+
+        <p className="app-header__lede">
           Review health and performance for <code>{nodeId}</code>.
         </p>
       </header>
 
       {nodeStatus === 'success' && node ? (
         <section className="network-node-summary" aria-labelledby="node-summary-title">
-          <p className="network-node-state__eyebrow">Node overview</p>
-          <h2 id="node-summary-title">{node.name}</h2>
+          <div className="network-node-summary__heading">
+            <p className="network-node-state__eyebrow">Node overview</p>
+            <h2 id="node-summary-title">{node.name}</h2>
+          </div>
 
           <dl className="network-node-summary__details">
             <div>
               <dt>Status</dt>
               <dd>
-                <span data-status={node.status}>{NODE_STATUS_LABELS[node.status]}</span>
+                <span
+                  className={[
+                    'network-node-summary__status',
+                    `network-node-summary__status--${node.status}`,
+                  ].join(' ')}
+                  data-status={node.status}
+                >
+                  <span className="network-node-summary__status-mark" aria-hidden="true" />
+                  {NODE_STATUS_LABELS[node.status]}
+                </span>
               </dd>
             </div>
 
@@ -127,32 +142,36 @@ export function NetworkNodeDetailsPage({
       metricsStatus === 'success' &&
       metrics ? (
         <section className="network-metrics" aria-labelledby="metrics-title">
-          <p className="network-node-state__eyebrow">Network metrics</p>
-          <h2 id="metrics-title">Last hour performance ({metrics.range})</h2>
+          <div className="network-metrics__heading">
+            <p className="network-node-state__eyebrow">Network metrics</p>
+            <h2 id="metrics-title">Last hour performance ({metrics.range})</h2>
+          </div>
 
           <NodeLatencyChart metrics={metrics} />
 
-          <table>
-            <caption>Latency and packet loss measurements for {nodeId}</caption>
-            <thead>
-              <tr>
-                <th scope="col">Timestamp</th>
-                <th scope="col">Latency</th>
-                <th scope="col">Packet loss</th>
-              </tr>
-            </thead>
-            <tbody>
-              {metrics.points.map((point) => (
-                <tr key={point.timestamp}>
-                  <td>
-                    <time dateTime={point.timestamp}>{point.timestamp}</time>
-                  </td>
-                  <td>{point.latencyMs} ms</td>
-                  <td>{point.packetLossPercent}%</td>
+          <div className="network-metrics__table-wrapper">
+            <table>
+              <caption>Latency and packet loss measurements for {nodeId}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Timestamp</th>
+                  <th scope="col">Latency</th>
+                  <th scope="col">Packet loss</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {metrics.points.map((point) => (
+                  <tr key={point.timestamp}>
+                    <td>
+                      <time dateTime={point.timestamp}>{point.timestamp}</time>
+                    </td>
+                    <td>{point.latencyMs} ms</td>
+                    <td>{point.packetLossPercent}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       ) : null}
     </main>
