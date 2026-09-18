@@ -86,6 +86,12 @@ src/
 
 This keeps data access replaceable and prevents UI components from becoming coupled to a specific implementation.
 
+### Architecture Graph
+
+- [Architecture report](graphify-out/GRAPH_REPORT.md)
+- [Interactive graph](graphify-out/graph.html) — download and open locally; GitHub does not execute HTML files.
+- [Raw graph data](graphify-out/graph.json)
+
 ## Async State Model
 
 The frontend handles each request explicitly:
