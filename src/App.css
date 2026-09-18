@@ -772,3 +772,15 @@ a {
     width: 26%;
   }
 }
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+}
+
+body {
+  display: block;
+  overflow-x: hidden;
+}
