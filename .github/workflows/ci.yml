@@ -61,5 +61,8 @@ jobs:
       - name: Test API
         run: dotnet test backend/NetworkMonitoring.Api.Tests/NetworkMonitoring.Api.Tests.csproj --configuration Release
 
+      - name: Run full-stack smoke tests
+        run: npm run test:e2e:full-stack
+
       - name: Build backend container
         run: docker build --tag network-monitoring-api:ci ./backend/NetworkMonitoring.Api
