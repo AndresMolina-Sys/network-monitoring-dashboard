@@ -85,7 +85,7 @@ export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
       </div>
 
       {filteredNodes.length > 0 ? (
-        <div className="network-node-grid">
+        <div className="network-node-list">
           {filteredNodes.map((node) => (
             <NetworkNodeCard key={node.id} node={node} />
           ))}

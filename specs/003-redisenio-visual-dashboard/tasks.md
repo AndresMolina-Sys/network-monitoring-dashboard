@@ -46,10 +46,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las dos rutas usan la dirección aprobada y la identidad oscura es coherente; inventario y detalle conservan el reconocimiento honesto de datos de muestra/simulados. Ejecutar primero la prueba dirigida pertinente y revisar la story aplicable.
       **Resultado:** Base carbón/papel/cobre, shell compacto de 1180 px y cabecera común aplicados a ambas rutas; se conserva “Simulated inventory” y “Simulated data”, y se eliminó la carga de fuentes externas. Router y story del panel pasan (2/2), al igual que lint, build, Prettier dirigido y `git diff --check`. `npm run format:check` global sigue señalando 49 archivos Impeccable no versionados, sin tocar. Los subagentes de implementación/revisión no entregaron un informe final; el coordinador verificó el diff por separado.
 
-- [ ] **T-008 — Rediseñar tarjetas y lectura del inventario**
+- [x] **T-008 — Rediseñar tarjetas y lectura del inventario**
       **Estimación:** 25 min · **Dependencias:** T-007 · **RF:** RF-1, RF-2, RF-7, RF-12
       Ajustar `network-nodes-panel.tsx`, `network-node-card.tsx` y estilos existentes; preservar navegación, estado textual y todos los campos del nodo.
       **Hecho cuando:** Las pruebas/stories dirigidas pasan y nombre, estado, ID, dirección, ubicación y última comprobación se localizan sin hover ni animación; una tarjeta sigue llevando al detalle.
+      **Resultado:** Las tarjetas pasan a filas de roster, con rótulo y texto de estado, ID, IP monoespaciada, ubicación y fecha UTC legible; se conserva el enlace de fila completa. Se añadió cobertura visible de los campos y enlaces. Router y stories del panel/tarjeta pasan (15/15); navegación E2E en escritorio/móvil (2/2) y overflow móvil (2/2); lint, build, Prettier dirigido y `git diff --check` pasan. Se actualizó en E2E el encabezado esperado, que seguía apuntando al título anterior de T-007.
 
 - [ ] **T-009 — Rediseñar controles y estados del inventario**
       **Estimación:** 25 min · **Dependencias:** T-008 · **RF:** RF-3, RF-6, RF-7, RF-12

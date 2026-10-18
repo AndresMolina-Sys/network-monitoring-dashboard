@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { NETWORK_NODES } from '../../../mocks/network-fixtures'
@@ -47,11 +47,26 @@ describe('NetworkNodesPanel', () => {
       }),
     ).toBeInTheDocument()
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Core Router',
-      }),
-    ).toBeInTheDocument()
+    const coreRouterLink = screen.getByRole('link', {
+      name: 'View metrics for Core Router',
+    })
+
+    expect(coreRouterLink).toHaveAttribute('href', '/nodes/core-router')
+    expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(
+      NETWORK_NODES.length,
+    )
+    expect(within(coreRouterLink).getByRole('heading', { name: 'Core Router' })).toBeVisible()
+    expect(within(coreRouterLink).getByText('core-router')).toBeVisible()
+    expect(within(coreRouterLink).getByText('Status')).toBeVisible()
+    expect(within(coreRouterLink).getByText('Online')).toBeVisible()
+    expect(within(coreRouterLink).getByText('Address')).toBeVisible()
+    expect(within(coreRouterLink).getByText('10.0.0.1')).toBeVisible()
+    expect(within(coreRouterLink).getByText('Location')).toBeVisible()
+    expect(within(coreRouterLink).getByText('Main office')).toBeVisible()
+    expect(within(coreRouterLink).getByText('Last checked')).toBeVisible()
+    const lastChecked = within(coreRouterLink).getByText(/2026/)
+    expect(lastChecked).toBeVisible()
+    expect(lastChecked).toHaveAttribute('datetime', NETWORK_NODES[0].lastCheckedAt)
   })
 
   it.each([

@@ -31,7 +31,7 @@ test.describe('Network monitoring dashboard', () => {
     await expect(page).toHaveURL(/\/$/)
     await expect(
       page.getByRole('heading', {
-        name: 'Network Monitoring Dashboard',
+        name: 'Monitored nodes',
       }),
     ).toBeVisible()
   })
