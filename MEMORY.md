@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-028 completada. T-029 pendiente: las exclusiones locales de Impeccable dejan Prettier en verde; lint pasa. `npm run test` se detuvo antes de pruebas por Chromium ausente y `EPERM` en la caché temporal; build y Storybook no se ejecutaron.
+- Spec 003: T-028 completada. T-029 pendiente: format y lint pasan; tras instalar Chromium, `npm run test` termina con 107/109. Fallan el selector de encabezado de la story Empty Metrics y timeout de 5 s en router.test; build y Storybook no se ejecutaron.
