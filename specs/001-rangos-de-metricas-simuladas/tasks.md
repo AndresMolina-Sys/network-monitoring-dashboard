@@ -56,7 +56,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** README y AGENTS.md reflejan los tres rangos; `npm run format:check`, `npm run lint`, `npm run test`, `npm run build`, `npm run build-storybook`, xUnit y las suites Playwright mock y full-stack pasan; MEMORY.md registra T-001 a T-009 completas y T-010 pendiente de aceptación en producción.
 
-- [ ] **T-010 — Comprobar aceptación en producción**
+- [x] **T-010 — Comprobar aceptación en producción**
 
   **Estimación:** 15 min · **Dependencias:** T-009 y despliegue autorizado disponible · **RF:** RF-11
 
