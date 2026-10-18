@@ -150,7 +150,8 @@ The control-boundary corrections are deliberately limited to filters, the select
 The measured focus color also clears 3:1 in the other keyboard contexts: on the maximum
 state-panel tint (`#2e2d2c`) it measures 7.16:1, on the focused field fill (`#24272a`) 8.12:1,
 and on the period selector's page background (`#17191c`) 9.18:1. The existing focus-ring row
-records the same color against the maximum filter-panel tint.
+records the opaque filter-field focus border at the maximum filter-panel tint; its translucent
+shadow is decorative and is not counted as the focus indicator.
 
 ## Typography
 
@@ -186,7 +187,7 @@ Depth comes primarily from tonal surfaces, restrained borders, and a soft panel 
 
 ## Shapes
 
-Small controls use gently rounded 6px corners; panels and chart surfaces use 8px corners. Status and simulated-data labels use pill silhouettes. Content rows rely on fine separators rather than enclosing every node in a rounded card. Focus rings remain distinct and are not clipped by decorative borders.
+Small controls use gently rounded 6px corners; panels and chart surfaces use 8px corners. Detail status badges and simulated-data labels use pill silhouettes; inventory status remains inline with its indicator dot. Content rows rely on fine separators rather than enclosing every node in a rounded card. Focus rings remain distinct and are not clipped by decorative borders.
 
 ## Components
 
@@ -206,7 +207,7 @@ Small controls use gently rounded 6px corners; panels and chart surfaces use 8px
 
 - **Inventory:** open row layout with a 2px semantic status rail, compact identity and metadata, and a quiet bottom divider.
 - **Charts and table:** graphite surfaces with 8px corners and restrained copper top accents; the table preserves exact values as the textual alternative to plots.
-- **Node state:** loading, error, empty, and not-found states use the same surface family and keep their recovery action visible.
+- **Node state:** loading, error, empty, and not-found states use the same surface family; retry actions remain available where retry applies.
 
 ### Inputs / Fields
 
