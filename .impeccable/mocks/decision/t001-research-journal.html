@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1440, initial-scale=1" />
+    <title>Network Monitoring Dashboard — Research Journal</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { width: 1440px; height: 900px; margin: 0; overflow: hidden; }
+      body { color: #eee9df; background: #17191c; font: 15px/1.5 Inter, "Segoe UI", sans-serif; }
+      .shell { width: 1180px; margin: 0 auto; padding-top: 36px; }
+      .top { height: 46px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #41403e; color: #bcb7af; font-size: 13px; }
+      .brand { color: #eee9df; font-weight: 650; letter-spacing: .01em; }
+      .sample { color: #c8a57d; font: 600 11px/1.2 "IBM Plex Mono", Consolas, monospace; letter-spacing: .09em; text-transform: uppercase; }
+      .heading { display: flex; align-items: end; justify-content: space-between; margin: 62px 0 26px; }
+      .eyebrow { margin: 0 0 8px; color: #c98b55; font: 600 11px/1.2 "IBM Plex Mono", Consolas, monospace; letter-spacing: .12em; text-transform: uppercase; }
+      h1 { margin: 0; font-size: 31px; font-weight: 560; letter-spacing: -.035em; }
+      .count { color: #a9a49d; font: 12px "IBM Plex Mono", Consolas, monospace; }
+      .controls { display: flex; gap: 12px; margin-bottom: 18px; }
+      .control { height: 42px; padding: 0 14px; border: 1px solid #817b72; border-radius: 7px; background: #222426; color: #eee9df; font: 13px Inter, "Segoe UI", sans-serif; }
+      .control:focus-visible { outline: 2px solid #d6a16e; outline-offset: 2px; }
+      .search { width: 330px; }
+      .search::placeholder { color: #c8c2b8; opacity: 1; }
+      .filter { width: 150px; }
+      .list { border-top: 1px solid #494640; }
+      .row { display: grid; grid-template-columns: 2.2fr 1fr 1.1fr 1.45fr 120px; align-items: center; gap: 22px; min-height: 142px; border-bottom: 1px solid #494640; position: relative; padding: 20px 8px 20px 22px; }
+      .row::before { content: ""; position: absolute; left: 0; top: 25px; bottom: 25px; width: 2px; background: var(--status); }
+      .online { --status: #8bc5b5; }
+      .degraded { --status: #e3b85b; }
+      .offline { --status: #e38f83; }
+      .node { display: flex; align-items: center; gap: 18px; }
+      .mark { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid #53504a; border-radius: 50%; color: var(--status); font: 11px "IBM Plex Mono", Consolas, monospace; }
+      h2 { margin: 0 0 5px; font-size: 19px; font-weight: 560; letter-spacing: -.02em; }
+      .id, .value { color: #d0cbc2; font: 12px "IBM Plex Mono", Consolas, monospace; }
+      .field { border-left: 1px solid #3c3b38; padding-left: 15px; }
+      .label { display: block; margin-bottom: 6px; color: #9d9992; font-size: 11px; }
+      .value { font: 13px/1.4 Inter, "Segoe UI", sans-serif; }
+      .status { color: var(--status); font-size: 12px; font-weight: 650; }
+      .open { color: #e8b07e; font: 600 11px "IBM Plex Mono", Consolas, monospace; text-align: right; text-decoration: none; }
+      .foot { margin-top: 24px; color: #8f8a82; font: 11px "IBM Plex Mono", Consolas, monospace; }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="top"><span class="brand">Network operations</span><span class="sample">Simulated inventory</span></header>
+      <section class="heading"><div><p class="eyebrow">Node register / 01</p><h1>Monitored nodes</h1></div><span class="count">03 ENDPOINTS · LAST HOUR</span></section>
+      <div class="controls"><input class="control search" type="search" aria-label="Search nodes" placeholder="Search by name, ID, address or location" /><select class="control filter" aria-label="Filter by node status"><option>All statuses</option><option>Online</option><option>Degraded</option><option>Offline</option></select></div>
+      <section class="list" aria-label="Monitored nodes">
+        <article class="row online"><div class="node"><span class="mark">01</span><div><h2>Core Router</h2><span class="id">core-router</span></div></div><div class="field"><span class="label">Status</span><span class="status">● Online</span></div><div class="field"><span class="label">Address</span><span class="value">10.0.0.1</span></div><div class="field"><span class="label">Location / Last checked</span><span class="value">Main office<br />13 Sep 2026 · 18:00 UTC</span></div><a class="open" href="/nodes/core-router">Open metrics ↗</a></article>
+        <article class="row degraded"><div class="node"><span class="mark">02</span><div><h2>Access Switch 01</h2><span class="id">access-switch-01</span></div></div><div class="field"><span class="label">Status</span><span class="status">● Degraded</span></div><div class="field"><span class="label">Address</span><span class="value">10.0.0.10</span></div><div class="field"><span class="label">Location / Last checked</span><span class="value">Main office<br />13 Sep 2026 · 17:58 UTC</span></div><a class="open" href="/nodes/access-switch-01">Open metrics ↗</a></article>
+        <article class="row offline"><div class="node"><span class="mark">03</span><div><h2>Branch Gateway</h2><span class="id">branch-gateway</span></div></div><div class="field"><span class="label">Status</span><span class="status">● Offline</span></div><div class="field"><span class="label">Address</span><span class="value">10.10.0.1</span></div><div class="field"><span class="label">Location / Last checked</span><span class="value">Branch office<br />13 Sep 2026 · 17:45 UTC</span></div><a class="open" href="/nodes/branch-gateway">Open metrics ↗</a></article>
+      </section>
+      <p class="foot">Measurements are simulated sample data · All times UTC</p>
+    </main>
+  </body>
+</html>

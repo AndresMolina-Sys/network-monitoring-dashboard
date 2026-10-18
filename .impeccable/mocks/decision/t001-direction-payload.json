@@ -1,0 +1,118 @@
+{
+  "title": "Choose the visual direction",
+  "question": "Choose a direction for the dashboard redesign. The screen remains a working product, and all measurements stay clearly simulated. Three other catalog forms remain available for a fresh hand.",
+  "options": [
+    {
+      "id": "night-survey-atlas",
+      "kind": "assigned",
+      "label": "Nocturne Survey Atlas",
+      "kicker": "THE ROLL",
+      "lineage": "Bathymetric survey charts and contemporary scientific atlases",
+      "thesis": "A dark survey language gives measured trends a distinctive visual signature without pretending nodes have geographic relationships.",
+      "palette": ["#0E1F23", "#182D30", "#E8ECE4", "#71D4C1", "#F5C75E", "#F28F88"],
+      "materials": ["matte ink surfaces", "fine contour-line engraving"],
+      "viewport": "A compact product header leads into Monitored nodes, the existing search and status filter, and three readable node cards; restrained contour lines frame the cards and return as quiet chart guides on the detail screen.",
+      "risk": "Contour marks could imply geography or hidden topology; keep them decorative, low-contrast, and never connect one node to another.",
+      "raised": [
+        {
+          "from": "Variable Font Specimen",
+          "raise": "Use a deliberate semantic type scale and tabular numerals so hierarchy and measurement values remain distinct."
+        },
+        {
+          "from": "Digital Design Canon",
+          "raise": "Pair every product claim with visible interface evidence and keep the simulated-data label beside the inventory."
+        },
+        {
+          "from": "Orienteering Map",
+          "raise": "Use a consistent visual legend and explicit text labels so status is never communicated by color alone."
+        }
+      ],
+      "html": ".impeccable/mocks/decision/t001-night-survey-atlas.html",
+      "htmlFrame": "1440x900"
+    },
+    {
+      "id": "research-journal",
+      "kind": "pick",
+      "label": "Applied Research Journal",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Engineering journal figures and field-research reports",
+      "thesis": "A carefully edited research surface lets people scan node health first and inspect the evidence behind each measurement.",
+      "palette": ["#17191C", "#24272A", "#EEE9DF", "#C98B55", "#8BC5B5", "#E3B85B"],
+      "materials": ["soft graphite ground", "warm paper-like text contrast"],
+      "viewport": "A restrained top bar leads into a concise node roster with clear status, identity, location, and timestamps; the detail page aligns real chart units and values with a narrow annotation rule.",
+      "risk": "The safer editorial language can feel like a familiar admin dashboard if the annotation discipline is too timid.",
+      "html": ".impeccable/mocks/decision/t001-research-journal.html",
+      "htmlFrame": "1440x900"
+    },
+    {
+      "id": "challenger-variable-font",
+      "kind": "challenger",
+      "catalogId": "variable-font-specimen",
+      "label": "Variable Font Specimen",
+      "verdict": "declined",
+      "lineage": "Interactive variable-type specimen",
+      "thesis": "Typography becomes an expressive system whose changing axes transform a complete glyph specimen.",
+      "palette": ["#F7F5EF", "#171717", "#E85D35"],
+      "materials": ["ink-black type", "near-white specimen paper"],
+      "viewport": "A display glyph dominates above a grid of characters and a live axis readout.",
+      "risk": "A type specimen asks visitors to inspect lettering instead of network-node health.",
+      "case": "Declined on both axes: the audience arrives to inspect node status and measurements, not manipulate font axes; the specimen structure obscures the working product.",
+      "kept": "Typography should still behave as a system: use clear label/value hierarchy and tabular numerals for measurements.",
+      "board": "https://impeccable.style/worlds/cards/variable-font-specimen.webp",
+      "hero": "https://impeccable.style/worlds/cards/variable-font-specimen-hero.webp"
+    },
+    {
+      "id": "challenger-monochrome-marketing",
+      "kind": "challenger",
+      "catalogId": "digital-design-canon-monochrome-product-marketing",
+      "label": "Monochrome Product Proof",
+      "verdict": "declined",
+      "lineage": "Proof-led software marketing pages",
+      "thesis": "Each statement is paired with a product detail that makes the claim visible and testable.",
+      "palette": ["#111418", "#20252A", "#ECEFF1", "#64B9AA"],
+      "materials": ["neutral digital surfaces", "single restrained accent"],
+      "viewport": "A single product claim sits beside an interface proof and becomes a vertical sequence of claim-and-evidence pairs.",
+      "risk": "Marketing-page pacing can make a working operations dashboard feel like a promotional landing page.",
+      "case": "Declined on both axes: a marketing narrative does not match the operator's scan-and-compare task and would displace the existing inventory workflow.",
+      "kept": "Keep every statement honest and visibly grounded in the actual fixture-backed interface.",
+      "board": "https://impeccable.style/worlds/cards/digital-design-canon-monochrome-product-marketing.webp",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-monochrome-product-marketing-hero.webp"
+    },
+    {
+      "id": "challenger-orienteering-map",
+      "kind": "challenger",
+      "catalogId": "notation-diagram-systems-orienteering-map",
+      "label": "Orienteering Map",
+      "verdict": "declined",
+      "lineage": "Orienteering maps and course legends",
+      "thesis": "A precise color and symbol legend makes a route readable across varied terrain.",
+      "palette": ["#F8F7EF", "#637C43", "#D6A643", "#538CA1", "#7958AE"],
+      "materials": ["flat map inks", "contour-line printing"],
+      "viewport": "A mapped terrain is overlaid with a numbered route, paired controls, and a compact symbol legend.",
+      "risk": "Route and terrain graphics could falsely imply geographic locations or network topology that the product does not contain.",
+      "case": "Declined on both axes: the map's central route has no real counterpart in the fixture data, while the resulting map would replace rather than clarify the dashboard.",
+      "kept": "Carry over the discipline of a consistent legend and explicit labels for every state and measurement.",
+      "board": "https://impeccable.style/worlds/cards/notation-diagram-systems-orienteering-map.webp",
+      "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-orienteering-map-hero.webp"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "code",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "kind": "canon",
+    "label": "The category standard",
+    "thesis": "A familiar dark operations dashboard uses a clean grid, restrained accent color, and conventional cards to keep node status and metrics immediately legible.",
+    "palette": ["#111827", "#1F2937", "#F9FAFB", "#38BDF8"],
+    "materials": ["flat dark surfaces", "fine neutral dividers"],
+    "viewport": "A compact header and standard search/filter controls lead into a simple node grid with explicit status labels.",
+    "risk": "It is easy to understand but offers less visual distinction for a portfolio presentation.",
+    "html": ".impeccable/mocks/decision/t001-category-standard.html",
+    "htmlFrame": "1440x900"
+  }
+}
