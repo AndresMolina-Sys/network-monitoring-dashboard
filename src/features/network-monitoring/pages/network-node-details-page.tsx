@@ -139,10 +139,11 @@ export function NetworkNodeDetailsPage({
 
       {!isNotFound && hasError && (
         <section
-          className="network-node-state network-node-state--metrics"
+          className="network-node-state network-node-state--metrics network-node-state--error"
           role="alert"
           aria-labelledby="metrics-error-title"
         >
+          <p className="network-node-state__eyebrow">Network metrics</p>
           <h2 id="metrics-error-title">Unable to load node metrics</h2>
           <p>We could not retrieve metrics for this node. Check the connection and try again.</p>
           <button type="button" onClick={retry}>
@@ -153,20 +154,23 @@ export function NetworkNodeDetailsPage({
 
       {!isNotFound && !hasError && isLoading && (
         <section
-          className="network-node-state network-node-state--metrics"
+          className="network-node-state network-node-state--metrics network-node-state--loading"
           role="status"
           aria-labelledby="metrics-loading-title"
+          aria-busy="true"
         >
+          <p className="network-node-state__eyebrow">Network metrics</p>
           <h2 id="metrics-loading-title">Loading node metrics...</h2>
         </section>
       )}
 
       {!isNotFound && !hasError && !isLoading && metricsStatus === 'empty' && (
         <section
-          className="network-node-state network-node-state--metrics"
+          className="network-node-state network-node-state--metrics network-node-state--empty"
           role="status"
           aria-labelledby="metrics-empty-title"
         >
+          <p className="network-node-state__eyebrow">Network metrics</p>
           <h2 id="metrics-empty-title">No metrics available</h2>
           <p>There are no data points available for this node in the selected range.</p>
         </section>

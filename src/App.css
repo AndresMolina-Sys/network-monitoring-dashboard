@@ -1069,6 +1069,27 @@ a {
 
 .network-node-state--metrics {
   margin-top: 1.5rem;
+  border-top: 2px solid var(--color-kicker);
+  border-left-width: 1px;
+  border-left-color: var(--color-border-soft);
+}
+
+.network-node-state--metrics.network-node-state--error {
+  border-top-color: var(--color-danger);
+}
+
+.network-node-state--metrics.network-node-state--loading {
+  border-top-color: var(--color-focus);
+}
+
+.network-node-state--metrics.network-node-state--empty {
+  border-top-color: var(--color-border);
+}
+
+.network-node-state--not-found {
+  border-top: 2px solid var(--color-kicker);
+  border-left-width: 1px;
+  border-left-color: var(--color-border-soft);
 }
 
 .network-metrics__heading {

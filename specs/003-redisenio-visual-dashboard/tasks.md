@@ -82,10 +82,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Pruebas y story dirigidas confirman escala, valores, tooltip, marcas legibles y tabla textual con los puntos del nodo/rango seleccionados.
       **Resultado:** La gráfica adopta la serie cobre, ejes legibles y superficies coherentes; la tabla mantiene todos los puntos del rango y una superficie cálida. Story y pruebas del detalle: 12/12; Chrome confirmó 1440/1440 px, cuatro filas para `1h` y consola sin errores. Lint, build, Prettier dirigido y `git diff --check` pasan.
 
-- [ ] **T-014 — Rediseñar estados del detalle y añadir la story vacía autorizada**
+- [x] **T-014 — Rediseñar estados del detalle y añadir la story vacía autorizada**
       **Estimación:** 25 min · **Dependencias:** T-011 · **RF:** RF-6, RF-7, RF-8, RF-12
       Ajustar carga, error, vacío y nodo inexistente; crear únicamente el archivo previamente autorizado `src/features/network-monitoring/pages/network-node-details-page.stories.tsx`, con nodo válido y métricas vacías mediante servicio inyectado.
       **Hecho cuando:** Tests y story confirman estados diferenciados, etiqueta simulada donde aplica y ausencia de datos obsoletos; el vacío del detalle se puede abrir en Storybook sin añadir rutas ni modo demo.
+      **Resultado:** RF-6, RF-7, RF-8 y RF-12 cubiertos; 11 pruebas dirigidas pasan y Chromium confirma story renderizada sin errores ni overflow.
 
 - [ ] **T-015 — Aplicar movimiento funcional y respetar movimiento reducido**
       **Estimación:** 25 min · **Dependencias:** T-008, T-009, T-010, T-011 · **RF:** RF-3, RF-5, RF-10

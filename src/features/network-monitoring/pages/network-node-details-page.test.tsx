@@ -231,7 +231,11 @@ describe('NetworkNodeDetailsPage', () => {
 
     renderDetailsPage(createService(getNodeMetrics))
 
-    expect(screen.getByRole('heading', { name: 'Loading node metrics...' })).toBeInTheDocument()
+    const loadingState = screen.getByRole('status', { name: 'Loading node metrics...' })
+
+    expect(loadingState).toHaveClass('network-node-state--metrics', 'network-node-state--loading')
+    expect(loadingState).toHaveAttribute('aria-busy', 'true')
+    expect(within(loadingState).getByText('Network metrics')).toBeVisible()
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
     expectNoMetricsVisuals()
@@ -266,8 +270,10 @@ describe('NetworkNodeDetailsPage', () => {
       vi.fn().mockResolvedValue({ ...createMetrics('1h'), points: [] }),
     )
     const emptyView = renderDetailsPage(emptyService)
+    const emptyState = await screen.findByRole('status', { name: 'No metrics available' })
 
-    expect(await screen.findByRole('heading', { name: 'No metrics available' })).toBeInTheDocument()
+    expect(emptyState).toHaveClass('network-node-state--metrics', 'network-node-state--empty')
+    expect(within(emptyState).getByText('Network metrics')).toBeVisible()
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
     expectNoMetricsVisuals()
@@ -276,9 +282,10 @@ describe('NetworkNodeDetailsPage', () => {
     const errorService = createService(vi.fn().mockRejectedValue(new Error('Request failed')))
     renderDetailsPage(errorService)
 
-    expect(
-      await screen.findByRole('heading', { name: 'Unable to load node metrics' }),
-    ).toBeInTheDocument()
+    const errorState = await screen.findByRole('alert', { name: 'Unable to load node metrics' })
+
+    expect(errorState).toHaveClass('network-node-state--metrics', 'network-node-state--error')
+    expect(within(errorState).getByText('Network metrics')).toBeVisible()
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
     expectNoMetricsVisuals()
@@ -290,7 +297,10 @@ describe('NetworkNodeDetailsPage', () => {
 
     renderDetailsPage(service)
 
-    expect(await screen.findByRole('heading', { name: 'Node not found' })).toBeInTheDocument()
+    const notFoundState = await screen.findByRole('region', { name: 'Node not found' })
+
+    expect(notFoundState).toHaveClass('network-node-state--not-found')
+    expect(within(notFoundState).getByText('Network node')).toBeVisible()
     expect(screen.queryByRole('group', { name: 'Metrics range' })).not.toBeInTheDocument()
     expectNoMetricsVisuals()
   })

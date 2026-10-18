@@ -11,11 +11,11 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
-- Spec, plan y checklist de Spec 003 están aprobados; T-001 a T-013 completas. T-005/T-007/T-012 se revisaron localmente cuando los revisores no devolvieron informe; T-006 confirmó code-led sin phase gates. T-007 fijó base carbón/papel/cobre; T-008 creó el roster; T-009 filtros/estados; T-010 resumen del nodo; T-011 selector/resumen; T-012/T-013 gráficas en cobre y tabla armonizada. El format:check global marca 49 archivos Impeccable no versionados; los cambios del producto pasan Prettier.
+- Spec, plan y checklist de Spec 003 están aprobados; T-001 a T-014 completas. T-005/T-007/T-012 se revisaron localmente cuando los revisores no devolvieron informe; T-006 confirmó code-led sin phase gates. T-007 fijó base carbón/papel/cobre; T-008 creó el roster; T-009 filtros/estados; T-010 resumen del nodo; T-011 selector/resumen; T-012/T-013 gráficas en cobre y tabla armonizada; T-014 estados del detalle y story vacía comprobada en Chromium. El format:check global marca 49 archivos Impeccable no versionados; los cambios del producto pasan Prettier.
 - Graphify refrescado tras `12b7913`: 595 nodos, 815 enlaces y 94 comunidades con nombre; el diagnóstico no detectó enlaces huérfanos, endpoints faltantes ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
-- `$feature` implementa cambios pequeños directamente, sin lista de pasos, `feature.md` ni aprobación adicional; F-001, F-002 y F-003 están completos.
+- `$feature` implementa cambios pequeños solicitados directamente, sin pasos, documento ni aprobación adicional; detiene alcance material nuevo. F-001, F-002 y F-003 están completos.
 - Impeccable está inicializado en `PRODUCT.md`; las superficies showcase son code-first y el detector está activado. Codex puede requerir aprobación inicial con `/hooks`.
 
 ## Decisiones (y por qué)
@@ -31,7 +31,6 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - Para Spec 001, cada apertura inicia en `1h`; las ventanas UTC se anclan a la muestra más reciente. Datos simulados cubren los tres rangos y la etiqueta permanece visible en todos los estados.
 - La selección más reciente prevalece; datos inválidos producen error sin cambiar el rango. Se conservan nodo inexistente, reintentos y vacío excepcional.
 - Mantener al agente principal como único coordinador de aprobación; pasar a subagentes el alcance y contexto exactos, serializar escrituras y paralelizar solo revisiones independientes de solo lectura. Los perfiles heredan permisos del coordinador; sus instrucciones no son sandbox.
-- Para cambios pequeños solicitados, `$feature` implementa directamente sin lista de pasos ni documento adicional; detenerse ante decisiones materiales nuevas o límites de alcance.
 - Al coordinar una solicitud nueva con `$sdd` sin fase explícita, clasificar primero: cambios localizados a `$feature`; cambios amplios o entre capas al flujo SDD. Las invocaciones con fase explícita conservan esa fase.
 - Versionar solo las skills propias `feature`, `sdd`, `sdd-*`; las skills de terceros, como `frontend-design` y `ui-ux-pro-max`, permanecen locales e ignoradas.
 - Mantener honesta la narrativa del portfolio: demo full-stack con datos simulados explícitos, sin implicar telemetría real ni clientes verificados.
@@ -44,7 +43,8 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - En este entorno Windows, Vitest puede detenerse antes de ejecutar pruebas por `EPERM` al renombrar su caché temporal; con autorización, repetir la prueba dirigida fuera del sandbox.
 - Playwright puede quedar detenido antes de descubrir tests dentro del sandbox; la ejecución autorizada fuera del sandbox pasó desktop y móvil.
 - `npm run build-storybook` termina correctamente con una advertencia de chunks generados mayores de 500 kB; registrar la advertencia, no tratarla como fallo.
+- En stories con servicios inyectados, evita pasarlos como `args` serializables: el panel de controles de Storybook puede fallar al imprimirlos; inyectarlos desde el `render`.
 
 ## Próximos pasos
 
-- Spec 003: T-001 a T-013 completas; siguiente es T-014, estados del detalle y story vacía autorizada. Las capturas DevTools completas de desktop/móvil quedan para T-025.
+- Spec 003: T-001 a T-014 completas; siguiente T-015, movimiento funcional y `prefers-reduced-motion`. Las capturas DevTools completas de desktop/móvil quedan para T-025.
