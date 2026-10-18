@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Locator } from '@playwright/test'
 
 test.describe('Network monitoring dashboard', () => {
   test('navigates from dashboard to node details and back', async ({ page }) => {
@@ -274,4 +274,75 @@ test.describe('Network monitoring dashboard', () => {
     await expect(page.getByRole('figure', { name: /Packet loss trend.*24h/ })).toBeVisible()
     await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(25)
   })
+
+  test('reaches inventory actions and metric charts with visible keyboard focus', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    const search = page.getByRole('searchbox', { name: 'Search nodes' })
+    const statusFilter = page.getByRole('combobox', { name: 'Filter by status' })
+    const firstNode = page.getByRole('link', { name: 'View metrics for Core Router' })
+
+    await expect(search).toBeVisible()
+    await page.locator('body').click({ position: { x: 1, y: 1 } })
+    await page.bringToFront()
+    await page.keyboard.press('Tab')
+    await expectVisibleKeyboardFocus(search)
+    await page.keyboard.press('Tab')
+    await expectVisibleKeyboardFocus(statusFilter)
+    await page.keyboard.press('Tab')
+    await expectVisibleKeyboardFocus(firstNode)
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/\/nodes\/core-router$/)
+
+    await page.goto('/nodes/core-router')
+
+    const backLink = page.getByRole('link', { name: 'Back to dashboard' })
+    const rangeGroup = page.getByRole('group', { name: 'Metrics range' })
+    const rangeButtons = ['1h', '24h', '7d'].map((range) =>
+      rangeGroup.getByRole('button', { name: range, exact: true }),
+    )
+    const charts = [
+      page
+        .getByRole('figure', { name: 'Latency trend for core-router (ms, 1h, UTC)' })
+        .locator('svg'),
+      page
+        .getByRole('figure', { name: 'Packet loss trend for core-router (percent, 1h, UTC)' })
+        .locator('svg'),
+    ]
+
+    await expect(charts[1]).toBeVisible()
+    await page.locator('body').click({ position: { x: 1, y: 1 } })
+    await page.bringToFront()
+    await page.keyboard.press('Tab')
+    await expectVisibleKeyboardFocus(backLink)
+
+    for (const control of [...rangeButtons, ...charts]) {
+      await page.keyboard.press('Tab')
+      await expectVisibleKeyboardFocus(control)
+    }
+
+    await expect(charts[0]).toHaveAttribute('role', 'application')
+    await expect(charts[1]).toHaveAttribute('role', 'application')
+    await expect(charts[0]).toHaveAccessibleName(
+      'Latency trend for core-router in milliseconds, range 1h, UTC',
+    )
+    await expect(charts[1]).toHaveAccessibleName(
+      'Packet loss trend for core-router in percent, range 1h, UTC',
+    )
+  })
 })
+
+async function expectVisibleKeyboardFocus(locator: Locator) {
+  await expect(locator).toBeFocused()
+
+  const focusIndicatorIsVisible = await locator.evaluate((element) => {
+    const style = getComputedStyle(element)
+    const hasOutline = style.outlineStyle !== 'none' && Number.parseFloat(style.outlineWidth) >= 2
+
+    return hasOutline || style.boxShadow !== 'none' || style.borderColor === 'rgb(232, 176, 126)'
+  })
+
+  expect(focusIndicatorIsVisible).toBe(true)
+}

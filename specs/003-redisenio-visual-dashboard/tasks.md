@@ -94,10 +94,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** La prueba con `page.emulateMedia({ reducedMotion: 'reduce' })` pasa y la revisión confirma que el contenido y las respuestas siguen disponibles sin movimiento no esencial.
       **Resultado:** Los controles de periodo dan una respuesta de presión sutil de 1 px; con `prefers-reduced-motion` se elimina ese desplazamiento y la transición queda en 0.01 ms, conservando selección, etiqueta, gráficas y tabla. Playwright dirigido: 4/4 (Chromium desktop y mobile); lint, build, Prettier dirigido y `git diff --check` pasan. La suite E2E completa conserva un fallo móvil preexistente de solapamiento de 1.94 px en etiquetas del eje 7d; su corrección queda aplazada a T-019 por decisión del usuario.
 
-- [ ] **T-016 — Verificar semántica, teclado y foco**
+- [x] **T-016 — Verificar semántica, teclado y foco**
       **Estimación:** 25 min · **Dependencias:** T-009, T-012, T-013, T-014 · **RF:** RF-3, RF-4, RF-5, RF-8, RF-9
       Completar nombres/relaciones semánticas y foco visible solo donde las pruebas/revisión detecten brechas; conservar la alternativa tabular y stories de teclado existentes.
       **Hecho cuando:** Recorrido manual por teclado alcanza las acciones y gráficas, el foco es visible, los nombres se entienden y las pruebas/stories dirigidas pasan.
+      **Resultado:** La auditoría confirmó nombres y relaciones para filtros, estados, tabla y gráficas. Se añadieron anillos `:focus-visible` al enlace de retorno y a ambos SVG; Playwright recorre búsqueda, filtro, enlace, retorno, rangos y gráficas con foco visible en desktop/móvil (2/2). Tests de detalle y stories de teclado: 14/14; contraste del foco: 9.18:1 sobre el fondo y 8.12:1 sobre las superficies de gráficas. Lint, build, Prettier dirigido y `git diff --check` pasan.
 
 - [ ] **T-017 — Ajustar responsividad del inventario**
       **Estimación:** 25 min · **Dependencias:** T-008, T-009 · **RF:** RF-2, RF-3, RF-7, RF-11, RF-12

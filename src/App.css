@@ -625,6 +625,13 @@ a {
   min-height: 280px;
 }
 
+.node-latency-chart__canvas .recharts-surface:focus-visible,
+.node-packet-loss-chart__canvas .recharts-surface:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
 .node-latency-chart .recharts-cartesian-axis-tick-value {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
@@ -860,6 +867,12 @@ a {
   color: var(--color-kicker);
   text-decoration: underline;
   text-underline-offset: 0.25rem;
+}
+
+.network-node-back-link:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
 }
 
 .app-header--detail {
