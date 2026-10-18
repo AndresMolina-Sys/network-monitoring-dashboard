@@ -77,6 +77,40 @@ test.describe('Network monitoring dashboard', () => {
     expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
   })
 
+  test('searches and filters nodes, including the no-results recovery state', async ({ page }) => {
+    await page.goto('/')
+
+    const search = page.getByRole('searchbox', { name: 'Search nodes' })
+    const statusFilter = page.getByRole('combobox', { name: 'Filter by status' })
+
+    await search.fill('Main office')
+    await expect(page.getByRole('link', { name: 'View metrics for Core Router' })).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'View metrics for Access Switch 01' }),
+    ).toBeVisible()
+    await expect(page.getByRole('link', { name: 'View metrics for Branch Gateway' })).toHaveCount(0)
+
+    await statusFilter.selectOption('degraded')
+    await expect(
+      page.getByRole('link', { name: 'View metrics for Access Switch 01' }),
+    ).toBeVisible()
+    await expect(page.getByText('Showing 1 of 3 nodes')).toBeVisible()
+
+    await statusFilter.selectOption('offline')
+    await expect(page.getByRole('heading', { name: 'No nodes match your filters' })).toBeVisible()
+    await expect(page.getByText('Showing 0 of 3 nodes')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Clear filters' }).click()
+    await expect(page.getByText('Showing 3 of 3 nodes')).toBeVisible()
+    await expect(page.getByRole('link', { name: 'View metrics for Core Router' })).toBeVisible()
+
+    const dimensions = await page.evaluate(() => ({
+      documentWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+    }))
+    expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+  })
+
   test('shows complete metric ranges without horizontal overflow', async ({ page }) => {
     const projectName = test.info().project.name
     const viewport =

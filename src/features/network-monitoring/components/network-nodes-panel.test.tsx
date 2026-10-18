@@ -54,6 +54,88 @@ describe('NetworkNodesPanel', () => {
     ).toBeInTheDocument()
   })
 
+  it.each([
+    ['node name', 'access switch', 'Access Switch 01'],
+    ['node ID', 'branch-gateway', 'Branch Gateway'],
+    ['address', '10.10.0.1', 'Branch Gateway'],
+    ['location', 'Branch office', 'Branch Gateway'],
+  ])('searches nodes by %s', async (_field, query, expectedNode) => {
+    const service = {
+      listNodes: vi.fn().mockResolvedValue(NETWORK_NODES),
+      getNode: vi.fn(),
+      getNodeMetrics: vi.fn(),
+    } satisfies NetworkMonitoringService
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={service} />
+      </MemoryRouter>,
+    )
+
+    await user.type(await screen.findByRole('searchbox', { name: 'Search nodes' }), query)
+
+    expect(
+      screen.getByRole('link', { name: `View metrics for ${expectedNode}` }),
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(1)
+  })
+
+  it.each([
+    ['online', 'Core Router'],
+    ['degraded', 'Access Switch 01'],
+    ['offline', 'Branch Gateway'],
+  ])('filters nodes by %s status', async (status, expectedNode) => {
+    const service = {
+      listNodes: vi.fn().mockResolvedValue(NETWORK_NODES),
+      getNode: vi.fn(),
+      getNodeMetrics: vi.fn(),
+    } satisfies NetworkMonitoringService
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={service} />
+      </MemoryRouter>,
+    )
+
+    await user.selectOptions(
+      await screen.findByRole('combobox', { name: 'Filter by status' }),
+      status,
+    )
+
+    expect(
+      screen.getByRole('link', { name: `View metrics for ${expectedNode}` }),
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(1)
+  })
+
+  it('shows an empty filter result and clears all filters', async () => {
+    const service = {
+      listNodes: vi.fn().mockResolvedValue(NETWORK_NODES),
+      getNode: vi.fn(),
+      getNodeMetrics: vi.fn(),
+    } satisfies NetworkMonitoringService
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={service} />
+      </MemoryRouter>,
+    )
+
+    await user.type(await screen.findByRole('searchbox', { name: 'Search nodes' }), 'Branch')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Filter by status' }), 'online')
+
+    expect(screen.getByRole('heading', { name: 'No nodes match your filters' })).toBeInTheDocument()
+    expect(screen.getByText('Showing 0 of 3 nodes')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Clear filters' }))
+
+    expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(3)
+    expect(screen.getByText('Showing 3 of 3 nodes')).toBeInTheDocument()
+  })
+
   it('renders the empty state when no nodes are returned', async () => {
     const listNodes = vi.fn().mockResolvedValue([])
 

@@ -180,6 +180,83 @@ a {
   white-space: nowrap;
 }
 
+.network-nodes-panel__filters {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) minmax(10rem, 0.55fr) auto;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.network-nodes-panel__field {
+  display: grid;
+  min-width: 0;
+  gap: 0.4rem;
+  color: var(--color-subtle-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.network-nodes-panel__field input,
+.network-nodes-panel__field select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--color-foreground);
+  background: var(--color-surface-solid);
+  font: 500 0.875rem var(--font-body);
+}
+
+.network-nodes-panel__field input::placeholder {
+  color: var(--color-subtle-foreground);
+  opacity: 0.8;
+}
+
+.network-nodes-panel__field input:focus-visible,
+.network-nodes-panel__field select:focus-visible,
+.network-nodes-panel__no-results button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.network-nodes-panel__results {
+  margin: 0 0 0.75rem;
+  color: var(--color-subtle-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.network-nodes-panel__no-results {
+  padding: 1.5rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-muted-foreground);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.network-nodes-panel__no-results h3 {
+  margin: 0;
+  color: var(--color-foreground);
+  font-size: 1.125rem;
+}
+
+.network-nodes-panel__no-results p {
+  margin: 0.5rem 0 1rem;
+}
+
+.network-nodes-panel__no-results button {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-kicker);
+  background: var(--color-surface-raised);
+  font-weight: 600;
+}
+
 .network-node-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -539,6 +616,15 @@ a {
   .network-nodes-panel__header {
     align-items: start;
     flex-direction: column;
+  }
+
+  .network-nodes-panel__filters {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .network-nodes-panel__results {
+    margin-bottom: 0;
   }
 
   .app-header h1 {
