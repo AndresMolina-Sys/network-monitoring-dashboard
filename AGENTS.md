@@ -48,6 +48,7 @@ If port 5173 is occupied, set `PLAYWRIGHT_PORT` before `npm run test:e2e` (for e
 ## Forma de trabajar
 
 - Plan cross-layer, API-contract, or multi-screen work before editing. Keep changes focused and preserve unrelated working-tree edits.
+- When coordinating a new request through `$sdd` without an explicit phase, classify it first: route small, localized UI/copy/table/accessibility changes to `$feature` and `feature.md`; use the usual SDD phases for cross-layer, contract, multi-screen, or otherwise broad changes. Honor explicit SDD phase invocations as written.
 - For small UI, copy, or accessibility changes recorded in `feature.md`, document and present the plan, then proceed without a separate approval step when the user has asked to make the change. Stop only for an unresolved material decision or a boundary listed under "Pregunta antes".
 - Extend existing service and test/story patterns. At handoff, report changed files, checks actually run, and remaining limitations.
 
