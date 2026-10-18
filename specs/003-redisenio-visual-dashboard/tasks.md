@@ -142,10 +142,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las pruebas alcanzan las acciones pertinentes por teclado, comprueban foco perceptible y confirman que reducir movimiento no elimina información ni funcionalidad.
       **Resultado:** Las pruebas existentes recorren por teclado inventario, detalle, selector y gráficas con foco visible; en modo de movimiento reducido verifican selección de periodo, etiqueta, título, gráficas y tabla. Playwright dirigido pasó en Chromium desktop y mobile (4/4); no hizo falta modificar pruebas ni estilos.
 
-- [ ] **T-024 — Ejecutar una sola vez el detector Impeccable**
+- [x] **T-024 — Ejecutar una sola vez el detector Impeccable**
       **Estimación:** 20 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023 · **RF:** RF-1, RF-8, RF-9, RF-10, RF-11, RF-12, RF-13
       Ejecutar `impeccable detect --json` una única vez sobre los targets realmente modificados y conservar sus resultados para revisión.
       **Hecho cuando:** El detector se ejecutó una vez, los findings se entregan al revisor y no se invoca de nuevo durante esta spec.
+      **Resultado:** Una ejecución detectó 4 avisos `side-tab` en `src/App.css` (líneas 240, 477, 904 y 1133). El revisor confirmó que son estilos anteriores a T-019, de prioridad baja (P3), y no bloquean la tarea; sus cambios CSS fueron de ajuste de texto y ancho mínimo. El detector no se volverá a ejecutar durante esta spec.
 
 - [ ] **T-025 — Capturar superficies y estados con Chrome DevTools**
       **Estimación:** 30 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023, T-024 · **RF:** RF-1, RF-2, RF-4, RF-6, RF-7, RF-11, RF-12, RF-13
