@@ -37,7 +37,7 @@ describe('AppRouter', () => {
       await screen.findByRole(
         'heading',
         {
-          name: 'Node details',
+          name: /Core Router/,
         },
         {
           timeout: 5000,

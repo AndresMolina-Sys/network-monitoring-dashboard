@@ -51,7 +51,7 @@ export const EmptyMetrics: Story = {
     const canvas = within(canvasElement)
 
     await expect(await canvas.findByRole('status', { name: 'No metrics available' })).toBeVisible()
-    await expect(canvas.getByRole('heading', { name: 'Core Router' })).toBeVisible()
+    await expect(canvas.getByRole('heading', { name: /Core Router/ })).toBeVisible()
     await expect(canvas.getByRole('group', { name: 'Metrics range' })).toBeVisible()
     await expect(canvas.getByRole('button', { name: '1h' })).toHaveAttribute('aria-pressed', 'true')
     await expect(canvas.getByText('Simulated data', { exact: true })).toBeVisible()

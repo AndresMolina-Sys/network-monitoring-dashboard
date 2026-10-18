@@ -174,12 +174,12 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
 
       **Resultado:** `DESIGN.md` y `.impeccable/design.json` describen los tokens reales y los contrastes calculados. Los bordes de filtros, periodo seleccionado y reintento/recuperación pasan con mínimos de 3.21:1, 3.33:1 y 3.17:1. El CLI local no ofrece `document`; se siguió su referencia oficial para redactar los artefactos. `npm run build`, validación YAML/JSON/rampas/componentes y Prettier dirigido pasan. Las mediciones parten de CSS y composición sRGB; DevTools no conectó al servidor local.
 
-- [ ] **T-029 — Ejecutar verificaciones finales no E2E**
+- [x] **T-029 — Ejecutar verificaciones finales no E2E**
       **Estimación:** 30 min · **Dependencias:** T-028 · **RF:** RF-1 a RF-13
       Ejecutar `npm run format:check`, `npm run lint`, `npm run test`, `npm run build` y `npm run build-storybook`. No ejecutar xUnit ni full-stack si no cambió API/contrato. Si cualquier comando falla, detenerse y reportar el resultado; esta tarea no incluye diagnóstico ni correcciones.
       **Hecho cuando:** Todos los comandos terminan correctamente y las advertencias se reportan sin ocultarlas; ante un fallo, la tarea queda sin completar y el coordinador recibe el comando y resultado fallidos, sin iniciar reparaciones dentro de esta verificación.
 
-      **Resultado (fallo; tarea pendiente):** Se excluyeron de Prettier los recursos locales de Impeccable, manteniendo `.impeccable/design.json` bajo verificación. `npm run format:check` y `npm run lint` pasan. Tras instalar Chromium y ejecutar `npm run test` fuera del sandbox, pasan 107 de 109 pruebas. Fallan la story `Empty Metrics` (espera el encabezado exacto `Core Router`, cuyo nombre accesible ahora incluye `core-router`) y `src/app/router.test.tsx` por timeout de 5 s. Por la regla de detenerse ante el primer comando fallido, no se ejecutaron build ni build-storybook ni se corrigieron pruebas.
+      **Resultado:** Después de la ejecución inicial fallida, se corrigieron en una reparación separada las dos expectativas de encabezado obsoletas, se instaló Chromium y se repitió la secuencia completa: `npm run format:check`, `npm run lint`, `npm run test` (109/109), `npm run build` y `npm run build-storybook` pasan. Storybook termina con la advertencia conocida de chunks mayores a 500 kB; no bloquea el build.
 
 - [ ] **T-030 — Ejecutar la suite E2E completa**
       **Estimación:** 30 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023, T-029 · **RF:** RF-2 a RF-12
