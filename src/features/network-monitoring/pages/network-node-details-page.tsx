@@ -48,29 +48,25 @@ export function NetworkNodeDetailsPage({
   return (
     <main className="app-shell">
       <header className="app-header app-header--detail">
-        <div className="app-header__topline">
-          <Link className="network-node-back-link" to="/">
-            <span aria-hidden="true">←</span>
-            Back to dashboard
-          </Link>
-          <p className="app-eyebrow">Network node</p>
-        </div>
+        <nav className="app-header__breadcrumb" aria-label="Breadcrumb">
+          <Link to="/">Dashboard</Link>
+          <span aria-hidden="true">/</span>
+          <Link to="/">Monitored nodes</Link>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{node?.name ?? nodeId}</span>
+        </nav>
 
-        <h1>Node details</h1>
-
-        <p className="app-header__lede">
-          Review health and performance for <code>{nodeId}</code>.
+        <p className="app-eyebrow">
+          Node detail{node ? ` / ${NODE_STATUS_LABELS[node.status]}` : ''}
         </p>
-      </header>
 
-      {nodeStatus === 'success' && node ? (
-        <section className="network-node-summary" aria-labelledby="node-summary-title">
-          <div className="network-node-summary__heading">
-            <p className="network-node-state__eyebrow">Node overview</p>
-            <h2 id="node-summary-title">{node.name}</h2>
-          </div>
+        <h1>
+          {node?.name ?? 'Node details'}
+          {node ? <code className="app-header__node-id">{node.id}</code> : null}
+        </h1>
 
-          <dl className="network-node-summary__details">
+        {node ? (
+          <dl className="app-header__node-meta" aria-label="Node metadata">
             <div>
               <dt>Status</dt>
               <dd>
@@ -86,19 +82,16 @@ export function NetworkNodeDetailsPage({
                 </span>
               </dd>
             </div>
-
             <div>
               <dt>Address</dt>
               <dd>
                 <code>{node.address}</code>
               </dd>
             </div>
-
             <div>
               <dt>Location</dt>
               <dd>{node.location}</dd>
             </div>
-
             <div>
               <dt>Last checked</dt>
               <dd>
@@ -106,8 +99,8 @@ export function NetworkNodeDetailsPage({
               </dd>
             </div>
           </dl>
-        </section>
-      ) : null}
+        ) : null}
+      </header>
 
       {!isNotFound && (
         <div className="network-metrics__toolbar">
@@ -203,8 +196,28 @@ export function NetworkNodeDetailsPage({
             </div>
           </dl>
 
-          <NodeLatencyChart metrics={metrics} />
-          <NodePacketLossChart metrics={metrics} />
+          <div className="network-metrics__visuals">
+            <NodeLatencyChart metrics={metrics} />
+            <div className="network-metrics__packet-loss-column">
+              <NodePacketLossChart metrics={metrics} />
+              <aside
+                className="network-metrics__annotation"
+                aria-label="Peak packet loss observation"
+              >
+                <span className="network-metrics__annotation-label">
+                  Observed sample · {formatMetricTime(metricsSummary.peakPacketLossPoint.timestamp)}{' '}
+                  UTC
+                </span>
+                <strong>
+                  {formatMetricValue(metricsSummary.peakPacketLossPercent)}% packet loss
+                </strong>
+                <p>Highest loss in this selected period.</p>
+                <time dateTime={metricsSummary.peakPacketLossPoint.timestamp}>
+                  {metricsSummary.peakPacketLossPoint.timestamp}
+                </time>
+              </aside>
+            </div>
+          </div>
 
           <div className="network-metrics__table-wrapper">
             <table>
@@ -252,20 +265,30 @@ function getMetricsHeading(range: MetricsRange): string {
 function summarizeMetrics(points: readonly MetricPoint[]) {
   const latencyTotal = points.reduce((total, point) => total + point.latencyMs, 0)
   const latestPoint = points[points.length - 1]
-  const peakPacketLossPercent = points.reduce(
-    (peak, point) => Math.max(peak, point.packetLossPercent),
-    0,
+  const peakPacketLossPoint = points.reduce(
+    (peak, point) => (point.packetLossPercent >= peak.packetLossPercent ? point : peak),
+    points[0],
   )
 
   return {
     latestLatencyMs: latestPoint.latencyMs,
     averageLatencyMs: latencyTotal / points.length,
-    peakPacketLossPercent,
+    peakPacketLossPercent: peakPacketLossPoint.packetLossPercent,
+    peakPacketLossPoint,
   }
 }
 
 function formatMetricValue(value: number): string {
   return new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(value)
+}
+
+function formatMetricTime(timestamp: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'UTC',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(timestamp))
 }
 
 function formatNodeDate(timestamp: string): string {

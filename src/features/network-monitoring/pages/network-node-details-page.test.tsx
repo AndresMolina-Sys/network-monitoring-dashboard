@@ -76,21 +76,29 @@ const RANGE_SUMMARIES: Record<
 }
 
 describe('NetworkNodeDetailsPage', () => {
-  it('shows the selected node details and a return link to the inventory', async () => {
+  it('shows the node identity, breadcrumb, and metadata in the page heading', async () => {
     renderDetailsPage(createService())
 
-    const nodeSummary = await screen.findByRole('region', { name: 'Core Router' })
+    const pageHeading = await screen.findByRole('heading', { level: 1, name: /Core Router/ })
+    const breadcrumb = screen.getByRole('navigation', { name: 'Breadcrumb' })
+    const pageHeader = pageHeading.closest('header') as HTMLElement
 
-    expect(screen.getByRole('link', { name: 'Back to dashboard' })).toHaveAttribute('href', '/')
-    expect(within(nodeSummary).getByText('Status')).toBeVisible()
-    expect(within(nodeSummary).getByText('Online')).toBeVisible()
-    expect(within(nodeSummary).getByText('Address')).toBeVisible()
-    expect(within(nodeSummary).getByText('10.0.0.1')).toBeVisible()
-    expect(within(nodeSummary).getByText('Location')).toBeVisible()
-    expect(within(nodeSummary).getByText('Main office')).toBeVisible()
-    expect(within(nodeSummary).getByText('Last checked')).toBeVisible()
+    expect(within(breadcrumb).getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/')
+    expect(within(breadcrumb).getByRole('link', { name: 'Monitored nodes' })).toHaveAttribute(
+      'href',
+      '/',
+    )
+    expect(within(breadcrumb).getByText('Core Router')).toHaveAttribute('aria-current', 'page')
+    expect(within(pageHeader).getByText('core-router')).toBeVisible()
+    expect(within(pageHeader).getByText('Status')).toBeVisible()
+    expect(within(pageHeader).getByText('Online')).toBeVisible()
+    expect(within(pageHeader).getByText('Address')).toBeVisible()
+    expect(within(pageHeader).getByText('10.0.0.1')).toBeVisible()
+    expect(within(pageHeader).getByText('Location')).toBeVisible()
+    expect(within(pageHeader).getByText('Main office')).toBeVisible()
+    expect(within(pageHeader).getByText('Last checked')).toBeVisible()
 
-    const checkedAt = nodeSummary.querySelector('time')
+    const checkedAt = pageHeader.querySelector('time')
     expect(checkedAt).toHaveAttribute('datetime', TEST_NODE.lastCheckedAt)
     expect(checkedAt).not.toBeEmptyDOMElement()
   })
@@ -102,6 +110,7 @@ describe('NetworkNodeDetailsPage', () => {
 
     expect(await screen.findByRole('heading', { name: RANGE_TITLES['1h'] })).toBeInTheDocument()
     expectMetricsSummary('1h')
+    expectPeakLossObservation('1h')
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
     expect(screen.getByRole('button', { name: '1h' })).toHaveAttribute('aria-pressed', 'true')
@@ -164,6 +173,7 @@ describe('NetworkNodeDetailsPage', () => {
 
       expect(await screen.findByRole('heading', { name: RANGE_TITLES[range] })).toBeInTheDocument()
       expectMetricsSummary(range)
+      expectPeakLossObservation(range)
       expect(screen.getByRole('button', { name: range })).toHaveAttribute('aria-pressed', 'true')
       const otherRange = range === '1h' ? '24h' : '1h'
       expect(screen.getByRole('button', { name: otherRange })).toHaveAttribute(
@@ -369,6 +379,20 @@ function expectMetricsSummary(range: MetricsRange): void {
   expect(within(summary).getByText(expected.averageLatency)).toBeVisible()
   expect(within(summary).getByText('Peak packet loss')).toBeInTheDocument()
   expect(within(summary).getByText(expected.peakPacketLoss)).toBeVisible()
+}
+
+function expectPeakLossObservation(range: MetricsRange): void {
+  const point = createMetrics(range).points.reduce((peak, candidate) =>
+    candidate.packetLossPercent >= peak.packetLossPercent ? candidate : peak,
+  )
+  const annotation = screen.getByRole('complementary', {
+    name: 'Peak packet loss observation',
+  })
+
+  expect(within(annotation).getByText(`${point.packetLossPercent}% packet loss`)).toBeVisible()
+  expect(within(annotation).getByText('Highest loss in this selected period.')).toBeVisible()
+  expect(within(annotation).getByText(/Observed sample · \d{2}:\d{2} UTC/)).toBeVisible()
+  expect(annotation.querySelector('time')).toHaveAttribute('datetime', point.timestamp)
 }
 
 function getTableRows(): HTMLElement[] {

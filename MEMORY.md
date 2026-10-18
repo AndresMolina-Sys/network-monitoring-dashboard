@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-026 completada; T-027 debe corregir el layout del detalle para ajustarlo a “Evidence Margin”. El contraste global de RF-9 queda para T-028.
+- Spec 003: T-027 completada: detalle “Evidence Margin” con breadcrumb/metadatos, gráfica principal de latencia y anotación del máximo de pérdida; responsive validado. T-028 medirá el contraste global de RF-9.

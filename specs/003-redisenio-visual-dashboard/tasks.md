@@ -160,10 +160,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** El coordinador recibe findings priorizados y una decisión verificable de si existe algún bloqueo; el revisor no modifica archivos ni aprueba por el usuario.
       **Resultado:** El revisor independiente encontró una discrepancia P1 con la referencia aprobada “Evidence Margin”: el detalle apila las dos gráficas y omite la anotación lateral (bloqueo para RF-13). También señaló que el contraste global de RF-9 aún no está medido; se mantiene para T-028, sin ratio fallido demostrado. No editó archivos ni ejecutó el detector.
 
-- [ ] **T-027 — Resolver findings de cierre en una ronda acotada**
+- [x] **T-027 — Resolver findings de cierre en una ronda acotada**
       **Estimación:** 25 min · **Dependencias:** T-026 · **RF:** RF afectados por findings dentro de RF-1 a RF-13
       Limitar el trabajo a un lote de hasta 25 minutos y a los requisitos y archivos ya aprobados. Si no hay findings materiales, registrar esa evidencia sin editar; si los hay, corregirlos en el lote y realizar como máximo una ronda de confirmación visual.
       **Hecho cuando:** **Éxito:** no quedan findings materiales dentro del alcance y la ronda única (si aplica) confirma las correcciones. **Parada, sin completar:** si no se pueden resolver y verificar todos dentro de 25 minutos, si el tiempo se agota o si hace falta ampliar alcance o crear archivos no autorizados, detenerse, dejar la tarea sin marcar y devolver el bloqueo al coordinador para un seguimiento SDD aprobado por separado; no ampliar el trabajo automáticamente.
+      **Resultado:** Se alineó el detalle con “Evidence Margin”: breadcrumb y metadatos compactos, latencia como gráfica principal y pérdida con anotación del máximo; Playwright confirmó escritorio, móvil y etiquetas 7d.
 
 - [ ] **T-028 — Documentar el sistema visual y contrastes medidos**
       **Estimación:** 30 min · **Dependencias:** T-027 · **RF:** RF-1, RF-7, RF-9, RF-10, RF-12, RF-13

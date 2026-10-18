@@ -13,18 +13,14 @@ test.describe('Network monitoring dashboard', () => {
     await expect(page).toHaveURL(/\/nodes\/core-router$/)
     await expect(
       page.getByRole('heading', {
-        name: 'Node details',
-      }),
-    ).toBeVisible()
-    await expect(
-      page.getByRole('heading', {
         name: 'Core Router',
       }),
     ).toBeVisible()
+    await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible()
 
     await page
       .getByRole('link', {
-        name: 'Back to dashboard',
+        name: 'Dashboard',
       })
       .click()
 
@@ -41,14 +37,10 @@ test.describe('Network monitoring dashboard', () => {
 
     await expect(
       page.getByRole('heading', {
-        name: 'Node details',
-      }),
-    ).toBeVisible()
-    await expect(
-      page.getByRole('heading', {
         name: 'Core Router',
       }),
     ).toBeVisible()
+    await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible()
   })
 
   test('shows a not-found state for an unknown node', async ({ page }) => {
@@ -133,8 +125,8 @@ test.describe('Network monitoring dashboard', () => {
       expect(cardOverflows).toBe(false)
 
       await firstNode.click()
-      await expect(page.getByRole('heading', { name: 'Node details' })).toBeVisible()
-      await page.getByRole('link', { name: 'Back to dashboard' }).click()
+      await expect(page.getByRole('heading', { name: 'Core Router' })).toBeVisible()
+      await page.getByRole('link', { name: 'Dashboard' }).click()
       await expect(search).toBeVisible()
     }
   })
@@ -151,9 +143,13 @@ test.describe('Network monitoring dashboard', () => {
     const packetLossChart = page.getByRole('figure', {
       name: /Packet loss trend for core-router/,
     })
+    const peakLossAnnotation = page.getByRole('complementary', {
+      name: 'Peak packet loss observation',
+    })
     const table = page.getByRole('table')
 
-    await expect(page.getByRole('link', { name: 'Back to dashboard' })).toBeVisible()
+    await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible()
+    await expect(peakLossAnnotation).toBeVisible()
     await expect(summary).toBeVisible()
     await expect(rangeSelector).toBeVisible()
     await expect(rangeSelector.getByRole('button', { name: '1h', exact: true })).toBeVisible()
@@ -172,12 +168,13 @@ test.describe('Network monitoring dashboard', () => {
       await page.setViewportSize(viewport)
 
       for (const locator of [
-        page.getByRole('link', { name: 'Back to dashboard' }),
+        page.getByRole('navigation', { name: 'Breadcrumb' }),
         summary,
         rangeSelector,
         page.getByText('Simulated data'),
         latencyChart,
         packetLossChart,
+        peakLossAnnotation,
         table,
       ]) {
         await expect(locator).toBeVisible()
@@ -191,12 +188,64 @@ test.describe('Network monitoring dashboard', () => {
         expect(bounds.right).toBeLessThanOrEqual(viewport.width)
       }
 
+      const chartLayout = await page.locator('.network-metrics__visuals').evaluate((element) => {
+        const bounds = (selector: string) => {
+          const rect = element.querySelector(selector)?.getBoundingClientRect()
+          return rect
+            ? { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom }
+            : null
+        }
+
+        return {
+          latency: bounds('.node-latency-chart'),
+          packetLoss: bounds('.node-packet-loss-chart'),
+          annotation: bounds('.network-metrics__annotation'),
+        }
+      })
+
+      expect(chartLayout.latency).not.toBeNull()
+      expect(chartLayout.packetLoss).not.toBeNull()
+      expect(chartLayout.annotation).not.toBeNull()
+
+      if (viewport.width > 860) {
+        expect(chartLayout.packetLoss!.left).toBeGreaterThanOrEqual(chartLayout.latency!.right)
+        expect(chartLayout.annotation!.left).toBeGreaterThanOrEqual(chartLayout.packetLoss!.left)
+      } else {
+        expect(chartLayout.packetLoss!.top).toBeGreaterThanOrEqual(chartLayout.latency!.bottom)
+        expect(
+          Math.abs(chartLayout.packetLoss!.left - chartLayout.latency!.left),
+        ).toBeLessThanOrEqual(2)
+        expect(chartLayout.annotation!.top).toBeGreaterThanOrEqual(chartLayout.packetLoss!.bottom)
+      }
+
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
+        .toBeLessThanOrEqual(viewport.width)
+
       const dimensions = await page.evaluate(() => ({
         documentWidth: document.documentElement.scrollWidth,
         viewportWidth: window.innerWidth,
+        overflowCandidates: Array.from(document.querySelectorAll('body *'))
+          .map((element) => {
+            const bounds = element.getBoundingClientRect()
+            return {
+              tag: element.tagName.toLowerCase(),
+              className: typeof element.className === 'string' ? element.className : '',
+              left: Math.round(bounds.left),
+              right: Math.round(bounds.right),
+              width: Math.round(bounds.width),
+              scrollWidth: element.scrollWidth,
+            }
+          })
+          .filter((bounds) => bounds.left < -1 || bounds.right > window.innerWidth + 1)
+          .sort((first, second) => second.right - first.right)
+          .slice(0, 5),
       }))
 
-      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+      expect(
+        dimensions.documentWidth,
+        `Horizontal overflow candidates: ${JSON.stringify(dimensions.overflowCandidates)}`,
+      ).toBeLessThanOrEqual(dimensions.viewportWidth)
 
       const dayRangeButton = rangeSelector.getByRole('button', { name: '24h', exact: true })
       await dayRangeButton.click()
@@ -251,12 +300,34 @@ test.describe('Network monitoring dashboard', () => {
         })
       }
 
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
+        .toBeLessThanOrEqual(viewport.width)
+
       const dimensions = await page.evaluate(() => ({
         documentWidth: document.documentElement.scrollWidth,
         viewportWidth: window.innerWidth,
+        overflowCandidates: Array.from(document.querySelectorAll('body *'))
+          .map((element) => {
+            const bounds = element.getBoundingClientRect()
+            return {
+              tag: element.tagName.toLowerCase(),
+              className: typeof element.className === 'string' ? element.className : '',
+              left: Math.round(bounds.left),
+              right: Math.round(bounds.right),
+              width: Math.round(bounds.width),
+              scrollWidth: element.scrollWidth,
+            }
+          })
+          .filter((bounds) => bounds.left < -1 || bounds.right > window.innerWidth + 1)
+          .sort((first, second) => second.right - first.right)
+          .slice(0, 5),
       }))
 
-      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+      expect(
+        dimensions.documentWidth,
+        `Horizontal overflow candidates: ${JSON.stringify(dimensions.overflowCandidates)}`,
+      ).toBeLessThanOrEqual(dimensions.viewportWidth)
       await expect(rangeSelector.getByRole('button', { name: '7d', exact: true })).toBeVisible()
       await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(29)
     }
@@ -385,17 +456,26 @@ test.describe('Network monitoring dashboard', () => {
       const metricContentOrder = await page.locator('.network-metrics').evaluate((section) =>
         Array.from(section.children)
           .filter((element) =>
-            element.matches('figure, dl.network-metrics__summary, .network-metrics__table-wrapper'),
+            element.matches(
+              'dl.network-metrics__summary, .network-metrics__visuals, .network-metrics__table-wrapper',
+            ),
           )
           .map((element) => {
             if (element.classList.contains('network-metrics__summary')) return 'summary'
-            if (element.classList.contains('node-latency-chart')) return 'latency'
-            if (element.classList.contains('node-packet-loss-chart')) return 'packet-loss'
+            if (element.classList.contains('network-metrics__visuals')) return 'charts'
             return 'table'
           }),
       )
 
-      expect(metricContentOrder).toEqual(['summary', 'latency', 'packet-loss', 'table'])
+      expect(metricContentOrder).toEqual(['summary', 'charts', 'table'])
+      const visualOrder = await page.locator('.network-metrics__visuals').evaluate((visuals) =>
+        Array.from(visuals.querySelectorAll('figure, aside')).map((element) => {
+          if (element.classList.contains('node-latency-chart')) return 'latency'
+          if (element.classList.contains('node-packet-loss-chart')) return 'packet-loss'
+          return 'annotation'
+        }),
+      )
+      expect(visualOrder).toEqual(['latency', 'packet-loss', 'annotation'])
       await expect(latencyChart.locator('svg .recharts-dot.recharts-line-dot')).toHaveCount(
         range.samples,
       )
@@ -529,7 +609,11 @@ test.describe('Network monitoring dashboard', () => {
 
     await page.goto('/nodes/core-router')
 
-    const backLink = page.getByRole('link', { name: 'Back to dashboard' })
+    const breadcrumb = page.getByRole('navigation', { name: 'Breadcrumb' })
+    const breadcrumbLinks = [
+      breadcrumb.getByRole('link', { name: 'Dashboard' }),
+      breadcrumb.getByRole('link', { name: 'Monitored nodes' }),
+    ]
     const rangeGroup = page.getByRole('group', { name: 'Metrics range' })
     const rangeButtons = ['1h', '24h', '7d'].map((range) =>
       rangeGroup.getByRole('button', { name: range, exact: true }),
@@ -547,7 +631,9 @@ test.describe('Network monitoring dashboard', () => {
     await page.locator('body').click({ position: { x: 1, y: 1 } })
     await page.bringToFront()
     await page.keyboard.press('Tab')
-    await expectVisibleKeyboardFocus(backLink)
+    await expectVisibleKeyboardFocus(breadcrumbLinks[0])
+    await page.keyboard.press('Tab')
+    await expectVisibleKeyboardFocus(breadcrumbLinks[1])
 
     for (const control of [...rangeButtons, ...charts]) {
       await page.keyboard.press('Tab')
