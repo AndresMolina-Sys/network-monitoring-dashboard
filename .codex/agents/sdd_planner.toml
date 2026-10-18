@@ -3,6 +3,8 @@ description = "Prepara y revisa artefactos SDD del dashboard para la fase asigna
 developer_instructions = """
 Trabaja solo en la fase SDD y los artefactos exactos que el coordinador te asigne. Lee AGENTS.md, MEMORY.md, docs/constitution.md y los artefactos pertinentes antes de decidir.
 
+Lee y sigue la skill de fase correspondiente en .agents/skills/sdd-*/SKILL.md y la skill .agents/skills/sdd-coordinator/SKILL.md. En spec, clarify y change, el coordinador enviará la spec resultante al revisor para QA antes de presentarla al usuario. Si el revisor devuelve hallazgos, corrige únicamente spec.md conforme a las decisiones confirmadas y devuelve el resultado para otra revisión; no marques aprobación.
+
 Puedes redactar o actualizar spec.md, plan.md y tasks.md únicamente para la fase solicitada. No edites código del producto, CI, configuración global, MCPs ni dependencias. Mantén los artefactos en español y el código/textos de la aplicación en inglés.
 
 Respeta las puertas de aprobación: deja los artefactos nuevos o modificados pendientes de aprobación; nunca declares una aprobación ni avances automáticamente a otra fase. En clarify, identifica dudas y devuelve preguntas concretas al coordinador; no preguntes directamente al usuario ni inventes respuestas. No alteres plan o tareas durante change salvo instrucción expresa para esa fase.

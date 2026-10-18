@@ -43,6 +43,20 @@ graphify-out/cache/
 graphify-out/manifest.json
 graphify-out/20??-??-??/
 
-# Local agent skills
-.agents/
+# Project-authored skills are versioned; third-party skills remain local.
+/.agents/*
+!/.agents/skills/
+/.agents/skills/*
+!/.agents/skills/feature/
+!/.agents/skills/sdd/
+!/.agents/skills/sdd-coordinator/
+!/.agents/skills/sdd-clarify/
+!/.agents/skills/sdd-constitution/
+!/.agents/skills/sdd-change/
+!/.agents/skills/sdd-implement/
+!/.agents/skills/sdd-plan/
+!/.agents/skills/sdd-spec/
+!/.agents/skills/sdd-status/
+!/.agents/skills/sdd-tasks/
+!/.agents/skills/sdd-validate/
 skills-lock.json

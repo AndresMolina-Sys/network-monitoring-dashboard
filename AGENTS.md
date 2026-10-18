@@ -48,9 +48,13 @@ If port 5173 is occupied, set `PLAYWRIGHT_PORT` before `npm run test:e2e` (for e
 ## Forma de trabajar
 
 - Plan cross-layer, API-contract, or multi-screen work before editing. Keep changes focused and preserve unrelated working-tree edits.
-- When coordinating a new request through `$sdd` without an explicit phase, classify it first: route small, localized UI/copy/table/accessibility changes to `$feature`; use the usual SDD phases for cross-layer, contract, multi-screen, or otherwise broad changes. Honor explicit SDD phase invocations as written.
-- For small changes requested by the user, `$feature` implements directly without a separate step list or planning artifact. Stop only for an unresolved material decision or a boundary listed under "Pregunta antes".
+- `$sdd` is the entry point: without an explicit phase, route small, localized changes to `$feature` and broader or cross-layer work to `$sdd-coordinator`. An explicit phase stays on that phase.
+- `$feature` implements clearly requested small changes directly. Do not create `feature.md`, a task checklist, or a separate plan-approval gate. Route scope that crosses its boundaries to SDD.
+- SDD uses phase skills in `.agents/skills/sdd-*/`; the main conversation retains user questions and approvals. Use the project planner, implementer, and reviewer profiles for their assigned work. A reviewer automatically checks every created or changed spec before it is presented; the planner may correct only that spec and the reviewer rechecks. Agents never approve on the user's behalf.
+- Preserve separate approval gates for spec, plan, and tasks. Implementation requires all three approved artifacts and covers only the specifically requested task. Stop after that task.
 - Extend existing service and test/story patterns. At handoff, report changed files, checks actually run, and remaining limitations.
+
+Project-authored skills (`feature`, `sdd`, `sdd-*`) are versioned. Keep third-party skills installed under `.agents/skills/` local and untracked.
 
 ## Memoria
 
@@ -73,6 +77,8 @@ If port 5173 is occupied, set `PLAYWRIGHT_PORT` before `npm run test:e2e` (for e
 - ⚠️ **Pregunta antes:** dependencies, new source/config files, API/data-contract changes, or scope expansion such as persistence, authentication, or polling.
 - 🚫 **Nunca:** add `Co-authored-by` or other authorship/agent attribution to commits; expose API keys, tokens, or credentials in files, logs, commands, screenshots, or responses; commit secrets; hand-edit generated output; or use wildcard CORS.
 - 🚫 **Push or deploy only when the user explicitly requests it.**
+
+Subagents do not commit. The main coordinator inspects the final diff and creates the required local commit; push and deploy remain explicit user actions.
 
 ## Verificación
 

@@ -13,8 +13,9 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - T-010 se verificó en producción tras el commit `0bd3b22`: la UI ofrece `1h`, `24h` y `7d`, muestra “Simulated data” y la API responde 200 con 4, 25 y 29 puntos.
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
-- El coordinador de Codex delega SDD a perfiles de proyecto: planificador, implementador de una tarea y revisor; los perfiles se versionan en `.codex/agents/`.
-- La Skill local `$feature` implementa cambios pequeños y localizados directamente, sin lista de pasos ni artefacto de planificación; F-001, F-002 y F-003 están completos.
+- `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
+- El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
+- `$feature` implementa cambios pequeños directamente, sin lista de pasos, `feature.md` ni aprobación adicional; F-001, F-002 y F-003 están completos.
 
 ## Decisiones (y por qué)
 
@@ -29,10 +30,10 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - Todos los nodos deben tener muestras simuladas para los tres rangos; la etiqueta “Simulated data” permanece junto al rango en carga, éxito, vacío y error.
 - La última selección de rango prevalece; datos incompletos, corruptos, desordenados, duplicados, fuera de ventana o fuera de límites numéricos producen error sin cambiar el rango. Vacío es excepcional.
 - La spec 001 cubre modo mock local y dashboard de producción; conserva el comportamiento existente de nodo inexistente y reintentos.
-- La Skill `$sdd` está en `.agents/skills/sdd/` y permanece local porque `.agents/` se ignora intencionalmente en Git.
 - Mantener al agente principal como único coordinador de aprobación; pasar a subagentes el alcance y contexto exactos, serializar escrituras y paralelizar solo revisiones independientes de solo lectura. Los perfiles heredan permisos del coordinador; sus instrucciones no son sandbox.
 - Para cambios pequeños solicitados, `$feature` implementa directamente sin lista de pasos ni documento adicional; detenerse ante decisiones materiales nuevas o límites de alcance.
 - Al coordinar una solicitud nueva con `$sdd` sin fase explícita, clasificar primero: cambios localizados a `$feature`; cambios amplios o entre capas al flujo SDD. Las invocaciones con fase explícita conservan esa fase.
+- Versionar solo las skills propias `feature`, `sdd`, `sdd-*`; las skills de terceros, como `frontend-design` y `ui-ux-pro-max`, permanecen locales e ignoradas.
 
 ## Aprendizajes y errores a evitar
 
