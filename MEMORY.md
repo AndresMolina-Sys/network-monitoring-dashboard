@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-001 a T-025 completas; siguiente T-026, revisión independiente de cierre visual.
+- Spec 003: T-026 completada; T-027 debe corregir el layout del detalle para ajustarlo a “Evidence Margin”. El contraste global de RF-9 queda para T-028.

@@ -154,10 +154,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Cada captura parte de un estado estable, se abre y valida visualmente en `.impeccable/review/`, y consola/dimensiones no muestran errores ni contenido engañoso.
       **Resultado:** Con autorización del usuario, Playwright se usó como alternativa a las capturas de Chrome DevTools. Se guardaron y revisaron seis capturas: inventario, detalle de `core-router` y estado vacío, en 1440 × 900 y 390 × 844. Las gráficas se recapturaron tras finalizar su animación; todos los trazos son visibles. Las seis páginas no tuvieron errores de consola ni overflow horizontal. Vite emitió advertencias de React Router sobre `HydrateFallback`, sin errores de ejecución.
 
-- [ ] **T-026 — Realizar revisión independiente de cierre visual**
+- [x] **T-026 — Realizar revisión independiente de cierre visual**
       **Estimación:** 25 min · **Dependencias:** T-024, T-025 · **RF:** RF-1 a RF-13
       Solicitar al revisor independiente (o asumir ese rol en una pasada separada si no hay subagentes) evaluación de referencias, campos, estados, accesibilidad, contraste, teclado, movimiento reducido, overflow y consola.
       **Hecho cuando:** El coordinador recibe findings priorizados y una decisión verificable de si existe algún bloqueo; el revisor no modifica archivos ni aprueba por el usuario.
+      **Resultado:** El revisor independiente encontró una discrepancia P1 con la referencia aprobada “Evidence Margin”: el detalle apila las dos gráficas y omite la anotación lateral (bloqueo para RF-13). También señaló que el contraste global de RF-9 aún no está medido; se mantiene para T-028, sin ratio fallido demostrado. No editó archivos ni ejecutó el detector.
 
 - [ ] **T-027 — Resolver findings de cierre en una ronda acotada**
       **Estimación:** 25 min · **Dependencias:** T-026 · **RF:** RF afectados por findings dentro de RF-1 a RF-13
