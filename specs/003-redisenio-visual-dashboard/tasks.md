@@ -88,10 +88,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Tests y story confirman estados diferenciados, etiqueta simulada donde aplica y ausencia de datos obsoletos; el vacío del detalle se puede abrir en Storybook sin añadir rutas ni modo demo.
       **Resultado:** RF-6, RF-7, RF-8 y RF-12 cubiertos; 11 pruebas dirigidas pasan y Chromium confirma story renderizada sin errores ni overflow.
 
-- [ ] **T-015 — Aplicar movimiento funcional y respetar movimiento reducido**
+- [x] **T-015 — Aplicar movimiento funcional y respetar movimiento reducido**
       **Estimación:** 25 min · **Dependencias:** T-008, T-009, T-010, T-011 · **RF:** RF-3, RF-5, RF-10
       Añadir solo transiciones sutiles ligadas a interacción/orientación y soporte `prefers-reduced-motion` en estilos existentes. Escribir primero la prueba E2E pertinente.
       **Hecho cuando:** La prueba con `page.emulateMedia({ reducedMotion: 'reduce' })` pasa y la revisión confirma que el contenido y las respuestas siguen disponibles sin movimiento no esencial.
+      **Resultado:** Los controles de periodo dan una respuesta de presión sutil de 1 px; con `prefers-reduced-motion` se elimina ese desplazamiento y la transición queda en 0.01 ms, conservando selección, etiqueta, gráficas y tabla. Playwright dirigido: 4/4 (Chromium desktop y mobile); lint, build, Prettier dirigido y `git diff --check` pasan. La suite E2E completa conserva un fallo móvil preexistente de solapamiento de 1.94 px en etiquetas del eje 7d; su corrección queda aplazada a T-019 por decisión del usuario.
 
 - [ ] **T-016 — Verificar semántica, teclado y foco**
       **Estimación:** 25 min · **Dependencias:** T-009, T-012, T-013, T-014 · **RF:** RF-3, RF-4, RF-5, RF-8, RF-9

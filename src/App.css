@@ -803,6 +803,10 @@ a {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  .network-metrics__range-button:active {
+    transform: none;
+  }
 }
 
 .node-latency-chart .recharts-default-tooltip,
@@ -1042,12 +1046,17 @@ a {
   transition:
     border-color var(--motion-fast),
     color var(--motion-fast),
-    background var(--motion-fast);
+    background var(--motion-fast),
+    transform var(--motion-fast);
 }
 
 .network-metrics__range-button:hover {
   color: var(--color-foreground);
   background: rgba(200, 165, 125, 0.08);
+}
+
+.network-metrics__range-button:active {
+  transform: translateY(1px);
 }
 
 .network-metrics__range-button[aria-pressed='true'] {

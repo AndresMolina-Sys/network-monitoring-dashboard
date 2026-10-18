@@ -220,4 +220,58 @@ test.describe('Network monitoring dashboard', () => {
       expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
     }
   })
+
+  test('provides subtle press feedback on metric range controls', async ({ page }) => {
+    await page.goto('/nodes/core-router')
+
+    const rangeButton = page.getByRole('button', { name: '24h', exact: true })
+    await rangeButton.hover()
+    await page.mouse.down()
+
+    await expect
+      .poll(() =>
+        rangeButton.evaluate(
+          (button) => new DOMMatrixReadOnly(getComputedStyle(button).transform).m42,
+        ),
+      )
+      .toBe(1)
+    await page.mouse.up()
+  })
+
+  test('keeps metric selection and content usable with reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.goto('/nodes/core-router')
+
+    const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
+    const rangeButton = rangeSelector.getByRole('button', { name: '24h', exact: true })
+
+    await expect(page.getByText('Simulated data')).toBeVisible()
+    await rangeButton.hover()
+    await page.mouse.down()
+
+    const motionStyles = await rangeButton.evaluate((button) => {
+      const style = getComputedStyle(button)
+      return {
+        transitionDuration: style.transitionDuration,
+        verticalOffset: new DOMMatrixReadOnly(style.transform).m42,
+      }
+    })
+    const transitionMilliseconds = motionStyles.transitionDuration.split(',').map((duration) => {
+      const value = Number.parseFloat(duration)
+      return duration.trim().endsWith('ms') ? value : value * 1000
+    })
+
+    expect(Math.max(...transitionMilliseconds)).toBeLessThanOrEqual(0.01)
+    expect(motionStyles.verticalOffset).toBe(0)
+    await page.mouse.up()
+    await rangeButton.click()
+
+    await expect(rangeButton).toHaveAttribute('aria-pressed', 'true')
+    await expect(
+      page.getByRole('heading', { name: 'Last 24 hours performance (24h)' }),
+    ).toBeVisible()
+    await expect(page.getByRole('figure', { name: /Latency trend.*24h/ })).toBeVisible()
+    await expect(page.getByRole('figure', { name: /Packet loss trend.*24h/ })).toBeVisible()
+    await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(25)
+  })
 })
