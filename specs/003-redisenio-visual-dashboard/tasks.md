@@ -185,6 +185,7 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Estimación:** 30 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023, T-029 · **RF:** RF-2 a RF-12
       Ejecutar únicamente `npm run test:e2e` como verificación integral final. Si falla, detenerse y reportar el resultado; esta tarea no incluye diagnóstico ni correcciones.
       **Hecho cuando:** La suite completa termina correctamente; ante un fallo, la tarea queda sin completar y el coordinador recibe el test y resultado fallidos para decidir el siguiente paso, sin reparar nada dentro de esta verificación.
+      **Resultado (fallo; tarea pendiente):** `npm run test:e2e` no inició porque el servidor Vite no pudo ocupar el puerto 5173, que ya estaba en uso. No se detuvo el proceso existente ni se cambió configuración; se requiere autorización para reintentar con `PLAYWRIGHT_PORT=4173` según `AGENTS.md`.
 
 ## Cierre del coordinador (posterior al checklist)
 
