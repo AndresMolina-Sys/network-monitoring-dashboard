@@ -1,6 +1,6 @@
 # Plan 003 — Rediseño visual integral del dashboard
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
 ## Alcance y enfoque
 
