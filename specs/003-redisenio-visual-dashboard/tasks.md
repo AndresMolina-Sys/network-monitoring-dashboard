@@ -96,42 +96,66 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       Afinar resumen, selector, gráficas, tabla y estados en los tamaños cubiertos, sin modificar `playwright.config.ts`.
       **Hecho cuando:** Las verificaciones dirigidas en 375, 390 × 844, 768, 1024 y 1440 px mantienen utilizables controles y datos, sin desbordamiento horizontal de página.
 
-- [ ] **T-019 — Completar pruebas E2E de aceptación**
-      **Estimación:** 30 min · **Dependencias:** T-015, T-016, T-017, T-018 · **RF:** RF-2 a RF-12
-      Ampliar solo `e2e/network-monitoring.spec.ts` para la matriz responsive, navegación, búsqueda/filtros, rangos, estados alcanzables, teclado y movimiento reducido; escribir primero cada aserción de comportamiento nueva.
-      **Hecho cuando:** `npm run test:e2e` pasa para inventario y detalle en 375, 390, 768, 1024 y 1440 px; las pruebas verifican overflow, datos y acciones sin modificar la configuración E2E.
+- [ ] **T-019 — Verificar la matriz responsive con Playwright**
+      **Estimación:** 25 min · **Dependencias:** T-017, T-018 · **RF:** RF-2, RF-3, RF-4, RF-6, RF-11, RF-12
+      Ampliar solo `e2e/network-monitoring.spec.ts` para comprobar inventario y detalle a 375, 390, 768, 1024 y 1440 px, sin cambiar la configuración E2E.
+      **Hecho cuando:** Las pruebas dirigidas verifican en cada ancho que datos y controles esenciales no se recortan, que las acciones principales siguen utilizables y que `scrollWidth <= innerWidth`.
 
-- [ ] **T-020 — Ejecutar una sola vez el detector Impeccable**
-      **Estimación:** 20 min · **Dependencias:** T-019 · **RF:** RF-1, RF-8, RF-9, RF-10, RF-11, RF-12, RF-13
+- [ ] **T-020 — Verificar navegación y búsqueda del inventario con Playwright**
+      **Estimación:** 25 min · **Dependencias:** T-009, T-017 · **RF:** RF-3, RF-5, RF-6
+      Completar o ajustar en `e2e/network-monitoring.spec.ts` el recorrido de inventario a detalle y regreso, búsqueda, filtro por estado, limpieza y recuperación de una lista sin coincidencias.
+      **Hecho cuando:** Las pruebas confirman navegación y recuperación con los controles existentes, sin introducir rutas, filtros ni capacidades nuevas.
+
+- [ ] **T-021 — Verificar sincronización del periodo seleccionado**
+      **Estimación:** 25 min · **Dependencias:** T-011, T-013, T-018 · **RF:** RF-4, RF-7
+      Completar o ajustar las pruebas Playwright de la página de detalle para seleccionar `1h`, `24h` y `7d` y comprobar el contenido visible asociado al rango actual.
+      **Hecho cuando:** Para los tres rangos, las pruebas confirman que selector, título, resumen, ambas gráficas y tabla muestran el mismo nodo y periodo, y que “Simulated data” sigue visible.
+
+- [ ] **T-022 — Verificar con Playwright solo los estados alcanzables**
+      **Estimación:** 20 min · **Dependencias:** T-014, T-018 · **RF:** RF-6, RF-7
+      En `e2e/network-monitoring.spec.ts`, comprobar el nodo inexistente y únicamente otros estados que las rutas, controles o escenarios ya existentes puedan exponer directamente. Para estados no navegables en E2E, apoyarse en la cobertura existente de Vitest y Storybook; no añadir rutas, query flags ni modos de prueba.
+      **Hecho cuando:** Las pruebas verifican los estados E2E realmente alcanzables sin contenido obsoleto; se confirma la cobertura existente para los estados no alcanzables y no se crea un mecanismo de acceso nuevo.
+
+- [ ] **T-023 — Verificar teclado, foco y movimiento reducido**
+      **Estimación:** 25 min · **Dependencias:** T-015, T-016 · **RF:** RF-3, RF-4, RF-5, RF-8, RF-10
+      Completar o ajustar pruebas dirigidas de teclado/foco y movimiento reducido en `e2e/network-monitoring.spec.ts`, usando `page.emulateMedia({ reducedMotion: 'reduce' })` para el último caso.
+      **Hecho cuando:** Las pruebas alcanzan las acciones pertinentes por teclado, comprueban foco perceptible y confirman que reducir movimiento no elimina información ni funcionalidad.
+
+- [ ] **T-024 — Ejecutar una sola vez el detector Impeccable**
+      **Estimación:** 20 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023 · **RF:** RF-1, RF-8, RF-9, RF-10, RF-11, RF-12, RF-13
       Ejecutar `impeccable detect --json` una única vez sobre los targets realmente modificados y conservar sus resultados para revisión.
       **Hecho cuando:** El detector se ejecutó una vez, los findings se entregan al revisor y no se invoca de nuevo durante esta spec.
 
-- [ ] **T-021 — Capturar superficies y estados con Chrome DevTools**
-      **Estimación:** 30 min · **Dependencias:** T-019, T-020 · **RF:** RF-1, RF-2, RF-4, RF-6, RF-7, RF-11, RF-12, RF-13
+- [ ] **T-025 — Capturar superficies y estados con Chrome DevTools**
+      **Estimación:** 30 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023, T-024 · **RF:** RF-1, RF-2, RF-4, RF-6, RF-7, RF-11, RF-12, RF-13
       En una ronda batch, capturar inventario y detalle en desktop y 390 × 844 móvil, más la story de detalle vacío en ambos tamaños; capturar estados existentes adicionales solo donde las rutas actuales lo permitan.
       **Hecho cuando:** Cada captura parte de un estado estable, se abre y valida visualmente en `.impeccable/review/`, y consola/dimensiones no muestran errores ni contenido engañoso.
 
-- [ ] **T-022 — Realizar revisión independiente de cierre visual**
-      **Estimación:** 25 min · **Dependencias:** T-020, T-021 · **RF:** RF-1 a RF-13
+- [ ] **T-026 — Realizar revisión independiente de cierre visual**
+      **Estimación:** 25 min · **Dependencias:** T-024, T-025 · **RF:** RF-1 a RF-13
       Solicitar al revisor independiente (o asumir ese rol en una pasada separada si no hay subagentes) evaluación de referencias, campos, estados, accesibilidad, contraste, teclado, movimiento reducido, overflow y consola.
       **Hecho cuando:** El coordinador recibe findings priorizados y una decisión verificable de si existe algún bloqueo; el revisor no modifica archivos ni aprueba por el usuario.
 
-- [ ] **T-023 — Resolver findings de cierre en una ronda acotada**
-      **Estimación:** 25 min · **Dependencias:** T-022 · **RF:** RF afectados por findings dentro de RF-1 a RF-13
-      Si hay defectos dentro del alcance, corregirlos en un solo lote y hacer como máximo una ronda de confirmación visual. Si no hay findings, registrar esa evidencia sin editar.
-      **Hecho cuando:** No quedan findings materiales dentro del alcance y la ronda de confirmación (si aplica) valida las correcciones; cualquier necesidad de ampliar alcance vuelve a aprobación SDD.
+- [ ] **T-027 — Resolver findings de cierre en una ronda acotada**
+      **Estimación:** 25 min · **Dependencias:** T-026 · **RF:** RF afectados por findings dentro de RF-1 a RF-13
+      Limitar el trabajo a un lote de hasta 25 minutos y a los requisitos y archivos ya aprobados. Si no hay findings materiales, registrar esa evidencia sin editar; si los hay, corregirlos en el lote y realizar como máximo una ronda de confirmación visual.
+      **Hecho cuando:** **Éxito:** no quedan findings materiales dentro del alcance y la ronda única (si aplica) confirma las correcciones. **Parada, sin completar:** si no se pueden resolver y verificar todos dentro de 25 minutos, si el tiempo se agota o si hace falta ampliar alcance o crear archivos no autorizados, detenerse, dejar la tarea sin marcar y devolver el bloqueo al coordinador para un seguimiento SDD aprobado por separado; no ampliar el trabajo automáticamente.
 
-- [ ] **T-024 — Documentar el sistema visual y contrastes medidos**
-      **Estimación:** 30 min · **Dependencias:** T-023 · **RF:** RF-1, RF-7, RF-9, RF-10, RF-12, RF-13
+- [ ] **T-028 — Documentar el sistema visual y contrastes medidos**
+      **Estimación:** 30 min · **Dependencias:** T-027 · **RF:** RF-1, RF-7, RF-9, RF-10, RF-12, RF-13
       Solo después de terminar el build, usar el documenter oficial de Impeccable para crear/actualizar `DESIGN.md` y `.impeccable/design.json` con el mundo visual realmente implementado.
       **Hecho cuando:** Los artefactos describen los tokens medidos y aprobados; `DESIGN.md` incluye por par relevante foreground/background, valores sRGB/hex, ratio medido, mínimo WCAG 2.2 AA y pasa/falla para texto, controles/foco, estados y marcas/ejes.
 
-- [ ] **T-025 — Ejecutar verificación final del frontend**
-      **Estimación:** 30 min · **Dependencias:** T-024 · **RF:** RF-1 a RF-13
-      Ejecutar los comandos acordados: `npm run format:check`, `npm run lint`, `npm run test`, `npm run build`, `npm run build-storybook` y `npm run test:e2e`. No ejecutar xUnit ni full-stack si no cambió API/contrato.
-      **Hecho cuando:** Todos los comandos previstos terminan correctamente, cualquier advertencia se reporta sin ocultarla y no se observan errores de interfaz en los flujos comprobados.
+- [ ] **T-029 — Ejecutar verificaciones finales no E2E**
+      **Estimación:** 30 min · **Dependencias:** T-028 · **RF:** RF-1 a RF-13
+      Ejecutar `npm run format:check`, `npm run lint`, `npm run test`, `npm run build` y `npm run build-storybook`. No ejecutar xUnit ni full-stack si no cambió API/contrato. Si cualquier comando falla, detenerse y reportar el resultado; esta tarea no incluye diagnóstico ni correcciones.
+      **Hecho cuando:** Todos los comandos terminan correctamente y las advertencias se reportan sin ocultarlas; ante un fallo, la tarea queda sin completar y el coordinador recibe el comando y resultado fallidos, sin iniciar reparaciones dentro de esta verificación.
 
-- [ ] **T-026 — Cerrar la spec y refrescar Graphify**
-      **Estimación:** 30 min · **Dependencias:** T-001 a T-025 · **RF:** RF-1 a RF-13
-      Como cierre final, y solo tras completar las tareas de dirección, build, revisión, documentación y verificación, refrescar Graphify una vez mediante su workflow soportado e inspeccionar grafo/reporte; después actualizar `MEMORY.md` y el coordinador prepara el commit local requerido con salidas generadas intencionadas.
-      **Hecho cuando:** El grafo y reporte actualizados se inspeccionan, el diff contiene únicamente resultados previstos, `MEMORY.md` queda vigente y el coordinador crea el commit local; no se hace push ni deploy sin solicitud explícita.
+- [ ] **T-030 — Ejecutar la suite E2E completa**
+      **Estimación:** 30 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023, T-029 · **RF:** RF-2 a RF-12
+      Ejecutar únicamente `npm run test:e2e` como verificación integral final. Si falla, detenerse y reportar el resultado; esta tarea no incluye diagnóstico ni correcciones.
+      **Hecho cuando:** La suite completa termina correctamente; ante un fallo, la tarea queda sin completar y el coordinador recibe el test y resultado fallidos para decidir el siguiente paso, sin reparar nada dentro de esta verificación.
+
+## Cierre del coordinador (posterior al checklist)
+
+Solo después de completar todas las tareas numeradas T-001 a T-030, el coordinador refresca Graphify una sola vez mediante su workflow soportado e inspecciona el grafo y el reporte generados. Después actualiza `MEMORY.md` y crea el commit local requerido, incluyendo únicamente salidas generadas intencionadas y verificadas. No hace push ni deploy sin solicitud explícita.
