@@ -93,6 +93,7 @@ test.describe('Network monitoring dashboard', () => {
       { value: '7d', heading: 'Last 7 days performance (7d)', samples: 29 },
     ]
     const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
+    const metricsSummary = page.getByLabel('Metrics summary')
     const table = page.getByRole('table')
 
     for (const range of ranges) {
@@ -110,20 +111,27 @@ test.describe('Network monitoring dashboard', () => {
       ).toHaveAttribute('aria-pressed', 'true')
       await expect(page.getByText('Simulated data')).toBeVisible()
       await expect(page.getByRole('heading', { name: range.heading })).toBeVisible()
+      await expect(metricsSummary).toBeVisible()
+      await expect(metricsSummary.getByText('Latest latency')).toBeVisible()
+      await expect(metricsSummary.getByText('Average latency')).toBeVisible()
+      await expect(metricsSummary.getByText('Peak packet loss')).toBeVisible()
       await expect(latencyChart.locator('svg')).toBeVisible()
       await expect(packetLossChart.locator('svg')).toBeVisible()
 
       const metricContentOrder = await page.locator('.network-metrics').evaluate((section) =>
         Array.from(section.children)
-          .filter((element) => element.matches('figure, .network-metrics__table-wrapper'))
+          .filter((element) =>
+            element.matches('figure, dl.network-metrics__summary, .network-metrics__table-wrapper'),
+          )
           .map((element) => {
+            if (element.classList.contains('network-metrics__summary')) return 'summary'
             if (element.classList.contains('node-latency-chart')) return 'latency'
             if (element.classList.contains('node-packet-loss-chart')) return 'packet-loss'
             return 'table'
           }),
       )
 
-      expect(metricContentOrder).toEqual(['latency', 'packet-loss', 'table'])
+      expect(metricContentOrder).toEqual(['summary', 'latency', 'packet-loss', 'table'])
       await expect(latencyChart.locator('svg .recharts-dot.recharts-line-dot')).toHaveCount(
         range.samples,
       )

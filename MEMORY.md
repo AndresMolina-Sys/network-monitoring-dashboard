@@ -5,7 +5,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 ## Estado actual
 
 - Frontend React/TypeScript desplegado en Vercel; API ASP.NET Core .NET 10 desplegada en Render.
-- Dashboard responsive con inventario de nodos, detalle de métricas y selector de periodos `1h`, `24h` y `7d`.
+- Dashboard responsive con inventario de nodos, detalle de métricas y selector de periodos `1h`, `24h` y `7d`; el detalle resume latencia reciente, latencia promedio y pérdida máxima del periodo.
 - La API usa tres nodos de prueba en memoria y soporta métricas `1h`, `24h` y `7d`; no hay persistencia ni telemetría en tiempo real.
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
@@ -14,7 +14,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
 - El coordinador de Codex delega SDD a perfiles de proyecto: planificador, implementador de una tarea y revisor; los perfiles se versionan en `.codex/agents/`.
-- La Skill local `$feature` registra cambios pequeños en `feature.md`; por decisión del usuario, basta documentar el plan antes de implementar solicitudes localizadas, sin aprobación separada. F-001 y F-002 están completos.
+- La Skill local `$feature` implementa cambios pequeños y localizados directamente, sin lista de pasos ni artefacto de planificación; F-001, F-002 y F-003 están completos.
 
 ## Decisiones (y por qué)
 
@@ -31,7 +31,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La spec 001 cubre modo mock local y dashboard de producción; conserva el comportamiento existente de nodo inexistente y reintentos.
 - La Skill `$sdd` está en `.agents/skills/sdd/` y permanece local porque `.agents/` se ignora intencionalmente en Git.
 - Mantener al agente principal como único coordinador de aprobación; pasar a subagentes el alcance y contexto exactos, serializar escrituras y paralelizar solo revisiones independientes de solo lectura. Los perfiles heredan permisos del coordinador; sus instrucciones no son sandbox.
-- Para cambios pequeños solicitados, usar `feature.md` como registro/plan y proceder sin una puerta adicional de aprobación; detenerse ante decisiones materiales nuevas o límites de alcance.
+- Para cambios pequeños solicitados, `$feature` implementa directamente sin lista de pasos ni documento adicional; detenerse ante decisiones materiales nuevas o límites de alcance.
 - Al coordinar una solicitud nueva con `$sdd` sin fase explícita, clasificar primero: cambios localizados a `$feature`; cambios amplios o entre capas al flujo SDD. Las invocaciones con fase explícita conservan esa fase.
 
 ## Aprendizajes y errores a evitar

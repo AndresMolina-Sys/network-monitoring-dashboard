@@ -62,6 +62,19 @@ const RANGE_TITLES: Record<MetricsRange, string> = {
   '7d': 'Last 7 days performance (7d)',
 }
 
+const RANGE_SUMMARIES: Record<
+  MetricsRange,
+  {
+    readonly latestLatency: string
+    readonly averageLatency: string
+    readonly peakPacketLoss: string
+  }
+> = {
+  '1h': { latestLatency: '21 ms', averageLatency: '19.5 ms', peakPacketLoss: '0.2%' },
+  '24h': { latestLatency: '22 ms', averageLatency: '20 ms', peakPacketLoss: '0.2%' },
+  '7d': { latestLatency: '21 ms', averageLatency: '19.9 ms', peakPacketLoss: '0.2%' },
+}
+
 describe('NetworkNodeDetailsPage', () => {
   it('starts a new details view at 1h and renders its chart and accessible table', async () => {
     const service = createService()
@@ -69,6 +82,7 @@ describe('NetworkNodeDetailsPage', () => {
     renderDetailsPage(service)
 
     expect(await screen.findByRole('heading', { name: RANGE_TITLES['1h'] })).toBeInTheDocument()
+    expectMetricsSummary('1h')
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
     expect(screen.getByRole('button', { name: '1h' })).toHaveAttribute('aria-pressed', 'true')
@@ -130,6 +144,7 @@ describe('NetworkNodeDetailsPage', () => {
       await user.click(screen.getByRole('button', { name: range }))
 
       expect(await screen.findByRole('heading', { name: RANGE_TITLES[range] })).toBeInTheDocument()
+      expectMetricsSummary(range)
       expect(screen.getByRole('button', { name: range })).toHaveAttribute('aria-pressed', 'true')
       const otherRange = range === '1h' ? '24h' : '1h'
       expect(screen.getByRole('button', { name: otherRange })).toHaveAttribute(
@@ -299,9 +314,22 @@ function expectChartsShareMetrics(): void {
 }
 
 function expectNoMetricsVisuals(): void {
+  expect(screen.queryByLabelText('Metrics summary')).not.toBeInTheDocument()
   expect(screen.queryByRole('figure', { name: /Latency chart/ })).not.toBeInTheDocument()
   expect(screen.queryByRole('figure', { name: /Packet loss chart/ })).not.toBeInTheDocument()
   expect(screen.queryByRole('table')).not.toBeInTheDocument()
+}
+
+function expectMetricsSummary(range: MetricsRange): void {
+  const summary = screen.getByLabelText('Metrics summary')
+  const expected = RANGE_SUMMARIES[range]
+
+  expect(within(summary).getByText('Latest latency')).toBeInTheDocument()
+  expect(within(summary).getByText(expected.latestLatency)).toBeVisible()
+  expect(within(summary).getByText('Average latency')).toBeInTheDocument()
+  expect(within(summary).getByText(expected.averageLatency)).toBeVisible()
+  expect(within(summary).getByText('Peak packet loss')).toBeInTheDocument()
+  expect(within(summary).getByText(expected.peakPacketLoss)).toBeVisible()
 }
 
 function getTableRows(): HTMLElement[] {

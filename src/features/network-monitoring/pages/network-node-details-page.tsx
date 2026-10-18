@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import type { MetricsRange, NetworkNode } from '../../../domain/network'
+import type { MetricPoint, MetricsRange, NetworkNode } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NodeLatencyChart } from '../components/node-latency-chart'
@@ -43,6 +43,7 @@ export function NetworkNodeDetailsPage({
   const isNotFound = nodeStatus === 'not-found' || metricsStatus === 'not-found'
   const hasError = nodeStatus === 'error' || metricsStatus === 'error'
   const isLoading = nodeStatus === 'loading' || metricsStatus === 'loading'
+  const metricsSummary = metrics?.points.length ? summarizeMetrics(metrics.points) : null
 
   return (
     <main className="app-shell">
@@ -175,11 +176,27 @@ export function NetworkNodeDetailsPage({
       !isLoading &&
       nodeStatus === 'success' &&
       metricsStatus === 'success' &&
-      metrics ? (
+      metrics &&
+      metricsSummary ? (
         <section className="network-metrics" aria-labelledby="metrics-title">
           <div className="network-metrics__heading">
             <h2 id="metrics-title">{getMetricsHeading(selectedRange)}</h2>
           </div>
+
+          <dl className="network-metrics__summary" aria-label="Metrics summary">
+            <div>
+              <dt>Latest latency</dt>
+              <dd>{formatMetricValue(metricsSummary.latestLatencyMs)} ms</dd>
+            </div>
+            <div>
+              <dt>Average latency</dt>
+              <dd>{formatMetricValue(metricsSummary.averageLatencyMs)} ms</dd>
+            </div>
+            <div>
+              <dt>Peak packet loss</dt>
+              <dd>{formatMetricValue(metricsSummary.peakPacketLossPercent)}%</dd>
+            </div>
+          </dl>
 
           <NodeLatencyChart metrics={metrics} />
           <NodePacketLossChart metrics={metrics} />
@@ -225,6 +242,25 @@ function getMetricsHeading(range: MetricsRange): string {
     case '7d':
       return 'Last 7 days performance (7d)'
   }
+}
+
+function summarizeMetrics(points: readonly MetricPoint[]) {
+  const latencyTotal = points.reduce((total, point) => total + point.latencyMs, 0)
+  const latestPoint = points[points.length - 1]
+  const peakPacketLossPercent = points.reduce(
+    (peak, point) => Math.max(peak, point.packetLossPercent),
+    0,
+  )
+
+  return {
+    latestLatencyMs: latestPoint.latencyMs,
+    averageLatencyMs: latencyTotal / points.length,
+    peakPacketLossPercent,
+  }
+}
+
+function formatMetricValue(value: number): string {
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(value)
 }
 
 function formatNodeDate(timestamp: string): string {
