@@ -124,10 +124,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las pruebas confirman navegación y recuperación con los controles existentes, sin introducir rutas, filtros ni capacidades nuevas.
       **Resultado:** La suite existente ya cubría navegación de ida y vuelta, búsqueda, filtro por estado, lista vacía y limpieza. La ejecución dirigida pasó en Chromium desktop y mobile (4/4); no hizo falta modificar el comportamiento ni agregar pruebas o rutas.
 
-- [ ] **T-021 — Verificar sincronización del periodo seleccionado**
+- [x] **T-021 — Verificar sincronización del periodo seleccionado**
       **Estimación:** 25 min · **Dependencias:** T-011, T-013, T-018 · **RF:** RF-4, RF-7
       Completar o ajustar las pruebas Playwright de la página de detalle para seleccionar `1h`, `24h` y `7d` y comprobar el contenido visible asociado al rango actual.
       **Hecho cuando:** Para los tres rangos, las pruebas confirman que selector, título, resumen, ambas gráficas y tabla muestran el mismo nodo y periodo, y que “Simulated data” sigue visible.
+      **Resultado:** El test existente recorrió `1h`, `24h` y `7d` y confirmó selección activa, título, resumen, nombres de gráficas, muestras de ambas series, caption/filas de tabla y etiqueta “Simulated data”. Playwright dirigido pasó en Chromium desktop y mobile (2/2); no hizo falta modificar la prueba.
 
 - [ ] **T-022 — Verificar con Playwright solo los estados alcanzables**
       **Estimación:** 20 min · **Dependencias:** T-014, T-018 · **RF:** RF-6, RF-7
