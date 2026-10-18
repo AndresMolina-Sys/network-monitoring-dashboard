@@ -1,8 +1,8 @@
 # Tasks 003 — Rediseño visual integral del dashboard
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
-Las estimaciones indican trabajo activo y no incluyen el tiempo de espera de aprobaciones. Todas las tareas permanecen sin aprobar ni completar. Después de aprobar este checklist, cada tarea de implementación requerirá una solicitud explícita y se ejecutará de forma serial. Un único implementador conservará la propiedad de escritura de `src/App.css` durante toda la spec.
+Las estimaciones indican trabajo activo y no incluyen el tiempo de espera de aprobaciones. Todas las tareas permanecen sin completar. Cada tarea de implementación requiere una solicitud explícita y se ejecuta de forma serial. Un único implementador conservará la propiedad de escritura de `src/App.css` durante toda la spec.
 
 En cada tarea de implementación se ejecuta primero la prueba dirigida pertinente y después se revisa la story aplicable. Si se modifica comportamiento observable, se escribe o ajusta primero su prueba. No se avanza a otra tarea si falla una verificación.
 
