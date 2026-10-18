@@ -12,6 +12,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - `specs/002-grafica-perdida-de-paquetes/spec.md`, `plan.md` y `tasks.md` están aprobados; T-001 a T-005 están completas. La revisión manual de producción se confirmó con capturas del usuario; CI y Vercel están en verde.
 - T-010 se verificó en producción tras el commit `0bd3b22`: la UI ofrece `1h`, `24h` y `7d`, muestra “Simulated data” y la API responde 200 con 4, 25 y 29 puntos.
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
+- Graphify refrescado tras `12b7913`: 595 nodos, 815 enlaces y 94 comunidades con nombre; el diagnóstico no detectó enlaces huérfanos, endpoints faltantes ni colapsos.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
@@ -21,7 +22,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 - Mantener `NetworkMonitoringService` como límite entre UI y datos para poder alternar mock/API y probar componentes con servicios inyectados.
 - Mantener “Simulated data” junto al selector, visible sin hover en carga, éxito, vacío y error; no prometer uptime, alertas, autenticación o telemetría en tiempo real.
-- Mantener `graphify-out` generado y enlazado desde README; `AGENTS.md` exige actualizarlo al completar una spec y ante cambios significativos fuera de ella, no tras cada tarea individual.
+- Mantener `graphify-out` generado y enlazado desde README; actualizarlo al completar una spec o cambios significativos. Versionar solo reporte, HTML y JSON; dejar backups y notas locales fuera del stage.
 - Crear siempre un commit local al terminar cambios solicitados, con asunto convencional en inglés; hacer push solo cuando el usuario lo pida explícitamente. No añadir líneas `Co-authored-by` ni otra atribución de autor/agente.
 - No exponer claves, tokens ni secretos en archivos, logs, comandos, capturas o respuestas.
 - Mantener todo el código y contenido de la aplicación en inglés (identificadores, comentarios, pruebas, mensajes de API y textos visibles); la documentación puede seguir el idioma solicitado.
