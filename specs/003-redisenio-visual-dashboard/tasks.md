@@ -130,10 +130,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Para los tres rangos, las pruebas confirman que selector, título, resumen, ambas gráficas y tabla muestran el mismo nodo y periodo, y que “Simulated data” sigue visible.
       **Resultado:** El test existente recorrió `1h`, `24h` y `7d` y confirmó selección activa, título, resumen, nombres de gráficas, muestras de ambas series, caption/filas de tabla y etiqueta “Simulated data”. Playwright dirigido pasó en Chromium desktop y mobile (2/2); no hizo falta modificar la prueba.
 
-- [ ] **T-022 — Verificar con Playwright solo los estados alcanzables**
+- [x] **T-022 — Verificar con Playwright solo los estados alcanzables**
       **Estimación:** 20 min · **Dependencias:** T-014, T-018 · **RF:** RF-6, RF-7
       En `e2e/network-monitoring.spec.ts`, comprobar el nodo inexistente y únicamente otros estados que las rutas, controles o escenarios ya existentes puedan exponer directamente. Para estados no navegables en E2E, apoyarse en la cobertura existente de Vitest y Storybook; no añadir rutas, query flags ni modos de prueba.
       **Hecho cuando:** Las pruebas verifican los estados E2E realmente alcanzables sin contenido obsoleto; se confirma la cobertura existente para los estados no alcanzables y no se crea un mecanismo de acceso nuevo.
+      **Resultado:** Playwright confirma nodo inexistente sin selector ni datos de métricas en desktop y mobile (2/2). Vitest/Storybook cubren carga, error, vacío, etiqueta simulada, reintento y ausencia de visuales obsoletos (2 archivos, 11 pruebas aprobadas). El primer intento en sandbox no pudo abrir Chromium por caché inaccesible; el reintento autorizado fuera del sandbox pasó. No se agregaron rutas ni flags.
 
 - [ ] **T-023 — Verificar teclado, foco y movimiento reducido**
       **Estimación:** 25 min · **Dependencias:** T-015, T-016 · **RF:** RF-3, RF-4, RF-5, RF-8, RF-10
