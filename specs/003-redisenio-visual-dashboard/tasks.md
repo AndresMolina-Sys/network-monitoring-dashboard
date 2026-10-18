@@ -118,10 +118,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las pruebas dirigidas verifican en cada ancho que datos y controles esenciales no se recortan, que las acciones principales siguen utilizables y que `scrollWidth <= innerWidth`.
       **Resultado:** La matriz verifica campos del inventario/detalle, navegación ida y vuelta, selección de rango, tablas completas y ausencia de overflow en Chromium desktop y mobile (10/10). Las etiquetas del eje de ambas gráficas 7d se redujeron de ocho a seis marcas legibles para evitar solapamientos; el ID/nombre sin espacios se parte también en el encabezado y el estado Node not found. Se corrigieron los casos detectados en `App.css` y ambos componentes de gráfica. Lint, build, Prettier dirigido y `git diff --check` pasan.
 
-- [ ] **T-020 — Verificar navegación y búsqueda del inventario con Playwright**
+- [x] **T-020 — Verificar navegación y búsqueda del inventario con Playwright**
       **Estimación:** 25 min · **Dependencias:** T-009, T-017 · **RF:** RF-3, RF-5, RF-6
       Completar o ajustar en `e2e/network-monitoring.spec.ts` el recorrido de inventario a detalle y regreso, búsqueda, filtro por estado, limpieza y recuperación de una lista sin coincidencias.
       **Hecho cuando:** Las pruebas confirman navegación y recuperación con los controles existentes, sin introducir rutas, filtros ni capacidades nuevas.
+      **Resultado:** La suite existente ya cubría navegación de ida y vuelta, búsqueda, filtro por estado, lista vacía y limpieza. La ejecución dirigida pasó en Chromium desktop y mobile (4/4); no hizo falta modificar el comportamiento ni agregar pruebas o rutas.
 
 - [ ] **T-021 — Verificar sincronización del periodo seleccionado**
       **Estimación:** 25 min · **Dependencias:** T-011, T-013, T-018 · **RF:** RF-4, RF-7
