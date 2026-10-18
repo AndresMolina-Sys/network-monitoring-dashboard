@@ -14,6 +14,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
 - El coordinador de Codex delega SDD a perfiles de proyecto: planificador, implementador de una tarea y revisor; los perfiles se versionan en `.codex/agents/`.
+- La Skill local `$feature` registra cambios pequeños en `feature.md`; F-001 (etiqueta del inventario) y F-002 (accesibilidad de gráficas) están pendientes de aprobación y no autorizan cambios de producto.
 
 ## Decisiones (y por qué)
 
@@ -42,4 +43,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- No quedan tareas aprobadas pendientes en las Specs 001 y 002. Nuevas funcionalidades requieren una solicitud y su flujo SDD correspondiente.
+- Aprobar o ajustar F-001 y F-002 en `feature.md`; mantener el flujo SDD para cambios grandes o que crucen contratos/capas.
