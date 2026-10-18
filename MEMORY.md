@@ -9,7 +9,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La API usa tres nodos de prueba en memoria y soporta métricas `1h`, `24h` y `7d`; no hay persistencia ni telemetría en tiempo real.
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
-- `specs/002-grafica-perdida-de-paquetes/spec.md`, `plan.md` y `tasks.md` están aprobados; T-001 a T-003 están completas, T-004 es la siguiente.
+- `specs/002-grafica-perdida-de-paquetes/spec.md`, `plan.md` y `tasks.md` están aprobados; T-001 a T-004 están completas. T-005 espera una versión desplegada con autorización explícita.
 - T-010 se verificó en producción tras el commit `0bd3b22`: la UI ofrece `1h`, `24h` y `7d`, muestra “Simulated data” y la API responde 200 con 4, 25 y 29 puntos.
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
@@ -38,7 +38,8 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - En Recharts 3, las etiquetas del eje se renderizan en un grupo hermano; las stories deben consultar `.recharts-yAxis-tick-labels`. Para probar tooltips, enviar `mousemove` a las coordenadas del punto y esperar el valor renderizado.
 - En este entorno Windows, Vitest puede detenerse antes de ejecutar pruebas por `EPERM` al renombrar su caché temporal; con autorización, repetir la prueba dirigida fuera del sandbox.
 - Playwright puede quedar detenido antes de descubrir tests dentro del sandbox; la ejecución autorizada fuera del sandbox pasó desktop y móvil.
+- `npm run build-storybook` termina correctamente con una advertencia de chunks generados mayores de 500 kB; registrar la advertencia, no tratarla como fallo.
 
 ## Próximos pasos
 
-- Continuar con T-004 de Spec 002: ejecutar las verificaciones completas de calidad y compilación.
+- T-005 de Spec 002 requiere comprobar manualmente producción después de un despliegue autorizado; no hacer push ni deploy sin solicitud explícita.

@@ -20,7 +20,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Primero se amplía la suite E2E y luego `npm run test:e2e` pasa en Chromium de escritorio y móvil de 390 × 844 al recorrer `1h`, `24h` y `7d`; ambas gráficas y la tabla coinciden en periodo, conservan el orden aprobado, muestran la etiqueta y no hay desbordamiento horizontal.
 
-- [ ] **T-004 — Ejecutar verificaciones de calidad y compilación**
+- [x] **T-004 — Ejecutar verificaciones de calidad y compilación**
 
   **Estimación:** 25 min · **Dependencias:** T-001, T-002, T-003 · **RF:** RF-1 a RF-8
 
