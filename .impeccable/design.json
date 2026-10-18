@@ -1,0 +1,399 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T22:34:26Z",
+  "title": "Design System: Network Monitoring Dashboard",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "Warm Charcoal",
+        "tonalRamp": [
+          "#090b0e",
+          "#202225",
+          "#383b3e",
+          "#535559",
+          "#6f7275",
+          "#8d8f93",
+          "#abaeb2",
+          "#cbced2"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Graphite Surface",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#202224",
+          "#393b3d",
+          "#535558",
+          "#6f7274",
+          "#8d8f92",
+          "#acaeb1",
+          "#cbced1"
+        ]
+      },
+      "surface-solid": {
+        "role": "neutral",
+        "displayName": "Solid Graphite",
+        "tonalRamp": [
+          "#090b0e",
+          "#1f2225",
+          "#383b3e",
+          "#525659",
+          "#6e7276",
+          "#8c9093",
+          "#aaaeb2",
+          "#caced2"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Raised Graphite",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#202224",
+          "#393b3d",
+          "#535558",
+          "#6f7274",
+          "#8d8f92",
+          "#acaeb1",
+          "#cbced1"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "#0e0b05",
+          "#25211a",
+          "#3e3a32",
+          "#59554c",
+          "#757168",
+          "#938f85",
+          "#b2ada4",
+          "#d2cdc3"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Warm Secondary",
+        "tonalRamp": [
+          "#0e0b05",
+          "#25211a",
+          "#3e3a33",
+          "#59554d",
+          "#757169",
+          "#938f86",
+          "#b2ada5",
+          "#d2cdc4"
+        ]
+      },
+      "subtle-foreground": {
+        "role": "neutral",
+        "displayName": "Stone Label",
+        "tonalRamp": [
+          "#0e0b06",
+          "#25211b",
+          "#3e3a33",
+          "#59554e",
+          "#75716a",
+          "#938e87",
+          "#b2ada5",
+          "#d2cdc5"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Tooltip Edge",
+        "tonalRamp": [
+          "#0e0b06",
+          "#25211b",
+          "#3e3a33",
+          "#59554e",
+          "#75716a",
+          "#938e87",
+          "#b2ada5",
+          "#d2cdc5"
+        ]
+      },
+      "border-soft": {
+        "role": "neutral",
+        "displayName": "Quiet Rule",
+        "tonalRamp": [
+          "#0e0b06",
+          "#25211b",
+          "#3e3a33",
+          "#59554e",
+          "#75716a",
+          "#938e87",
+          "#b2ada5",
+          "#d2cdc5"
+        ]
+      },
+      "copper": {
+        "role": "primary",
+        "displayName": "Journal Copper",
+        "tonalRamp": [
+          "#1c0300",
+          "#351a00",
+          "#51330a",
+          "#6d4e28",
+          "#8b6b44",
+          "#aa8861",
+          "#caa77f",
+          "#ebc79e"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control Stone",
+        "tonalRamp": [
+          "#0c0b08",
+          "#23211e",
+          "#3c3a37",
+          "#575551",
+          "#73716d",
+          "#918f8b",
+          "#b0aea9",
+          "#d0cdc9"
+        ]
+      },
+      "range-selected-border": {
+        "role": "primary",
+        "displayName": "Selected Copper Edge",
+        "tonalRamp": [
+          "#1b0400",
+          "#341a00",
+          "#503318",
+          "#6c4e32",
+          "#8a6a4e",
+          "#a9886a",
+          "#c9a788",
+          "#eac6a7"
+        ]
+      },
+      "action-border": {
+        "role": "primary",
+        "displayName": "Recovery Copper Edge",
+        "tonalRamp": [
+          "#230000",
+          "#3e1200",
+          "#5b2d00",
+          "#794813",
+          "#986533",
+          "#b78251",
+          "#d8a16f",
+          "#fac18e"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Soft Copper Light",
+        "tonalRamp": [
+          "#230000",
+          "#3e1200",
+          "#5b2d00",
+          "#794813",
+          "#986533",
+          "#b78251",
+          "#d8a16f",
+          "#fac18e"
+        ]
+      },
+      "online": {
+        "role": "secondary",
+        "displayName": "Sea-glass",
+        "tonalRamp": [
+          "#00130a",
+          "#002b20",
+          "#034539",
+          "#286154",
+          "#467e70",
+          "#639c8d",
+          "#82bcac",
+          "#a1dccc"
+        ]
+      },
+      "degraded": {
+        "role": "tertiary",
+        "displayName": "Signal Amber",
+        "tonalRamp": [
+          "#200000",
+          "#3b1600",
+          "#573100",
+          "#744d00",
+          "#926a00",
+          "#b18824",
+          "#d2a749",
+          "#f3c76b"
+        ]
+      },
+      "offline": {
+        "role": "tertiary",
+        "displayName": "Muted Coral",
+        "tonalRamp": [
+          "#2a0000",
+          "#480000",
+          "#661e18",
+          "#863b32",
+          "#a6584e",
+          "#c7766a",
+          "#e99488",
+          "#ffb4a7"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Operational Display",
+        "purpose": "Compact page and section headings."
+      },
+      "body": {
+        "displayName": "Readable Sans",
+        "purpose": "Descriptions and supporting interface text."
+      },
+      "label": {
+        "displayName": "Measurement Mono",
+        "purpose": "Identifiers, timestamps, ranges, chart labels, and tabular values."
+      }
+    },
+    "shadows": [
+      {
+        "name": "panel-tooltip",
+        "value": "0 1rem 2rem rgba(0, 0, 0, 0.12)",
+        "purpose": "Soft separation for chart tooltips."
+      }
+    ],
+    "motion": [
+      {
+        "name": "fast-state",
+        "value": "150ms ease-out",
+        "purpose": "Short hover, focus, and control-state transitions; reduced-motion settings override it."
+      },
+      {
+        "name": "standard-state",
+        "value": "150ms ease-out",
+        "purpose": "Consistent state transitions for inventory rows and controls."
+      }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "640px" },
+      { "name": "chart-stack", "value": "860px" },
+      { "name": "tablet", "value": "960px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Filter Field",
+      "kind": "input",
+      "refersTo": "filter-field",
+      "description": "A compact search/filter input on a dark surface.",
+      "html": "<label class=\"ds-field\"><span>Node</span><input type=\"search\" value=\"core-router\" /></label>",
+      "css": ".ds-field { display: grid; gap: 6px; color: var(--color-subtle-foreground); font: 12px var(--font-mono); } .ds-field input { min-height: 44px; padding: 10px 13px; border: 1px solid var(--color-control-border); border-radius: var(--radius-sm); color: var(--color-foreground); background: var(--color-background); font: 500 14px var(--font-body); transition: border-color var(--motion-fast), background var(--motion-fast); } .ds-field input:focus-visible { border-color: var(--color-focus); outline: 3px solid var(--color-focus); outline-offset: 2px; }"
+    },
+    {
+      "name": "Node Inventory Row",
+      "kind": "card",
+      "refersTo": "network-node-card",
+      "description": "An open, full-row link with compact node identity and status.",
+      "html": "<a class=\"ds-node-row\" href=\"#node\"><span><small>NODE / core-router</small><strong>Core Router</strong></span><span class=\"ds-status ds-online\"><i></i>Online</span></a>",
+      "css": ".ds-node-row { display: flex; min-height: 92px; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 16px; border-bottom: 1px solid var(--color-border-soft); color: var(--color-foreground); text-decoration: none; transition: background var(--motion-standard); } .ds-node-row:hover { background: rgba(238, 233, 223, 0.035); } .ds-node-row:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; } .ds-node-row small { display: block; color: var(--color-subtle-foreground); font: 11px var(--font-mono); } .ds-node-row strong { display: block; margin-top: 6px; font: 600 19px var(--font-body); } .ds-status { display: inline-flex; align-items: center; gap: 6px; font: 600 12px var(--font-mono); } .ds-status i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; } .ds-online { color: var(--color-online); }"
+    },
+    {
+      "name": "Status Labels",
+      "kind": "chip",
+      "refersTo": "network-node-summary__status",
+      "description": "Text-led semantic status pills with a matching indicator dot.",
+      "html": "<span class=\"ds-status-pill ds-status-online\"><i></i>Online</span>",
+      "css": ".ds-status-pill { display: inline-flex; min-height: 28px; align-items: center; gap: 7px; padding: 5px 10px; border: 1px solid currentColor; border-radius: 999px; font: 600 12px var(--font-mono); } .ds-status-pill i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; } .ds-status-online { color: var(--color-online); background: rgba(139, 197, 181, 0.09); } .ds-status-degraded { color: var(--color-degraded); background: rgba(227, 184, 91, 0.09); } .ds-status-offline { color: var(--color-offline); background: rgba(227, 143, 131, 0.09); }"
+    },
+    {
+      "name": "Metric Period Selector",
+      "kind": "button",
+      "refersTo": "network-metrics__range-button",
+      "description": "A compact segmented selector with an explicit selected period.",
+      "html": "<div class=\"ds-periods\" role=\"group\" aria-label=\"Metric period\"><button aria-pressed=\"true\">1h</button><button aria-pressed=\"false\">24h</button><button aria-pressed=\"false\">7d</button></div>",
+      "css": ".ds-periods { display: inline-flex; gap: 2px; padding: 4px; border: 1px solid var(--color-border-soft); border-radius: var(--radius-md); background: var(--color-background); } .ds-periods button { min-width: 44px; min-height: 40px; padding: 8px 14px; border: 1px solid transparent; border-radius: 4px; color: var(--color-subtle-foreground); background: transparent; font: 13px var(--font-mono); transition: border-color var(--motion-fast), color var(--motion-fast), background var(--motion-fast); } .ds-periods button[aria-pressed=\"true\"] { border-color: var(--color-range-selected-border); color: var(--color-kicker); background: rgba(200, 165, 125, 0.12); } .ds-periods button:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }"
+    },
+    {
+      "name": "Simulated Data Label",
+      "kind": "chip",
+      "refersTo": "network-metrics__data-label",
+      "description": "Persistent copy that clarifies fixture data is simulated.",
+      "html": "<span class=\"ds-simulated\">Simulated data</span>",
+      "css": ".ds-simulated { display: inline-flex; min-height: 38px; align-items: center; padding: 7px 11px; border: 1px solid rgba(200, 165, 125, 0.2); border-radius: 999px; color: var(--color-kicker); background: rgba(200, 165, 125, 0.07); font: 11px var(--font-mono); white-space: nowrap; }"
+    },
+    {
+      "name": "Metric Chart Panel",
+      "kind": "custom",
+      "refersTo": "node-latency-chart",
+      "description": "A measured line chart on a restrained graphite surface.",
+      "html": "<figure class=\"ds-chart\"><figcaption>Latency trend · UTC</figcaption><svg viewBox=\"0 0 320 100\" role=\"img\" aria-label=\"Illustrative latency trend\"><path class=\"ds-grid\" d=\"M0 25H320 M0 50H320 M0 75H320\"/><path class=\"ds-line\" d=\"M8 70 C70 50 100 38 158 48 S250 65 312 22\"/></svg></figure>",
+      "css": ".ds-chart { margin: 0; padding: 20px; border: 1px solid var(--color-border-soft); border-top: 2px solid rgba(200, 165, 125, 0.62); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-foreground); } .ds-chart figcaption { margin-bottom: 14px; font: 600 14px var(--font-body); } .ds-chart svg { display: block; width: 100%; overflow: visible; } .ds-grid { fill: none; stroke: rgba(188, 183, 175, 0.14); stroke-dasharray: 2 5; } .ds-line { fill: none; stroke: var(--color-focus); stroke-width: 2.5; stroke-linecap: round; }"
+    },
+    {
+      "name": "Peak Loss Annotation",
+      "kind": "custom",
+      "refersTo": "network-metrics__annotation",
+      "description": "A compact note linked to the measured maximum packet-loss point.",
+      "html": "<aside class=\"ds-annotation\"><span>Peak packet loss</span><strong>Maximum in selected period</strong><p>See the timestamped sample in the table.</p></aside>",
+      "css": ".ds-annotation { display: grid; gap: 7px; padding: 14px 16px; border-top: 1px solid rgba(200, 165, 125, 0.45); color: var(--color-muted-foreground); background: linear-gradient(105deg, rgba(200, 165, 125, 0.055), transparent 75%); } .ds-annotation span { color: var(--color-kicker); font: 11px var(--font-mono); } .ds-annotation strong { color: var(--color-foreground); font: 600 16px var(--font-body); } .ds-annotation p { margin: 0; font: 13px/1.5 var(--font-body); }"
+    },
+    {
+      "name": "Recovery Button",
+      "kind": "button",
+      "refersTo": "network-node-state button",
+      "description": "A clear retry action with a measured copper boundary and focus ring.",
+      "html": "<button class=\"ds-retry\" type=\"button\">Try again</button>",
+      "css": ".ds-retry { min-height: 44px; padding: 11px 16px; border: 1px solid var(--color-action-border); border-radius: var(--radius-sm); color: var(--color-foreground); background: rgba(200, 165, 125, 0.12); font: 600 14px var(--font-body); transition: border-color var(--motion-fast), background var(--motion-fast); } .ds-retry:hover { border-color: var(--color-focus); background: rgba(200, 165, 125, 0.2); } .ds-retry:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Measurement Table",
+      "kind": "custom",
+      "refersTo": "network-metrics__table-wrapper",
+      "description": "An exact, horizontally scrollable textual alternative to the charts.",
+      "html": "<div class=\"ds-table-wrap\"><table><caption>Simulated measurements</caption><thead><tr><th>Timestamp</th><th>Latency</th><th>Packet loss</th></tr></thead><tbody><tr><td>17:00 UTC</td><td>18 ms</td><td>0%</td></tr></tbody></table></div>",
+      "css": ".ds-table-wrap { overflow-x: auto; border: 1px solid var(--color-border-soft); border-radius: var(--radius-md); background: var(--color-surface); } .ds-table-wrap table { width: 100%; border-collapse: collapse; color: var(--color-muted-foreground); font: 12px var(--font-mono); } .ds-table-wrap caption { padding: 16px 16px 4px; text-align: left; } .ds-table-wrap th, .ds-table-wrap td { padding: 11px 10px; border-bottom: 1px solid var(--color-border-soft); text-align: left; } .ds-table-wrap th { color: var(--color-subtle-foreground); font-weight: 600; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Applied Research Journal",
+    "overview": "The dashboard treats network health as an evidence review: warm charcoal surfaces, paper-toned type, and restrained copper annotations organize fixture data without dressing it up as live telemetry. Sea-glass, amber, and coral are reserved for the three meaningful node states. The detail view follows “Evidence Margin”: node context stays compact, latency leads, and packet loss is paired with a concise maximum-value annotation.\n\nThe interface favors readable operational density over a marketing-style hero. Clear hierarchy, quiet rules, and precise labels keep the inventory and metric evidence scannable on desktop and mobile. Motion is limited to short state transitions; reduced-motion preferences are honored.",
+    "keyCharacteristics": [
+      "Warm charcoal, paper-toned text, and restrained copper accents.",
+      "Status colors communicate node health; chart accents identify measured series.",
+      "Simulated fixture data is identified in the interface.",
+      "Compact inventory rows and an evidence-led detail composition."
+    ],
+    "rules": [
+      {
+        "name": "The Fixture Truth Rule",
+        "body": "Never style simulated measurements or their labels in a way that implies live monitoring.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measurement Mono Rule",
+        "body": "Reserve monospace for identifiers, addresses, timestamps, ranges, chart metadata, and tabular measurements; use the body face for prose.",
+        "section": "typography"
+      },
+      {
+        "name": "The Evidence Order Rule",
+        "body": "Keep node identity and status before metrics, latency as the leading chart, packet loss and its maximum annotation adjacent, and the exact sample table after the visual evidence.",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "Do preserve the Applied Research Journal palette and the Evidence Margin reading order.",
+      "Do identify all fixture measurements as simulated and keep the exact sample table available.",
+      "Do use the status hues only for their matching node states and retain readable text labels.",
+      "Do keep focus outlines visible and preserve the 3:1 measured boundaries for filters, selected periods, and recovery actions.",
+      "Do honor reduced-motion preferences and the responsive breakpoints documented above."
+    ],
+    "donts": [
+      "Don't claim live telemetry, persistence, uptime, alerting, or synchronization that the product does not provide.",
+      "Don't use copper as a node-health status or use status colors as general decoration.",
+      "Don't remove the table when changing chart presentation; it is the exact textual measurement alternative.",
+      "Don't treat decorative chart grid lines or soft separators as essential data marks or control boundaries."
+    ]
+  }
+}

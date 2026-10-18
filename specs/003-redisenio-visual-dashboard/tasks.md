@@ -166,10 +166,13 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** **Éxito:** no quedan findings materiales dentro del alcance y la ronda única (si aplica) confirma las correcciones. **Parada, sin completar:** si no se pueden resolver y verificar todos dentro de 25 minutos, si el tiempo se agota o si hace falta ampliar alcance o crear archivos no autorizados, detenerse, dejar la tarea sin marcar y devolver el bloqueo al coordinador para un seguimiento SDD aprobado por separado; no ampliar el trabajo automáticamente.
       **Resultado:** Se alineó el detalle con “Evidence Margin”: breadcrumb y metadatos compactos, latencia como gráfica principal y pérdida con anotación del máximo; Playwright confirmó escritorio, móvil y etiquetas 7d.
 
-- [ ] **T-028 — Documentar el sistema visual y contrastes medidos**
+- [x] **T-028 — Documentar el sistema visual y contrastes medidos**
       **Estimación:** 30 min · **Dependencias:** T-027 · **RF:** RF-1, RF-7, RF-9, RF-10, RF-12, RF-13
       Solo después de terminar el build, usar el documenter oficial de Impeccable para crear/actualizar `DESIGN.md` y `.impeccable/design.json` con el mundo visual realmente implementado.
+      **Ampliación aprobada:** ajustar exclusivamente los bordes de campos de búsqueda/filtro, del periodo seleccionado y de los botones de reintento/recuperación que no alcanzaron 3:1; volver a medirlos antes de documentar. No modificar otros estilos.
       **Hecho cuando:** Los artefactos describen los tokens medidos y aprobados; `DESIGN.md` incluye por par relevante foreground/background, valores sRGB/hex, ratio medido, mínimo WCAG 2.2 AA y pasa/falla para texto, controles/foco, estados y marcas/ejes.
+
+      **Resultado:** `DESIGN.md` y `.impeccable/design.json` describen los tokens reales y los contrastes calculados. Los bordes de filtros, periodo seleccionado y reintento/recuperación pasan con mínimos de 3.21:1, 3.33:1 y 3.17:1. El CLI local no ofrece `document`; se siguió su referencia oficial para redactar los artefactos. `npm run build`, validación YAML/JSON/rampas/componentes y Prettier dirigido pasan. Las mediciones parten de CSS y composición sRGB; DevTools no conectó al servidor local.
 
 - [ ] **T-029 — Ejecutar verificaciones finales no E2E**
       **Estimación:** 30 min · **Dependencias:** T-028 · **RF:** RF-1 a RF-13
