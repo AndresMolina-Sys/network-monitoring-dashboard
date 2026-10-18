@@ -148,10 +148,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** El detector se ejecutó una vez, los findings se entregan al revisor y no se invoca de nuevo durante esta spec.
       **Resultado:** Una ejecución detectó 4 avisos `side-tab` en `src/App.css` (líneas 240, 477, 904 y 1133). El revisor confirmó que son estilos anteriores a T-019, de prioridad baja (P3), y no bloquean la tarea; sus cambios CSS fueron de ajuste de texto y ancho mínimo. El detector no se volverá a ejecutar durante esta spec.
 
-- [ ] **T-025 — Capturar superficies y estados con Chrome DevTools**
+- [x] **T-025 — Capturar superficies y estados con Chrome DevTools**
       **Estimación:** 30 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023, T-024 · **RF:** RF-1, RF-2, RF-4, RF-6, RF-7, RF-11, RF-12, RF-13
       En una ronda batch, capturar inventario y detalle en desktop y 390 × 844 móvil, más la story de detalle vacío en ambos tamaños; capturar estados existentes adicionales solo donde las rutas actuales lo permitan.
       **Hecho cuando:** Cada captura parte de un estado estable, se abre y valida visualmente en `.impeccable/review/`, y consola/dimensiones no muestran errores ni contenido engañoso.
+      **Resultado:** Con autorización del usuario, Playwright se usó como alternativa a las capturas de Chrome DevTools. Se guardaron y revisaron seis capturas: inventario, detalle de `core-router` y estado vacío, en 1440 × 900 y 390 × 844. Las gráficas se recapturaron tras finalizar su animación; todos los trazos son visibles. Las seis páginas no tuvieron errores de consola ni overflow horizontal. Vite emitió advertencias de React Router sobre `HydrateFallback`, sin errores de ejecución.
 
 - [ ] **T-026 — Realizar revisión independiente de cierre visual**
       **Estimación:** 25 min · **Dependencias:** T-024, T-025 · **RF:** RF-1 a RF-13
