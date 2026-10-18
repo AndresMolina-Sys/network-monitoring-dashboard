@@ -14,7 +14,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Primero se amplían las pruebas de página y luego se integra el componente entre la gráfica de latencia y la tabla; las pruebas verifican datos compartidos, etiqueta “Simulated data”, tabla intacta y ausencia de datos gráficos obsoletos en carga, vacío, error y nodo inexistente.
 
-- [ ] **T-003 — Añadir y ejecutar aceptación E2E local**
+- [x] **T-003 — Añadir y ejecutar aceptación E2E local**
 
   **Estimación:** 25 min · **Dependencias:** T-002 · **RF:** RF-1, RF-2, RF-5, RF-7, RF-8
 

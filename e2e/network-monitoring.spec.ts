@@ -93,7 +93,13 @@ test.describe('Network monitoring dashboard', () => {
       { value: '7d', heading: 'Last 7 days performance (7d)', samples: 29 },
     ]
     const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
-    const chart = page.getByRole('figure', { name: 'Latency trend for core-router (UTC)' })
+    const latencyChart = page.getByRole('figure', {
+      name: 'Latency trend for core-router (UTC)',
+    })
+    const packetLossChart = page.getByRole('figure', {
+      name: 'Packet loss trend for core-router (UTC)',
+    })
+    const table = page.getByRole('table')
 
     for (const range of ranges) {
       await rangeSelector.getByRole('button', { name: range.value, exact: true }).click()
@@ -103,16 +109,39 @@ test.describe('Network monitoring dashboard', () => {
       ).toHaveAttribute('aria-pressed', 'true')
       await expect(page.getByText('Simulated data')).toBeVisible()
       await expect(page.getByRole('heading', { name: range.heading })).toBeVisible()
-      await expect(chart.locator('svg')).toBeVisible()
-      await expect(page.locator('tbody tr')).toHaveCount(range.samples)
+      await expect(latencyChart.locator('svg')).toBeVisible()
+      await expect(packetLossChart.locator('svg')).toBeVisible()
+
+      const metricContentOrder = await page.locator('.network-metrics').evaluate((section) =>
+        Array.from(section.children)
+          .filter((element) => element.matches('figure, .network-metrics__table-wrapper'))
+          .map((element) => {
+            if (element.classList.contains('node-latency-chart')) return 'latency'
+            if (element.classList.contains('node-packet-loss-chart')) return 'packet-loss'
+            return 'table'
+          }),
+      )
+
+      expect(metricContentOrder).toEqual(['latency', 'packet-loss', 'table'])
+      await expect(latencyChart.locator('svg .recharts-dot.recharts-line-dot')).toHaveCount(
+        range.samples,
+      )
+      await expect(packetLossChart.locator('svg .recharts-dot.recharts-line-dot')).toHaveCount(
+        range.samples,
+      )
+      await expect(table.locator('caption')).toHaveText(
+        `Latency and packet loss measurements for core-router (${range.value})`,
+      )
+      await expect(table.locator('thead th')).toHaveText(['Timestamp', 'Latency', 'Packet loss'])
+      await expect(table.locator('tbody tr')).toHaveCount(range.samples)
 
       if (range.value === '7d') {
-        const chartLabels = (await chart.locator('svg text').allTextContents()).map((label) =>
-          label.trim(),
+        const chartLabels = (await latencyChart.locator('svg text').allTextContents()).map(
+          (label) => label.trim(),
         )
         const dateLabels = chartLabels.filter((label) => /^[A-Z][a-z]{2} \d{1,2}$/.test(label))
         const timeLabels = chartLabels.filter((label) => /^\d{2}:\d{2}$/.test(label))
-        const dateLabelBounds = await chart.locator('svg text').evaluateAll((elements) =>
+        const dateLabelBounds = await latencyChart.locator('svg text').evaluateAll((elements) =>
           elements
             .filter((element) => /^[A-Z][a-z]{2} \d{1,2}$/.test(element.textContent?.trim() ?? ''))
             .map((element) => {
@@ -121,7 +150,7 @@ test.describe('Network monitoring dashboard', () => {
             })
             .sort((first, second) => first.left - second.left),
         )
-        const chartBounds = await chart.evaluate((element) => {
+        const chartBounds = await latencyChart.evaluate((element) => {
           const { left, right } = element.getBoundingClientRect()
           return { left, right }
         })
