@@ -25,6 +25,9 @@ describe('NetworkNodesPanel', () => {
     const loadingStatus = screen.getByRole('status')
 
     expect(loadingStatus).toHaveTextContent('Loading network nodes...')
+    expect(screen.queryByRole('searchbox', { name: 'Search nodes' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Monitored nodes' })).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('link', { name: /^View metrics for/ })).toHaveLength(0)
   })
 
   it('renders monitored nodes after a successful response', async () => {
@@ -149,6 +152,8 @@ describe('NetworkNodesPanel', () => {
 
     expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(3)
     expect(screen.getByText('Showing 3 of 3 nodes')).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: 'Search nodes' })).toHaveValue('')
+    expect(screen.getByRole('combobox', { name: 'Filter by status' })).toHaveValue('all')
   })
 
   it('renders the empty state when no nodes are returned', async () => {
@@ -171,6 +176,8 @@ describe('NetworkNodesPanel', () => {
         name: 'No network nodes found',
       }),
     ).toBeInTheDocument()
+    expect(screen.queryByRole('searchbox', { name: 'Search nodes' })).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('link', { name: /^View metrics for/ })).toHaveLength(0)
   })
 
   it('retries after an error and renders the nodes', async () => {
@@ -198,6 +205,9 @@ describe('NetworkNodesPanel', () => {
         name: 'Unable to load network nodes',
       }),
     ).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(screen.queryByRole('searchbox', { name: 'Search nodes' })).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('link', { name: /^View metrics for/ })).toHaveLength(0)
 
     await user.click(
       screen.getByRole('button', {
@@ -213,6 +223,7 @@ describe('NetworkNodesPanel', () => {
       ).toBeInTheDocument()
     })
 
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(listNodes).toHaveBeenCalledTimes(2)
   })
 })

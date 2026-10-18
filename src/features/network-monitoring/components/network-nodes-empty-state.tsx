@@ -1,7 +1,7 @@
 export function NetworkNodesEmptyState() {
   return (
     <section
-      className="network-node-state"
+      className="network-node-state network-node-state--empty"
       role="status"
       aria-labelledby="network-nodes-empty-title"
     >

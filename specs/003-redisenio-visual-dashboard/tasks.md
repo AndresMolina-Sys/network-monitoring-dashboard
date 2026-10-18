@@ -52,10 +52,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las pruebas/stories dirigidas pasan y nombre, estado, ID, dirección, ubicación y última comprobación se localizan sin hover ni animación; una tarjeta sigue llevando al detalle.
       **Resultado:** Las tarjetas pasan a filas de roster, con rótulo y texto de estado, ID, IP monoespaciada, ubicación y fecha UTC legible; se conserva el enlace de fila completa. Se añadió cobertura visible de los campos y enlaces. Router y stories del panel/tarjeta pasan (15/15); navegación E2E en escritorio/móvil (2/2) y overflow móvil (2/2); lint, build, Prettier dirigido y `git diff --check` pasan. Se actualizó en E2E el encabezado esperado, que seguía apuntando al título anterior de T-007.
 
-- [ ] **T-009 — Rediseñar controles y estados del inventario**
+- [x] **T-009 — Rediseñar controles y estados del inventario**
       **Estimación:** 25 min · **Dependencias:** T-008 · **RF:** RF-3, RF-6, RF-7, RF-12
       Ajustar búsqueda, filtro, limpieza, recuperación sin coincidencias y componentes existentes de carga, vacío y error. Para cualquier cambio de comportamiento, escribir o ajustar primero la prueba correspondiente.
       **Hecho cuando:** Las pruebas dirigidas confirman resultados y recuperación de filtros, además de estados comprensibles sin contenido obsoleto; no se altera la lógica de búsqueda/filtro.
+      **Resultado:** Se conservaron la lógica y los controles, se dio tratamiento visual cálido al panel, al estado sin resultados y a los estados de carga/vacío/error; el esqueleto ahora sigue el roster en filas. Las pruebas confirman limpieza de filtros, mensajes y ausencia de tarjetas obsoletas. Vitest completo: 107/107; stories dirigidas: 16/16; lint, build, Prettier dirigido y `git diff --check` pasan.
 
 - [ ] **T-010 — Rediseñar resumen y navegación del detalle**
       **Estimación:** 25 min · **Dependencias:** T-007 · **RF:** RF-1, RF-4, RF-5, RF-6, RF-7, RF-12
