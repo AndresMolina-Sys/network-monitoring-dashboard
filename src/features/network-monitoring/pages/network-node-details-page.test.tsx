@@ -76,6 +76,25 @@ const RANGE_SUMMARIES: Record<
 }
 
 describe('NetworkNodeDetailsPage', () => {
+  it('shows the selected node details and a return link to the inventory', async () => {
+    renderDetailsPage(createService())
+
+    const nodeSummary = await screen.findByRole('region', { name: 'Core Router' })
+
+    expect(screen.getByRole('link', { name: 'Back to dashboard' })).toHaveAttribute('href', '/')
+    expect(within(nodeSummary).getByText('Status')).toBeVisible()
+    expect(within(nodeSummary).getByText('Online')).toBeVisible()
+    expect(within(nodeSummary).getByText('Address')).toBeVisible()
+    expect(within(nodeSummary).getByText('10.0.0.1')).toBeVisible()
+    expect(within(nodeSummary).getByText('Location')).toBeVisible()
+    expect(within(nodeSummary).getByText('Main office')).toBeVisible()
+    expect(within(nodeSummary).getByText('Last checked')).toBeVisible()
+
+    const checkedAt = nodeSummary.querySelector('time')
+    expect(checkedAt).toHaveAttribute('datetime', TEST_NODE.lastCheckedAt)
+    expect(checkedAt).not.toBeEmptyDOMElement()
+  })
+
   it('starts a new details view at 1h and renders its chart and accessible table', async () => {
     const service = createService()
 

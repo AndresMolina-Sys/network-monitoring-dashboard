@@ -50,6 +50,7 @@ export function NetworkNodeDetailsPage({
       <header className="app-header app-header--detail">
         <div className="app-header__topline">
           <Link className="network-node-back-link" to="/">
+            <span aria-hidden="true">←</span>
             Back to dashboard
           </Link>
           <p className="app-eyebrow">Network node</p>

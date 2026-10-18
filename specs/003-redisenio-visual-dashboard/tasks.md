@@ -58,10 +58,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las pruebas dirigidas confirman resultados y recuperación de filtros, además de estados comprensibles sin contenido obsoleto; no se altera la lógica de búsqueda/filtro.
       **Resultado:** Se conservaron la lógica y los controles, se dio tratamiento visual cálido al panel, al estado sin resultados y a los estados de carga/vacío/error; el esqueleto ahora sigue el roster en filas. Las pruebas confirman limpieza de filtros, mensajes y ausencia de tarjetas obsoletas. Vitest completo: 107/107; stories dirigidas: 16/16; lint, build, Prettier dirigido y `git diff --check` pasan.
 
-- [ ] **T-010 — Rediseñar resumen y navegación del detalle**
+- [x] **T-010 — Rediseñar resumen y navegación del detalle**
       **Estimación:** 25 min · **Dependencias:** T-007 · **RF:** RF-1, RF-4, RF-5, RF-6, RF-7, RF-12
       Ajustar encabezado, resumen del nodo y retorno al inventario en `network-node-details-page.tsx` y estilos existentes, conservando identidad del nodo y navegación.
       **Hecho cuando:** Las pruebas dirigidas confirman nombre, estado y datos del nodo, retorno y carga directa de ruta; textos e indicadores no afirman telemetría en vivo o persistencia.
+      **Resultado:** Se refinó la cabecera, el enlace de retorno y el resumen visual de nodo, preservando campos, estado y copia simulada. Prueba dirigida de detalle/router: 11/11; Playwright para navegación ida/vuelta y carga directa en Chromium de escritorio/móvil: 4/4; lint, build, Prettier dirigido y `git diff --check` pasan. No se agregaron afirmaciones de telemetría real ni persistencia.
 
 - [ ] **T-011 — Rediseñar selector, resumen de métricas y etiqueta simulada**
       **Estimación:** 25 min · **Dependencias:** T-010 · **RF:** RF-4, RF-6, RF-7, RF-12
