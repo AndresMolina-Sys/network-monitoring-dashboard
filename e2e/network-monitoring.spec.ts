@@ -134,6 +134,67 @@ test.describe('Network monitoring dashboard', () => {
     }
   })
 
+  test('keeps node detail controls and measurements usable across viewport sizes', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/nodes/core-router')
+
+    const summary = page.getByLabel('Metrics summary')
+    const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
+    const latencyChart = page.getByRole('figure', { name: /Latency trend for core-router/ })
+    const packetLossChart = page.getByRole('figure', {
+      name: /Packet loss trend for core-router/,
+    })
+    const table = page.getByRole('table')
+
+    await expect(page.getByRole('link', { name: 'Back to dashboard' })).toBeVisible()
+    await expect(summary).toBeVisible()
+    await expect(rangeSelector).toBeVisible()
+    await expect(rangeSelector.getByRole('button', { name: '1h', exact: true })).toBeVisible()
+    await expect(page.getByText('Simulated data')).toBeVisible()
+    await expect(latencyChart.locator('svg')).toBeVisible()
+    await expect(packetLossChart.locator('svg')).toBeVisible()
+    await expect(table.locator('tbody tr')).toHaveCount(4)
+
+    for (const viewport of [
+      { width: 375, height: 812 },
+      { width: 390, height: 844 },
+      { width: 768, height: 900 },
+      { width: 1024, height: 900 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport)
+
+      for (const locator of [
+        page.getByRole('link', { name: 'Back to dashboard' }),
+        summary,
+        rangeSelector,
+        page.getByText('Simulated data'),
+        latencyChart,
+        packetLossChart,
+        table,
+      ]) {
+        await expect(locator).toBeVisible()
+
+        const bounds = await locator.evaluate((element) => {
+          const { left, right } = element.getBoundingClientRect()
+          return { left, right }
+        })
+
+        expect(bounds.left).toBeGreaterThanOrEqual(0)
+        expect(bounds.right).toBeLessThanOrEqual(viewport.width)
+      }
+
+      const dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+    }
+  })
+
   test('searches and filters nodes, including the no-results recovery state', async ({ page }) => {
     await page.goto('/')
 

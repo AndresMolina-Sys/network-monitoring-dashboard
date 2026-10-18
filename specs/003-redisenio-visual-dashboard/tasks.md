@@ -106,10 +106,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las verificaciones dirigidas en 375, 390, 768, 1024 y 1440 px no recortan contenido/acciones y `scrollWidth <= innerWidth`.
       **Resultado:** La prueba E2E revisa 320 px como proxy de zoom y 375, 390, 768, 1024 y 1440 px en desktop/mobile. Reprodujo recorte con ID y nombre largos sin separadores; se añadió `overflow-wrap: anywhere` solo a esos campos. Controles y campos del nodo permanecen visibles, la tarjeta no desborda y `scrollWidth <= innerWidth` en todas las medidas. E2E combinado con teclado: 4/4; lint, build, Prettier dirigido y `git diff --check` pasan.
 
-- [ ] **T-018 — Ajustar responsividad del detalle**
+- [x] **T-018 — Ajustar responsividad del detalle**
       **Estimación:** 25 min · **Dependencias:** T-010, T-011, T-012, T-013, T-014 · **RF:** RF-4, RF-6, RF-7, RF-11, RF-12
       Afinar resumen, selector, gráficas, tabla y estados en los tamaños cubiertos, sin modificar `playwright.config.ts`.
       **Hecho cuando:** Las verificaciones dirigidas en 375, 390 × 844, 768, 1024 y 1440 px mantienen utilizables controles y datos, sin desbordamiento horizontal de página.
+      **Resultado:** La prueba dirigida cubre enlace de retorno, resumen, selector y etiqueta, ambas gráficas, tabla y filas de datos en 375, 390 × 844, 768, 1024 y 1440 px; elementos dentro del viewport y `scrollWidth <= innerWidth`. No hizo falta alterar CSS: los estilos existentes ya conservan el contenido y los controles. Playwright: 2/2 (Chromium desktop/mobile); lint, build, Prettier dirigido y `git diff --check` pasan. El solapamiento de etiquetas del eje 7d, de 1.94 px en móvil, permanece expresamente diferido a T-019.
 
 - [ ] **T-019 — Verificar la matriz responsive con Playwright**
       **Estimación:** 25 min · **Dependencias:** T-017, T-018 · **RF:** RF-2, RF-3, RF-4, RF-6, RF-11, RF-12
