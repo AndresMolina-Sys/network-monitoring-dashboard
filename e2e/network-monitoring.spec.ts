@@ -364,8 +364,12 @@ test.describe('Network monitoring dashboard', () => {
       const headingOverflows = await nodeHeading.evaluate(
         (element) => element.scrollWidth > element.clientWidth,
       )
+      const identifierOverflows = await nodeIdentifier.evaluate(
+        (element) => element.scrollWidth > element.clientWidth,
+      )
 
       expect(headingOverflows).toBe(false)
+      expect(identifierOverflows).toBe(false)
     }
 
     await page.goto(`/nodes/${longIdentifier}`)
