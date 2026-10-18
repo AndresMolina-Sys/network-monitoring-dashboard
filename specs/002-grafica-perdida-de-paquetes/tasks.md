@@ -1,6 +1,6 @@
 # Tasks 002 — Gráfica de pérdida de paquetes
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
 - [ ] **T-001 — Crear la gráfica de pérdida de paquetes**
 
