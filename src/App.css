@@ -351,6 +351,7 @@ a {
 
 .network-node-card__eyebrow span {
   color: var(--color-muted-foreground);
+  overflow-wrap: anywhere;
 }
 
 .network-node-card__title {
@@ -360,6 +361,7 @@ a {
   font-weight: 560;
   letter-spacing: -0.025em;
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .network-node-card__details {

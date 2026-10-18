@@ -77,6 +77,63 @@ test.describe('Network monitoring dashboard', () => {
     expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
   })
 
+  test('keeps inventory controls and node fields visible across viewport sizes', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    const search = page.getByRole('searchbox', { name: 'Search nodes' })
+    const statusFilter = page.getByRole('combobox', { name: 'Filter by status' })
+    const firstNode = page.getByRole('link', { name: 'View metrics for Core Router' })
+    const nodeCard = firstNode.locator('article')
+
+    await expect(search).toBeVisible()
+    await expect(firstNode).toBeVisible()
+
+    await nodeCard.locator('.network-node-card__eyebrow span').evaluate((element) => {
+      element.textContent =
+        'regionalnetworkgatewaynorthcampusoperationscenteridentifierwithoutbreaks'
+    })
+    await nodeCard.locator('.network-node-card__title').evaluate((element) => {
+      element.textContent = 'RegionalNetworkGatewayOperationsCenterWithoutBreaks'
+    })
+    await nodeCard.locator('.network-node-card__detail code').evaluate((element) => {
+      element.textContent = '2001:0db8:85a3:0000:0000:8a2e:0370:7334:2001:0db8'
+    })
+    await nodeCard
+      .locator('.network-node-card__detail--location dd')
+      .first()
+      .evaluate((element) => {
+        element.textContent = 'North Campus Regional Network Operations Center, Building 12'
+      })
+
+    for (const width of [320, 375, 390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 })
+
+      await expect(search).toBeVisible()
+      await expect(statusFilter).toBeVisible()
+      await expect(nodeCard.locator('.network-node-card__title')).toBeVisible()
+      await expect(nodeCard.getByText('Online')).toBeVisible()
+      await expect(nodeCard.locator('.network-node-card__detail code')).toBeVisible()
+      await expect(
+        nodeCard.locator('.network-node-card__detail--location dd').first(),
+      ).toBeVisible()
+      await expect(nodeCard.getByText('Last checked')).toBeVisible()
+      await expect(nodeCard.getByText('Open metrics')).toBeVisible()
+
+      const dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+      const cardOverflows = await nodeCard.evaluate(
+        (element) => element.scrollWidth > element.clientWidth,
+      )
+
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+      expect(cardOverflows).toBe(false)
+    }
+  })
+
   test('searches and filters nodes, including the no-results recovery state', async ({ page }) => {
     await page.goto('/')
 

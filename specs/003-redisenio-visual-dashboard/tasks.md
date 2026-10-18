@@ -100,10 +100,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Recorrido manual por teclado alcanza las acciones y gráficas, el foco es visible, los nombres se entienden y las pruebas/stories dirigidas pasan.
       **Resultado:** La auditoría confirmó nombres y relaciones para filtros, estados, tabla y gráficas. Se añadieron anillos `:focus-visible` al enlace de retorno y a ambos SVG; Playwright recorre búsqueda, filtro, enlace, retorno, rangos y gráficas con foco visible en desktop/móvil (2/2). Tests de detalle y stories de teclado: 14/14; contraste del foco: 9.18:1 sobre el fondo y 8.12:1 sobre las superficies de gráficas. Lint, build, Prettier dirigido y `git diff --check` pasan.
 
-- [ ] **T-017 — Ajustar responsividad del inventario**
+- [x] **T-017 — Ajustar responsividad del inventario**
       **Estimación:** 25 min · **Dependencias:** T-008, T-009 · **RF:** RF-2, RF-3, RF-7, RF-11, RF-12
       Afinar estilos del inventario para tamaños estrechos, intermedios, zoom y contenido largo, preservando todos los campos y controles.
       **Hecho cuando:** Las verificaciones dirigidas en 375, 390, 768, 1024 y 1440 px no recortan contenido/acciones y `scrollWidth <= innerWidth`.
+      **Resultado:** La prueba E2E revisa 320 px como proxy de zoom y 375, 390, 768, 1024 y 1440 px en desktop/mobile. Reprodujo recorte con ID y nombre largos sin separadores; se añadió `overflow-wrap: anywhere` solo a esos campos. Controles y campos del nodo permanecen visibles, la tarjeta no desborda y `scrollWidth <= innerWidth` en todas las medidas. E2E combinado con teclado: 4/4; lint, build, Prettier dirigido y `git diff --check` pasan.
 
 - [ ] **T-018 — Ajustar responsividad del detalle**
       **Estimación:** 25 min · **Dependencias:** T-010, T-011, T-012, T-013, T-014 · **RF:** RF-4, RF-6, RF-7, RF-11, RF-12
