@@ -40,10 +40,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** La herramienta confirma `CODE-LED`, sin ronda de comps ni fases bloqueantes, y las aprobaciones requeridas están explícitas; si falta alguna, el trabajo visual permanece bloqueado.
       **Resultado:** `build-phase start --direction seed:107fcfd7b5a49f4c --artifact src/App.tsx` confirmó que no hay comp round ni phase gates; contrato, referencias y aprobaciones están registrados.
 
-- [ ] **T-007 — Establecer la base visual y el marco de página**
+- [x] **T-007 — Establecer la base visual y el marco de página**
       **Estimación:** 25 min · **Dependencias:** T-006 · **RF:** RF-1, RF-7, RF-10, RF-11, RF-12
       Actualizar la base visual en `src/index.css` y `src/App.css`, y aplicar el marco compartido en `src/App.tsx` sin fijar atributos distintos de la dirección aprobada.
       **Hecho cuando:** Las dos rutas usan la dirección aprobada y la identidad oscura es coherente; inventario y detalle conservan el reconocimiento honesto de datos de muestra/simulados. Ejecutar primero la prueba dirigida pertinente y revisar la story aplicable.
+      **Resultado:** Base carbón/papel/cobre, shell compacto de 1180 px y cabecera común aplicados a ambas rutas; se conserva “Simulated inventory” y “Simulated data”, y se eliminó la carga de fuentes externas. Router y story del panel pasan (2/2), al igual que lint, build, Prettier dirigido y `git diff --check`. `npm run format:check` global sigue señalando 49 archivos Impeccable no versionados, sin tocar. Los subagentes de implementación/revisión no entregaron un informe final; el coordinador verificó el diff por separado.
 
 - [ ] **T-008 — Rediseñar tarjetas y lectura del inventario**
       **Estimación:** 25 min · **Dependencias:** T-007 · **RF:** RF-1, RF-2, RF-7, RF-12

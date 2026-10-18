@@ -4,24 +4,11 @@ import { NetworkNodesPanel } from './features/network-monitoring/components/netw
 function App() {
   return (
     <main className="app-shell">
-      <header className="app-header">
+      <header className="app-header app-header--inventory">
         <div className="app-header__topline">
-          <p className="app-eyebrow">Network operations</p>
-          <p className="app-header__signal">
-            <span aria-hidden="true" />
-            Simulated inventory
-          </p>
+          <h1 className="app-header__brand">Network operations</h1>
+          <p className="app-header__signal">Simulated inventory</p>
         </div>
-
-        <h1>Network Monitoring Dashboard</h1>
-
-        <p className="app-header__lede">Know which link is slipping before it becomes an outage.</p>
-
-        <ul className="app-header__meta" aria-label="Dashboard capabilities">
-          <li>Availability</li>
-          <li>Latency</li>
-          <li>Packet loss</li>
-        </ul>
       </header>
 
       <NetworkNodesPanel />

@@ -1,32 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@400;500;600;700&display=swap');
-
 :root {
   color-scheme: dark;
-  --color-background: #0f172a;
-  --color-surface: rgba(27, 35, 54, 0.78);
-  --color-surface-solid: #1b2336;
-  --color-surface-raised: rgba(51, 65, 85, 0.34);
-  --color-foreground: #f8fafc;
-  --color-muted-foreground: #cbd5e1;
-  --color-subtle-foreground: #94a3b8;
-  --color-kicker: #67e8f9;
-  --color-border: rgba(148, 163, 184, 0.24);
-  --color-border-soft: rgba(148, 163, 184, 0.14);
-  --color-focus: #67e8f9;
-  --color-online: #86efac;
-  --color-online-bg: rgba(34, 197, 94, 0.12);
-  --color-degraded: #fcd34d;
-  --color-degraded-bg: rgba(245, 158, 11, 0.14);
-  --color-offline: #fca5a5;
-  --color-offline-bg: rgba(239, 68, 68, 0.14);
-  --color-danger: #fca5a5;
-  --font-body: 'Fira Sans', system-ui, sans-serif;
-  --font-mono: 'Fira Code', ui-monospace, monospace;
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --shadow-panel: 0 1.5rem 3rem rgba(2, 6, 23, 0.24);
-  --motion-fast: 160ms ease;
-  --motion-standard: 240ms ease;
+  --color-background: #17191c;
+  --color-surface: #222426;
+  --color-surface-solid: #24272a;
+  --color-surface-raised: #292b2d;
+  --color-foreground: #eee9df;
+  --color-muted-foreground: #d0cbc2;
+  --color-subtle-foreground: #bcb7af;
+  --color-kicker: #c8a57d;
+  --color-border: rgba(188, 183, 175, 0.28);
+  --color-border-soft: rgba(188, 183, 175, 0.16);
+  --color-focus: #e8b07e;
+  --color-online: #8bc5b5;
+  --color-online-bg: rgba(139, 197, 181, 0.14);
+  --color-degraded: #e3b85b;
+  --color-degraded-bg: rgba(227, 184, 91, 0.14);
+  --color-offline: #e38f83;
+  --color-offline-bg: rgba(227, 143, 131, 0.14);
+  --color-danger: #e38f83;
+  --font-body: Inter, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Cascadia Code', Consolas, ui-monospace, monospace;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --shadow-panel: 0 1rem 2rem rgba(0, 0, 0, 0.12);
+  --motion-fast: 150ms ease-out;
+  --motion-standard: 150ms ease-out;
 }
 
 * {
@@ -70,15 +68,17 @@ a {
 }
 
 .app-shell {
-  width: min(1240px, calc(100% - 2rem));
+  width: min(1180px, calc(100% - 2rem));
   min-height: 100dvh;
   margin: 0 auto;
-  padding: clamp(1.5rem, 4vw, 3.5rem) 0 clamp(3rem, 7vw, 6rem);
+  padding: clamp(1rem, 2.4vw, 2rem) 0 clamp(3rem, 6vw, 5rem);
 }
 
 .app-header {
-  max-width: 960px;
-  margin-bottom: clamp(3rem, 8vw, 7rem);
+  width: 100%;
+  margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--color-border-soft);
 }
 
 .app-header__topline {
@@ -86,7 +86,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .app-eyebrow,
@@ -101,59 +101,40 @@ a {
 }
 
 .app-header__signal {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
   margin: 0;
-  color: var(--color-online);
+  color: var(--color-kicker);
   font-family: var(--font-mono);
   font-size: 0.75rem;
-}
-
-.app-header__signal > span {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 0 0.25rem var(--color-online-bg);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .app-header h1 {
-  max-width: 9ch;
+  max-width: none;
   margin: 0;
   color: var(--color-foreground);
-  font-size: clamp(3.5rem, 10vw, 8.5rem);
-  font-weight: 700;
-  letter-spacing: -0.075em;
-  line-height: 0.88;
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
-.app-header__lede,
-.app-header > p:last-child {
+.app-header h1.app-header__brand {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.app-header__lede {
   max-width: 58ch;
-  margin: 2rem 0 0;
+  margin: 0.55rem 0 0;
   color: var(--color-muted-foreground);
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  line-height: 1.65;
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
-.app-header__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin: 2rem 0 0;
-  padding: 0;
-  color: var(--color-subtle-foreground);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  list-style: none;
-}
-
-.app-header__meta li {
-  padding: 0.45rem 0.7rem;
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-raised);
+.app-header--inventory .app-header__topline {
+  margin-bottom: 0;
 }
 
 .network-nodes-panel__header {
@@ -167,9 +148,9 @@ a {
 .network-nodes-panel__header h2 {
   margin: 0.45rem 0 0;
   color: var(--color-foreground);
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  letter-spacing: -0.05em;
-  line-height: 1;
+  font-size: clamp(1.5rem, 2.6vw, 1.875rem);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
 }
 
 .network-nodes-panel__summary {
@@ -603,16 +584,10 @@ a {
 }
 
 @media (max-width: 640px) {
-  .app-shell {
-    width: min(100% - 1.5rem, 42rem);
-    padding-top: 1.25rem;
-  }
-
   .app-header {
-    margin-bottom: 3.5rem;
+    margin-bottom: 2rem;
   }
 
-  .app-header__topline,
   .network-nodes-panel__header {
     align-items: start;
     flex-direction: column;
@@ -625,15 +600,6 @@ a {
 
   .network-nodes-panel__results {
     margin-bottom: 0;
-  }
-
-  .app-header h1 {
-    max-width: 8ch;
-    font-size: clamp(3.2rem, 18vw, 5.5rem);
-  }
-
-  .app-header__lede {
-    margin-top: 1.5rem;
   }
 
   .network-node-grid {
