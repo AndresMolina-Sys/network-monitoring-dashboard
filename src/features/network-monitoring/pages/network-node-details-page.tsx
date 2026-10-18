@@ -4,6 +4,7 @@ import type { MetricsRange, NetworkNode } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NodeLatencyChart } from '../components/node-latency-chart'
+import { NodePacketLossChart } from '../components/node-packet-loss-chart'
 import { NetworkNodeNotFoundState } from '../components/network-node-not-found-state'
 import { useNetworkNode } from '../hooks/use-network-node'
 import { useNodeMetrics } from '../hooks/use-node-metrics'
@@ -181,6 +182,7 @@ export function NetworkNodeDetailsPage({
           </div>
 
           <NodeLatencyChart metrics={metrics} />
+          <NodePacketLossChart metrics={metrics} />
 
           <div className="network-metrics__table-wrapper">
             <table>

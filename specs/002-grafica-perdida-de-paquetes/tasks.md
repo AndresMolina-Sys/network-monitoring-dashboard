@@ -8,7 +8,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Primero se añade una prueba Storybook/Vitest y luego `NodePacketLossChart` con estilos delimitados; la prueba comprueba muestras de 0 %, 0.2 % y 100 %, eje fijo inclusivo 0–100 % y tooltip con timestamp y porcentaje correctos.
 
-- [ ] **T-002 — Integrar la gráfica en el detalle del nodo**
+- [x] **T-002 — Integrar la gráfica en el detalle del nodo**
 
   **Estimación:** 25 min · **Dependencias:** T-001 · **RF:** RF-1, RF-2, RF-5, RF-6, RF-7, RF-8
 

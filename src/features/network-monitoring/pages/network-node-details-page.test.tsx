@@ -6,17 +6,32 @@ import { describe, expect, it, vi } from 'vitest'
 import type { MetricsRange, NetworkNode, NodeMetrics } from '../../../domain/network'
 import { NetworkNodeNotFoundError } from '../../../services/network-monitoring-errors'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
+import { NodeLatencyChart } from '../components/node-latency-chart'
+import { NodePacketLossChart } from '../components/node-packet-loss-chart'
 import { NetworkNodeDetailsPage } from './network-node-details-page'
 
 vi.mock('../components/node-latency-chart', () => ({
-  NodeLatencyChart: ({ metrics }: { metrics: NodeMetrics }) => (
+  NodeLatencyChart: vi.fn(({ metrics }: { readonly metrics: NodeMetrics }) => (
     <figure
       aria-label={`Latency chart for ${metrics.range}`}
       data-point-count={metrics.points.length}
     >
       <figcaption>Latency trend for {metrics.nodeId} (UTC)</figcaption>
     </figure>
-  ),
+  )),
+}))
+
+vi.mock('../components/node-packet-loss-chart', () => ({
+  NodePacketLossChart: vi.fn(({ metrics }: { readonly metrics: NodeMetrics }) => (
+    <figure
+      aria-label={`Packet loss chart for ${metrics.nodeId} (${metrics.range})`}
+      data-node-id={metrics.nodeId}
+      data-range={metrics.range}
+      data-point-count={metrics.points.length}
+    >
+      <figcaption>Packet loss trend for {metrics.nodeId} (UTC)</figcaption>
+    </figure>
+  )),
 }))
 
 const TEST_NODE: NetworkNode = {
@@ -59,11 +74,34 @@ describe('NetworkNodeDetailsPage', () => {
       '4',
     )
     expect(
-      screen.getByRole('table', {
-        name: 'Latency and packet loss measurements for core-router (1h)',
-      }),
-    ).toBeInTheDocument()
+      screen.getByRole('figure', { name: 'Packet loss chart for core-router (1h)' }),
+    ).toHaveAttribute('data-point-count', '4')
+    expectChartsShareMetrics()
+
+    const latencyChart = screen.getByRole('figure', { name: 'Latency chart for 1h' })
+    const packetLossChart = screen.getByRole('figure', {
+      name: 'Packet loss chart for core-router (1h)',
+    })
+    const table = screen.getByRole('table', {
+      name: 'Latency and packet loss measurements for core-router (1h)',
+    })
+    expect(
+      latencyChart.compareDocumentPosition(packetLossChart) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      packetLossChart.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(getTableRows()).toHaveLength(5)
+    expect(
+      within(table)
+        .getAllByRole('columnheader')
+        .map((header) => header.textContent),
+    ).toEqual(['Timestamp', 'Latency', 'Packet loss'])
+    expect(
+      Array.from(within(table).getAllByRole('row')[1].querySelectorAll('td')).map(
+        (cell) => cell.textContent,
+      ),
+    ).toEqual([createMetrics('1h').points[0].timestamp, '18 ms', '0%'])
     expect(service.getNodeMetrics).toHaveBeenCalledWith('core-router', '1h', expect.anything())
   })
 
@@ -93,6 +131,11 @@ describe('NetworkNodeDetailsPage', () => {
         'data-point-count',
         String(RANGE_FIXTURES[range].sampleCount),
       )
+      expect(
+        screen.getByRole('figure', { name: `Packet loss chart for core-router (${range})` }),
+      ).toHaveAttribute('data-point-count', String(RANGE_FIXTURES[range].sampleCount))
+      expectChartsShareMetrics()
+      expectSimulatedDataLabel()
       expect(getTableRows()).toHaveLength(RANGE_FIXTURES[range].sampleCount + 1)
       expect(
         screen.getByRole('table', {
@@ -135,6 +178,29 @@ describe('NetworkNodeDetailsPage', () => {
     expect(screen.getByRole('heading', { name: 'Loading node metrics...' })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
+    expectNoMetricsVisuals()
+  })
+
+  it('does not show the previous period chart while the selected period is loading', async () => {
+    const user = userEvent.setup()
+    const deferredMetrics = createDeferred<NodeMetrics>()
+    const service = createService(
+      vi.fn<NetworkMonitoringService['getNodeMetrics']>((_nodeId, range) =>
+        range === '1h' ? Promise.resolve(createMetrics(range)) : deferredMetrics.promise,
+      ),
+    )
+
+    renderDetailsPage(service)
+
+    expect(
+      await screen.findByRole('figure', { name: 'Packet loss chart for core-router (1h)' }),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '24h' }))
+
+    expect(await screen.findByRole('heading', { name: 'Loading node metrics...' })).toBeVisible()
+    expect(screen.getByRole('button', { name: '24h' })).toHaveAttribute('aria-pressed', 'true')
+    expectSimulatedDataLabel()
+    expectNoMetricsVisuals()
   })
 
   it('keeps the range selector available for empty and error states', async () => {
@@ -146,6 +212,7 @@ describe('NetworkNodeDetailsPage', () => {
     expect(await screen.findByRole('heading', { name: 'No metrics available' })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
+    expectNoMetricsVisuals()
     emptyView.unmount()
 
     const errorService = createService(vi.fn().mockRejectedValue(new Error('Request failed')))
@@ -156,6 +223,7 @@ describe('NetworkNodeDetailsPage', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
+    expectNoMetricsVisuals()
   })
 
   it('does not show the range selector when the node is not found', async () => {
@@ -166,6 +234,7 @@ describe('NetworkNodeDetailsPage', () => {
 
     expect(await screen.findByRole('heading', { name: 'Node not found' })).toBeInTheDocument()
     expect(screen.queryByRole('group', { name: 'Metrics range' })).not.toBeInTheDocument()
+    expectNoMetricsVisuals()
   })
 })
 
@@ -196,6 +265,29 @@ function createMetrics(range: MetricsRange): NodeMetrics {
       packetLossPercent: index % 2 === 0 ? 0 : 0.2,
     })),
   }
+}
+
+function createDeferred<T>() {
+  let resolve!: (value: T) => void
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise
+  })
+
+  return { promise, resolve }
+}
+
+function expectChartsShareMetrics(): void {
+  const latencyMetrics = vi.mocked(NodeLatencyChart).mock.lastCall?.[0].metrics
+  const packetLossMetrics = vi.mocked(NodePacketLossChart).mock.lastCall?.[0].metrics
+
+  expect(latencyMetrics).toBeDefined()
+  expect(packetLossMetrics).toBe(latencyMetrics)
+}
+
+function expectNoMetricsVisuals(): void {
+  expect(screen.queryByRole('figure', { name: /Latency chart/ })).not.toBeInTheDocument()
+  expect(screen.queryByRole('figure', { name: /Packet loss chart/ })).not.toBeInTheDocument()
+  expect(screen.queryByRole('table')).not.toBeInTheDocument()
 }
 
 function getTableRows(): HTMLElement[] {
