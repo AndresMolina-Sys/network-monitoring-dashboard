@@ -11,7 +11,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
-- Spec, plan y checklist de Spec 003 están aprobados; T-001 a T-005 completas. El contrato y ambas referencias están registrados; T-005 fue auditada en una pasada local porque los revisores delegados no devolvieron informe. Implementación no iniciada.
+- Spec, plan y checklist de Spec 003 están aprobados; T-001 a T-006 completas. T-005 se auditó localmente porque los revisores delegados no devolvieron informe; T-006 confirmó que code-led no tiene phase gates. T-007 inicia la implementación.
 - Graphify refrescado tras `12b7913`: 595 nodos, 815 enlaces y 94 comunidades con nombre; el diagnóstico no detectó enlaces huérfanos, endpoints faltantes ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-001 a T-005 completas; siguiente es T-006, verificar e iniciar el build gate aprobado de Impeccable. No iniciar código antes de completar el gate.
+- Spec 003: T-001 a T-006 completas; siguiente es T-007, establecer la base visual y el marco de página según el contrato code-led.
