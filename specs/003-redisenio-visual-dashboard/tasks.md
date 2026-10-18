@@ -136,10 +136,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las pruebas verifican los estados E2E realmente alcanzables sin contenido obsoleto; se confirma la cobertura existente para los estados no alcanzables y no se crea un mecanismo de acceso nuevo.
       **Resultado:** Playwright confirma nodo inexistente sin selector ni datos de métricas en desktop y mobile (2/2). Vitest/Storybook cubren carga, error, vacío, etiqueta simulada, reintento y ausencia de visuales obsoletos (2 archivos, 11 pruebas aprobadas). El primer intento en sandbox no pudo abrir Chromium por caché inaccesible; el reintento autorizado fuera del sandbox pasó. No se agregaron rutas ni flags.
 
-- [ ] **T-023 — Verificar teclado, foco y movimiento reducido**
+- [x] **T-023 — Verificar teclado, foco y movimiento reducido**
       **Estimación:** 25 min · **Dependencias:** T-015, T-016 · **RF:** RF-3, RF-4, RF-5, RF-8, RF-10
       Completar o ajustar pruebas dirigidas de teclado/foco y movimiento reducido en `e2e/network-monitoring.spec.ts`, usando `page.emulateMedia({ reducedMotion: 'reduce' })` para el último caso.
       **Hecho cuando:** Las pruebas alcanzan las acciones pertinentes por teclado, comprueban foco perceptible y confirman que reducir movimiento no elimina información ni funcionalidad.
+      **Resultado:** Las pruebas existentes recorren por teclado inventario, detalle, selector y gráficas con foco visible; en modo de movimiento reducido verifican selección de periodo, etiqueta, título, gráficas y tabla. Playwright dirigido pasó en Chromium desktop y mobile (4/4); no hizo falta modificar pruebas ni estilos.
 
 - [ ] **T-024 — Ejecutar una sola vez el detector Impeccable**
       **Estimación:** 20 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023 · **RF:** RF-1, RF-8, RF-9, RF-10, RF-11, RF-12, RF-13
