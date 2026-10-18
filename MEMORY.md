@@ -11,7 +11,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
-- Spec, plan y checklist de Spec 003 están aprobados; T-001 completada con la dirección “Applied Research Journal” aprobada. Faltan las referencias independientes para `/` y `/nodes/:nodeId` y sus aprobaciones antes de implementar.
+- Spec, plan y checklist de Spec 003 están aprobados; T-001 y T-002 completas con “Applied Research Journal” y la referencia del inventario `/` aprobadas. Falta la referencia de `/nodes/:nodeId` antes de implementar.
 - Graphify refrescado tras `12b7913`: 595 nodos, 815 enlaces y 94 comunidades con nombre; el diagnóstico no detectó enlaces huérfanos, endpoints faltantes ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
@@ -22,7 +22,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 - Mantener `NetworkMonitoringService` como límite entre UI y datos para poder alternar mock/API y probar componentes con servicios inyectados.
 - Mantener “Simulated data” junto al selector, visible sin hover en carga, éxito, vacío y error; no prometer uptime, alertas, autenticación o telemetría en tiempo real.
-- Para Spec 003, usar “Applied Research Journal”: jerarquía editorial clara para escanear nodos y evidencia de medición; la selección no aprueba las referencias específicas de las pantallas ni autoriza cambios de interfaz.
+- Para Spec 003, usar “Applied Research Journal”: jerarquía editorial para escanear nodos y evidencia; la referencia de `/` está aprobada, pero falta la de detalle y aún no se autoriza implementar.
 - Mantener `graphify-out` generado y enlazado desde README; actualizarlo al completar una spec o cambios significativos. Versionar solo reporte, HTML y JSON; dejar backups y notas locales fuera del stage.
 - Crear siempre un commit local al terminar cambios solicitados, con asunto convencional en inglés; hacer push solo cuando el usuario lo pida explícitamente. No añadir líneas `Co-authored-by` ni otra atribución de autor/agente.
 - No exponer claves, tokens ni secretos en archivos, logs, comandos, capturas o respuestas.
@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-001 completa; obtener y aprobar por separado las referencias code-first del inventario y del detalle antes del build. Mantener el flujo SDD para cambios grandes o que crucen contratos/capas.
+- Spec 003: T-001 y T-002 completas; obtener y aprobar la referencia code-first de `/nodes/:nodeId` antes del build. Mantener el flujo SDD para cambios grandes o que crucen contratos/capas.

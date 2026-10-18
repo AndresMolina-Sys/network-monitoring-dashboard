@@ -2,7 +2,7 @@
 
 Estado: Aprobado por el usuario
 
-Las estimaciones indican trabajo activo y no incluyen el tiempo de espera de aprobaciones. T-001 está completa; las tareas restantes requieren una solicitud explícita y se ejecutan de forma serial. Un único implementador conservará la propiedad de escritura de `src/App.css` durante toda la spec.
+Las estimaciones indican trabajo activo y no incluyen el tiempo de espera de aprobaciones. T-001 y T-002 están completas; las tareas restantes requieren una solicitud explícita y se ejecutan de forma serial. Un único implementador conservará la propiedad de escritura de `src/App.css` durante toda la spec.
 
 En cada tarea de implementación se ejecuta primero la prueba dirigida pertinente y después se revisa la story aplicable. Si se modifica comportamiento observable, se escribe o ajusta primero su prueba. No se avanza a otra tarea si falla una verificación.
 
@@ -11,7 +11,7 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       Ejecutar el flujo Impeccable aprobado `concept-seed --scope direction --mode operate`; no editar la interfaz.
       **Hecho cuando:** Se presentan las direcciones generadas y la persona usuaria selecciona y aprueba explícitamente una antes de continuar.
 
-- [ ] **T-002 — Obtener y aprobar referencia code-first del inventario**
+- [x] **T-002 — Obtener y aprobar referencia code-first del inventario**
       **Estimación:** 25 min · **Dependencias:** T-001 · **RF:** RF-1, RF-2, RF-12, RF-13
       Revisar primero si la dirección aprobada trae una referencia específica para `/`; si no, usar `concept-seed --scope surface --mode operate` en esa superficie. Solo si no produce boceto HTML, usar el fallback oficial `serve-question --schema`.
       **Hecho cuando:** Se presenta una referencia visual identificada con `/` y la persona usuaria la aprueba explícitamente; no se inicia código.
