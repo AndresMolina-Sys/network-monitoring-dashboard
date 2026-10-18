@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-028 completada: DESIGN.md/sidecar y contrastes documentados. T-029 pendiente: `npm run format:check` falla con 49 archivos locales de Impeccable; los comandos posteriores no se ejecutaron. Requiere decidir cómo tratar esos recursos antes de reintentar.
+- Spec 003: T-028 completada. T-029 pendiente: las exclusiones locales de Impeccable dejan Prettier en verde; lint pasa. `npm run test` se detuvo antes de pruebas por Chromium ausente y `EPERM` en la caché temporal; build y Storybook no se ejecutaron.

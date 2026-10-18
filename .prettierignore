@@ -5,3 +5,8 @@ test-results/
 playwright-report/
 blob-report/
 graphify-out/
+# Local Impeccable resources are maintained by their own tooling.
+.github/agents/impeccable-*.agent.md
+.github/skills/impeccable/
+.impeccable/mocks/
+.impeccable/questions/
