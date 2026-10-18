@@ -15,7 +15,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
 - `$feature` implementa cambios pequeños directamente, sin lista de pasos, `feature.md` ni aprobación adicional; F-001, F-002 y F-003 están completos.
-- Impeccable está inicializado en `PRODUCT.md`; las futuras landing pages o superficies showcase son code-first.
+- Impeccable está inicializado en `PRODUCT.md`; las superficies showcase son code-first y el detector está activado. Codex puede requerir aprobación inicial con `/hooks`.
 
 ## Decisiones (y por qué)
 
