@@ -22,10 +22,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Se presenta una referencia independiente identificada con `/nodes/:nodeId` y la persona usuaria la aprueba explícitamente; no se inicia código.
       **Aprobación:** “Evidence Margin”, con la gráfica de latencia como foco y la pérdida/anotación en una columna lateral; aprobada para la composición de escritorio.
 
-- [ ] **T-004 — Registrar y releer el contrato visual**
+- [x] **T-004 — Registrar y releer el contrato visual**
       **Estimación:** 25 min · **Dependencias:** T-002, T-003 · **RF:** RF-13
       Resolver la ubicación mediante `surface-brief read src/App.tsx`; escribir con el comando oficial el contrato aprobado de seis bloques (`THESIS`, `OWN-WORLD`, `STORY`, `FIRST VIEWPORT`, `FORM`, `FINISH`) y asociar las dos referencias usando solo el formato soportado.
       **Hecho cuando:** Una lectura posterior confirma los seis bloques y las asociaciones aprobadas para inventario y detalle; si la herramienta no puede registrarlas, se detiene y se consulta al usuario.
+      **Resultado:** `.impeccable/surfaces/src-app-tsx.md` registra los seis bloques y relaciona los dos HTML aprobados mediante `related_targets`.
 
 - [ ] **T-005 — Auditar la interfaz existente antes del build**
       **Estimación:** 25 min · **Dependencias:** T-004 · **RF:** RF-2, RF-3, RF-4, RF-6, RF-8, RF-9, RF-10, RF-11, RF-12

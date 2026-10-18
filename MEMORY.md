@@ -11,7 +11,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
-- Spec, plan y checklist de Spec 003 están aprobados; T-001 a T-003 completas. “Applied Research Journal” y las referencias de `/` y `/nodes/:nodeId` están aprobadas; implementación no iniciada.
+- Spec, plan y checklist de Spec 003 están aprobados; T-001 a T-004 completas. “Applied Research Journal” y las referencias de `/` y `/nodes/:nodeId` están aprobadas; el contrato de seis bloques las asocia en `.impeccable/surfaces/src-app-tsx.md`. Implementación no iniciada.
 - Graphify refrescado tras `12b7913`: 595 nodos, 815 enlaces y 94 comunidades con nombre; el diagnóstico no detectó enlaces huérfanos, endpoints faltantes ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
@@ -22,7 +22,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 - Mantener `NetworkMonitoringService` como límite entre UI y datos para poder alternar mock/API y probar componentes con servicios inyectados.
 - Mantener “Simulated data” junto al selector, visible sin hover en carga, éxito, vacío y error; no prometer uptime, alertas, autenticación o telemetría en tiempo real.
-- Para Spec 003, usar “Applied Research Journal”: jerarquía editorial para escanear nodos y evidencia. “Evidence Margin” es la composición aprobada para `/nodes/:nodeId`: latencia protagonista con pérdida y evidencia lateral; responsive y otros estados se validan en tareas posteriores.
+- Para Spec 003, usar “Applied Research Journal”: jerarquía editorial para escanear nodos y evidencia. “Evidence Margin” es la composición aprobada para `/nodes/:nodeId`: latencia protagonista con pérdida y evidencia lateral; responsive y otros estados se validan en tareas posteriores. La brief oficial enlaza y registra ambos HTML con `related_targets`.
 - Mantener `graphify-out` generado y enlazado desde README; actualizarlo al completar una spec o cambios significativos. Versionar solo reporte, HTML y JSON; dejar backups y notas locales fuera del stage.
 - Crear siempre un commit local al terminar cambios solicitados, con asunto convencional en inglés; hacer push solo cuando el usuario lo pida explícitamente. No añadir líneas `Co-authored-by` ni otra atribución de autor/agente.
 - No exponer claves, tokens ni secretos en archivos, logs, comandos, capturas o respuestas.
@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-001 a T-003 completas; siguiente es T-004, registrar y releer el contrato visual aprobado. No iniciar el build hasta completar sus aprobaciones y tareas previas.
+- Spec 003: T-001 a T-004 completas; siguiente es T-005, auditar la interfaz existente en solo lectura. No iniciar el build hasta completar sus aprobaciones y tareas previas.
