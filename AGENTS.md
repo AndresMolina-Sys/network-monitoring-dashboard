@@ -52,6 +52,7 @@ If port 5173 is occupied, set `PLAYWRIGHT_PORT` before `npm run test:e2e` (for e
 - `$feature` implements clearly requested small changes directly. Do not create `feature.md`, a task checklist, or a separate plan-approval gate. Route scope that crosses its boundaries to SDD.
 - SDD uses phase skills in `.agents/skills/sdd-*/`; the main conversation retains user questions and approvals. Use the project planner, implementer, and reviewer profiles for their assigned work. A reviewer automatically checks every created or changed spec before it is presented; the planner may correct only that spec and the reviewer rechecks. Agents never approve on the user's behalf.
 - Preserve separate approval gates for spec, plan, and tasks. Implementation requires all three approved artifacts and covers only the specifically requested task. Stop after that task.
+- After all tasks in a spec are complete, refresh Graphify once for that spec using its supported workflow, inspect the generated graph/report, and include intended tracked outputs in the final commit. Do not regenerate after each task or hand-edit generated files.
 - Extend existing service and test/story patterns. At handoff, report changed files, checks actually run, and remaining limitations.
 
 Project-authored skills (`feature`, `sdd`, `sdd-*`) are versioned. Keep third-party skills installed under `.agents/skills/` local and untracked.
