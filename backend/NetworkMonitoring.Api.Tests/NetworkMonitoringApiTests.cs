@@ -7,6 +7,20 @@ namespace NetworkMonitoring.Api.Tests;
 public sealed class NetworkMonitoringApiTests
     : IClassFixture<WebApplicationFactory<global::Program>>
 {
+    private static readonly string[] NodeIds =
+    [
+        "core-router",
+        "access-switch-01",
+        "branch-gateway",
+    ];
+
+    private static readonly (string Range, int SampleCount, TimeSpan Cadence)[] MetricRanges =
+    [
+        ("1h", 4, TimeSpan.FromMinutes(20)),
+        ("24h", 25, TimeSpan.FromHours(1)),
+        ("7d", 29, TimeSpan.FromHours(6)),
+    ];
+
     private readonly HttpClient client;
 
     public NetworkMonitoringApiTests(
@@ -58,10 +72,53 @@ public sealed class NetworkMonitoringApiTests
     }
 
     [Fact]
-    public async Task Get_metrics_returns_metrics_for_the_requested_range()
+    public async Task Get_metrics_returns_complete_ranges_for_all_nodes()
+    {
+        foreach (var nodeId in NodeIds)
+        {
+            DateTimeOffset? sharedLatestTimestamp = null;
+
+            foreach (var (range, sampleCount, cadence) in MetricRanges)
+            {
+                var metrics = await client.GetFromJsonAsync<NodeMetricsResponse>(
+                    $"/api/nodes/{nodeId}/metrics?range={range}"
+                );
+
+                Assert.NotNull(metrics);
+                Assert.Equal(nodeId, metrics!.NodeId);
+                Assert.Equal(range, metrics.Range);
+                Assert.Equal(sampleCount, metrics.Points.Count);
+                Assert.All(
+                    metrics.Points,
+                    point => Assert.Equal(TimeSpan.Zero, point.Timestamp.Offset)
+                );
+
+                for (var index = 1; index < metrics.Points.Count; index++)
+                {
+                    Assert.Equal(
+                        cadence,
+                        metrics.Points[index].Timestamp - metrics.Points[index - 1].Timestamp
+                    );
+                }
+
+                var latestTimestamp = metrics.Points[metrics.Points.Count - 1].Timestamp;
+                if (sharedLatestTimestamp is null)
+                {
+                    sharedLatestTimestamp = latestTimestamp;
+                }
+                else
+                {
+                    Assert.Equal(sharedLatestTimestamp.Value, latestTimestamp);
+                }
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Get_metrics_without_range_defaults_to_one_hour()
     {
         var metrics = await client.GetFromJsonAsync<NodeMetricsResponse>(
-            "/api/nodes/core-router/metrics?range=1h"
+            "/api/nodes/core-router/metrics"
         );
 
         Assert.NotNull(metrics);
@@ -74,7 +131,7 @@ public sealed class NetworkMonitoringApiTests
     public async Task Get_metrics_with_unsupported_range_returns_bad_request()
     {
         var response = await client.GetAsync(
-            "/api/nodes/core-router/metrics?range=24h"
+            "/api/nodes/core-router/metrics?range=12h"
         );
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -84,7 +141,7 @@ public sealed class NetworkMonitoringApiTests
     public async Task Get_metrics_for_unknown_node_returns_not_found()
     {
         var response = await client.GetAsync(
-            "/api/nodes/unknown-node/metrics?range=1h"
+            "/api/nodes/unknown-node/metrics?range=12h"
         );
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

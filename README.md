@@ -54,6 +54,8 @@ For local development, the frontend uses the mock service when `VITE_API_BASE_UR
 
 The API provides node listings, node lookup, health checks, and range-aware latency metrics.
 
+Node metrics support the `1h`, `24h`, and `7d` ranges. If the `range` query parameter is omitted, the API defaults to `1h`; the node details page also opens with `1h` selected.
+
 ## Architecture
 
 The application is organized around a replaceable service boundary:
@@ -128,9 +130,8 @@ Cancellation is handled with `AbortController` so obsolete requests do not updat
 ## Roadmap
 
 1. Persist monitored nodes and measurements in SQL Server.
-2. Add configurable time ranges such as `24h` and `7d`.
-3. Add periodic refresh, retry backoff, and monitoring alerts.
-4. Expand the dashboard with packet loss visualization and summary metrics.
+2. Add periodic refresh, retry backoff, and monitoring alerts.
+3. Expand the dashboard with packet loss visualization and summary metrics.
 
 ## Getting Started
 
@@ -195,6 +196,8 @@ The mock service supports dedicated demo scenarios:
 - `GET /api/nodes`
 - `GET /api/nodes/{nodeId}`
 - `GET /api/nodes/{nodeId}/metrics?range=1h`
+
+The metrics endpoint supports `1h`, `24h`, and `7d`; omitting `range` defaults to `1h`.
 
 ### Available Commands
 

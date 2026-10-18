@@ -1,6 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import type { NetworkNode } from '../../../domain/network'
+import type { MetricsRange, NetworkNode } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NodeLatencyChart } from '../components/node-latency-chart'
@@ -18,10 +18,13 @@ const NODE_STATUS_LABELS: Record<NetworkNode['status'], string> = {
   offline: 'Offline',
 }
 
+const METRICS_RANGES: readonly MetricsRange[] = ['1h', '24h', '7d']
+
 export function NetworkNodeDetailsPage({
   service = networkMonitoringService,
 }: NetworkNodeDetailsPageProps) {
   const { nodeId = 'unknown' } = useParams()
+  const [selectedRange, setSelectedRange] = useState<MetricsRange>('1h')
 
   const { status: nodeStatus, node, retry: retryNode } = useNetworkNode(nodeId, service)
 
@@ -29,7 +32,7 @@ export function NetworkNodeDetailsPage({
     status: metricsStatus,
     metrics,
     retry: retryMetrics,
-  } = useNodeMetrics(nodeId, '1h', service)
+  } = useNodeMetrics(nodeId, selectedRange, service)
 
   const retry = useCallback(() => {
     retryNode()
@@ -103,11 +106,40 @@ export function NetworkNodeDetailsPage({
         </section>
       ) : null}
 
+      {!isNotFound && (
+        <div className="network-metrics__toolbar">
+          <p className="network-node-state__eyebrow">Network metrics</p>
+          <div className="network-metrics__controls">
+            <div
+              className="network-metrics__range-selector"
+              role="group"
+              aria-label="Metrics range"
+            >
+              {METRICS_RANGES.map((range) => (
+                <button
+                  key={range}
+                  className="network-metrics__range-button"
+                  type="button"
+                  aria-pressed={selectedRange === range}
+                  onClick={() => setSelectedRange(range)}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
+            <p className="network-metrics__data-label">Simulated data</p>
+          </div>
+        </div>
+      )}
+
       {isNotFound && <NetworkNodeNotFoundState nodeId={nodeId} />}
 
       {!isNotFound && hasError && (
-        <section className="network-node-state" role="alert" aria-labelledby="metrics-error-title">
-          <p className="network-node-state__eyebrow">Network metrics</p>
+        <section
+          className="network-node-state network-node-state--metrics"
+          role="alert"
+          aria-labelledby="metrics-error-title"
+        >
           <h2 id="metrics-error-title">Unable to load node metrics</h2>
           <p>We could not retrieve metrics for this node. Check the connection and try again.</p>
           <button type="button" onClick={retry}>
@@ -118,18 +150,20 @@ export function NetworkNodeDetailsPage({
 
       {!isNotFound && !hasError && isLoading && (
         <section
-          className="network-node-state"
+          className="network-node-state network-node-state--metrics"
           role="status"
           aria-labelledby="metrics-loading-title"
         >
-          <p className="network-node-state__eyebrow">Network metrics</p>
           <h2 id="metrics-loading-title">Loading node metrics...</h2>
         </section>
       )}
 
       {!isNotFound && !hasError && !isLoading && metricsStatus === 'empty' && (
-        <section className="network-node-state" role="status" aria-labelledby="metrics-empty-title">
-          <p className="network-node-state__eyebrow">Network metrics</p>
+        <section
+          className="network-node-state network-node-state--metrics"
+          role="status"
+          aria-labelledby="metrics-empty-title"
+        >
           <h2 id="metrics-empty-title">No metrics available</h2>
           <p>There are no data points available for this node in the selected range.</p>
         </section>
@@ -143,15 +177,16 @@ export function NetworkNodeDetailsPage({
       metrics ? (
         <section className="network-metrics" aria-labelledby="metrics-title">
           <div className="network-metrics__heading">
-            <p className="network-node-state__eyebrow">Network metrics</p>
-            <h2 id="metrics-title">Last hour performance ({metrics.range})</h2>
+            <h2 id="metrics-title">{getMetricsHeading(selectedRange)}</h2>
           </div>
 
           <NodeLatencyChart metrics={metrics} />
 
           <div className="network-metrics__table-wrapper">
             <table>
-              <caption>Latency and packet loss measurements for {nodeId}</caption>
+              <caption>
+                Latency and packet loss measurements for {nodeId} ({selectedRange})
+              </caption>
               <thead>
                 <tr>
                   <th scope="col">Timestamp</th>
@@ -176,6 +211,17 @@ export function NetworkNodeDetailsPage({
       ) : null}
     </main>
   )
+}
+
+function getMetricsHeading(range: MetricsRange): string {
+  switch (range) {
+    case '1h':
+      return 'Last hour performance (1h)'
+    case '24h':
+      return 'Last 24 hours performance (24h)'
+    case '7d':
+      return 'Last 7 days performance (7d)'
+  }
 }
 
 function formatNodeDate(timestamp: string): string {

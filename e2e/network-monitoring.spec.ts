@@ -76,4 +76,76 @@ test.describe('Network monitoring dashboard', () => {
 
     expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
   })
+
+  test('shows complete metric ranges without horizontal overflow', async ({ page }) => {
+    const projectName = test.info().project.name
+    const viewport =
+      projectName === 'mobile-chromium' ? { width: 390, height: 844 } : { width: 1440, height: 900 }
+
+    await page.setViewportSize(viewport)
+    expect(page.viewportSize()).toEqual(viewport)
+
+    await page.goto('/nodes/core-router')
+
+    const ranges = [
+      { value: '1h', heading: 'Last hour performance (1h)', samples: 4 },
+      { value: '24h', heading: 'Last 24 hours performance (24h)', samples: 25 },
+      { value: '7d', heading: 'Last 7 days performance (7d)', samples: 29 },
+    ]
+    const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
+    const chart = page.getByRole('figure', { name: 'Latency trend for core-router (UTC)' })
+
+    for (const range of ranges) {
+      await rangeSelector.getByRole('button', { name: range.value, exact: true }).click()
+
+      await expect(
+        rangeSelector.getByRole('button', { name: range.value, exact: true }),
+      ).toHaveAttribute('aria-pressed', 'true')
+      await expect(page.getByText('Simulated data')).toBeVisible()
+      await expect(page.getByRole('heading', { name: range.heading })).toBeVisible()
+      await expect(chart.locator('svg')).toBeVisible()
+      await expect(page.locator('tbody tr')).toHaveCount(range.samples)
+
+      if (range.value === '7d') {
+        const chartLabels = (await chart.locator('svg text').allTextContents()).map((label) =>
+          label.trim(),
+        )
+        const dateLabels = chartLabels.filter((label) => /^[A-Z][a-z]{2} \d{1,2}$/.test(label))
+        const timeLabels = chartLabels.filter((label) => /^\d{2}:\d{2}$/.test(label))
+        const dateLabelBounds = await chart.locator('svg text').evaluateAll((elements) =>
+          elements
+            .filter((element) => /^[A-Z][a-z]{2} \d{1,2}$/.test(element.textContent?.trim() ?? ''))
+            .map((element) => {
+              const { left, right } = element.getBoundingClientRect()
+              return { left, right }
+            })
+            .sort((first, second) => first.left - second.left),
+        )
+        const chartBounds = await chart.evaluate((element) => {
+          const { left, right } = element.getBoundingClientRect()
+          return { left, right }
+        })
+
+        expect(dateLabels).toHaveLength(8)
+        expect(new Set(dateLabels).size).toBe(dateLabels.length)
+        expect(timeLabels).toHaveLength(0)
+        expect(dateLabelBounds).toHaveLength(8)
+        dateLabelBounds.forEach((bounds, index) => {
+          expect(bounds.left).toBeGreaterThanOrEqual(chartBounds.left)
+          expect(bounds.right).toBeLessThanOrEqual(chartBounds.right)
+
+          if (index > 0) {
+            expect(bounds.left).toBeGreaterThanOrEqual(dateLabelBounds[index - 1].right)
+          }
+        })
+      }
+
+      const dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+    }
+  })
 })

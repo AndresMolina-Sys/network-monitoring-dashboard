@@ -1,16 +1,17 @@
 # AGENTS.md — Network Monitoring Dashboard
 
-Responsive React dashboard backed by ASP.NET Core API; monitoring records are fixtures, not live telemetry.
+Responsive dashboard for reviewing network-node health and latency. The React frontend connects to an ASP.NET Core API in production; monitoring records are fixture data, not live or persisted telemetry.
 
-## Stack & structure
+## Stack y estructura
 
-- React 19, TypeScript 6, Vite 8; Node.js 22.23.2. Backend: ASP.NET Core minimal API, xUnit, .NET 10.
-- `src/app`: routes; `src/domain`: contracts; `src/features/network-monitoring`: UI/tests; `src/services`: mock/HTTP boundary; `src/mocks`: fixtures.
-- `backend/NetworkMonitoring.Api` and `.Tests`: API and tests; `e2e`: Playwright. CI is in `.github/workflows/ci.yml`; `graphify-out` is generated.
+- Frontend: React 19, TypeScript 6, Vite 8, React Router, Recharts; Node.js 22.23.2 (`.nvmrc`). Backend: ASP.NET Core minimal API and xUnit on .NET 10.
+- `src/app`: routing; `src/domain`: shared contracts; `src/features/network-monitoring`: pages, hooks, components, tests, and stories.
+- `src/services`: service contract and mock/HTTP implementations; `src/services/index.ts` selects one. `src/mocks`: fixtures.
+- `backend/NetworkMonitoring.Api/Program.cs`: endpoints and in-memory fixtures; `appsettings*.json`: CORS. `e2e`: Playwright; `.github/workflows/ci.yml`: CI; `graphify-out`: generated architecture references.
 
-## Commands
+## Comandos
 
-Root commands:
+Run from the repository root:
 
 ```sh
 npm ci
@@ -21,35 +22,58 @@ npm run format:check
 npm run test
 npm run test:e2e
 npm run test:e2e:full-stack
+npm run storybook
+npm run build-storybook
 dotnet test backend/NetworkMonitoring.Api.Tests/NetworkMonitoring.Api.Tests.csproj
 docker build --tag network-monitoring-api:ci ./backend/NetworkMonitoring.Api
 ```
 
-E2E defaults to mocks; full-stack starts API and frontend.
+Default E2E tests use the mock service; the full-stack command starts the local API and frontend. API and container commands require .NET 10 and Docker.
+If port 5173 is occupied, set `PLAYWRIGHT_PORT` before `npm run test:e2e` (for example, `$env:PLAYWRIGHT_PORT='4173'` in PowerShell); the default remains 5173.
 
-## Conventions
+## Convenciones
 
-- Prettier: two spaces, no semicolons, single quotes, trailing commas, 100 columns. Use kebab-case files, PascalCase components/types, `*.test.ts(x)`, colocated `*.stories.tsx`.
-- Code/comments/tests/API/UI text are English; SDD docs and `MEMORY.md` are Spanish. Preserve `NetworkMonitoringService` and inject it in tests.
-- Use scoped commit subjects such as `feat(ui): ...` or `docs(readme): ...`.
+- Follow Prettier: two spaces, no semicolons, single quotes, trailing commas, 100-character width. Run `npm run format:check`.
+- Use kebab-case filenames, PascalCase components/types, `*.test.ts(x)` tests, and `*.stories.tsx` stories beside feature code. Keep identifiers, comments, and UI copy in English.
+- Use `src/domain/network.ts` for frontend contracts and `src/services/network-monitoring-service.ts` as the data boundary. Inject that service in tests; follow existing hook async/error patterns.
+- Follow the commit style in recent history (`feat(ui): ...`, `fix(ui): ...`, `docs(readme): ...`). Do not add authorship or agent attribution trailers.
 
-## Domain rules
+## Reglas de dominio / trampas conocidas
 
-- Without `VITE_API_BASE_URL`, use mocks; `?demo=empty|error|slow` is development-only. API fixtures are three in-memory nodes; only `1h` is supported (`24h`/`7d` are rejected).
-- No database, live telemetry, polling, uptime, alerts, or auth exists; do not claim otherwise. CORS must be explicit, never `*`.
+- Without `VITE_API_BASE_URL`, the frontend uses mock fixtures. In development, `?demo=empty`, `?demo=error`, and `?demo=slow` select mock states only.
+- The API has three in-memory fixture nodes and supports metrics ranges `1h`, `24h`, and `7d`; an omitted range defaults to `1h`. All measurements are simulated fixtures, not live telemetry.
+- No database, real-time polling, uptime calculation, alerting, or authentication exists. Do not imply otherwise in UI or docs.
+- Keep CORS origins explicit and test both allowed and rejected origins; never use `*` to fix browser tests.
 
-## Spec-Driven Development
+## Forma de trabajar
 
-- Use `$sdd <phase> <context>` with `docs/constitution.md`: `constitution`, `spec`, `clarify`, `plan`, `tasks`, `implement`, `validate`, `change`, `status`.
-- Specs use `specs/NNN-name/{spec.md,plan.md,tasks.md}`; create one only for a concrete feature request. `.agents/skills/sdd` is local and gitignored.
-- Artifacts start pending approval. Only explicit confirmation approves; requesting another phase alone does not. Implement only approved artifacts, one requested task, tests first, then stop. Never auto-advance.
-- The primary Codex agent is the coordinator: it alone asks the user questions, records approvals, chooses the next phase, and reviews subagent results. Project profiles live in `.codex/agents/`: `sdd_planner` prepares or updates SDD artifacts, `sdd_implementer` implements one approved task, and `sdd_reviewer` performs read-only checks. Delegate these roles automatically for applicable SDD phases; if a profile is unavailable, the coordinator follows the same gates directly.
-- Give each handoff the phase, original request and confirmed decisions, authorized scope, exact artifact paths, and prior-phase result. Planner returns unresolved questions to the coordinator and never edits product code. Implementer receives one approved `T-xxx` only. Reviewer reports evidence and findings without editing or approving artifacts.
-- Permit parallel delegation only for independent read-only investigations/reviews. Serialize all writes; the coordinator inspects the actual diff and verification results before reporting. Agent instructions are not permission isolation: subagents inherit the coordinator's permissions and sandbox.
-- After artifact changes, refresh `MEMORY.md` with current state/decisions (<50 lines). `status` is read-only.
+- Plan cross-layer, API-contract, or multi-screen work before editing. Keep changes focused and preserve unrelated working-tree edits.
+- Extend existing service and test/story patterns. At handoff, report changed files, checks actually run, and remaining limitations.
 
-## Boundaries & verification
+## Memoria
 
-- Check `git status`, preserve user edits/service boundaries, and keep credentials untracked. Ask before dependencies, source/config additions, API/contracts, or scope changes.
-- Never add authorship attribution, expose/commit secrets, hand-edit generated files, use wildcard CORS, or commit/push/deploy without request.
-- Verify frontend format/lint/tests/build; Playwright for responsive flows (390 × 844); xUnit/full-stack for API changes. Docs need `npm run format:check`; validate Skills with `quick_validate.py`. Report actual results.
+- At the start, read MEMORY.md to learn the project status and decisions made.
+- Upon finishing a task, update it: current status, important decisions (with their rationale), and pitfalls to avoid.
+- Keep it brief (~50 lines maximum): summarize or remove what is no longer useful.
+- If something becomes a permanent rule, propose moving it to AGENTS.md instead of keeping it in memory.
+- Never store sensitive data (keys, tokens, personal data).
+
+## Reglas
+
+- Lee `docs/constitution.md` y la spec activa (`specs/NNN-*/`) antes de tocar código.
+
+## Límites
+
+- ✅ **Siempre:** check `git status`, preserve the service boundary, test behavior changes, and keep credentials untracked.
+- ✅ **Siempre:** update `MEMORY.md` upon finishing each task.
+- ✅ **Siempre:** create a local commit after completing requested changes. Use an English subject in the form `<type>(<scope>): <subject>` (under 50 characters) and a body with a `<description>` (under 100 characters, using a simple present or imperative verb to explain why and how). Allowed types: `fix`, `feat`, `test`, `refactor`, `revert`, `build`, and `chore`.
+
+- ⚠️ **Pregunta antes:** dependencies, new source/config files, API/data-contract changes, or scope expansion such as persistence, authentication, or polling.
+- 🚫 **Nunca:** add `Co-authored-by` or other authorship/agent attribution to commits; expose API keys, tokens, or credentials in files, logs, commands, screenshots, or responses; commit secrets; hand-edit generated output; or use wildcard CORS.
+- 🚫 **Push or deploy only when the user explicitly requests it.**
+
+## Verificación
+
+- Frontend: run `npm run format:check`, `npm run lint`, `npm run test`, and `npm run build`; add `npm run test:e2e` for navigation/responsive changes.
+- API/contracts: run the xUnit test command and `npm run test:e2e:full-stack`; build Docker when container files change. CI also builds Storybook and the API.
+- Documentation-only changes need a formatting check; report only checks that actually passed.

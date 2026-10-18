@@ -21,7 +21,10 @@ interface LatencyChartPoint {
 
 export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
   const chartData: readonly LatencyChartPoint[] = metrics.points.map((point) => ({
-    label: formatMetricTime(point.timestamp),
+    label:
+      metrics.range === '7d'
+        ? formatMetricDate(point.timestamp)
+        : formatMetricTime(point.timestamp),
     timestamp: point.timestamp,
     latencyMs: point.latencyMs,
   }))
@@ -40,6 +43,7 @@ export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
             <CartesianGrid stroke="rgba(148, 163, 184, 0.16)" strokeDasharray="3 3" />
             <XAxis
               dataKey="label"
+              interval={metrics.range === '7d' ? 3 : 'preserveStartEnd'}
               tick={{ fill: '#94a3b8', fontSize: 12 }}
               tickLine={false}
               axisLine={false}
@@ -75,5 +79,13 @@ function formatMetricTime(timestamp: string): string {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
+  }).format(new Date(timestamp))
+}
+
+function formatMetricDate(timestamp: string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC',
+    month: 'short',
+    day: 'numeric',
   }).format(new Date(timestamp))
 }

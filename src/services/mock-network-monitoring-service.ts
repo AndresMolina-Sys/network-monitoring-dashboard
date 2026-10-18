@@ -1,5 +1,5 @@
 import type { MetricsRange, NetworkNode, NodeMetrics } from '../domain/network'
-import { NETWORK_NODE_METRICS, NETWORK_NODES } from '../mocks/network-fixtures'
+import { NETWORK_NODE_METRICS_BY_RANGE, NETWORK_NODES } from '../mocks/network-fixtures'
 import type { NetworkMonitoringService } from './network-monitoring-service'
 import { NetworkNodeNotFoundError, NetworkRequestError } from './network-monitoring-errors'
 
@@ -51,13 +51,15 @@ export class MockNetworkMonitoringService implements NetworkMonitoringService {
     await waitForResponse(this.latencyMs, signal)
     this.throwIfFailureConfigured()
 
-    const metrics = NETWORK_NODE_METRICS[nodeId]
+    const metricsByRange = NETWORK_NODE_METRICS_BY_RANGE[nodeId]
 
-    if (!metrics) {
+    if (!metricsByRange) {
       throw new NetworkNodeNotFoundError(nodeId)
     }
 
-    if (metrics.range !== range) {
+    const metrics = metricsByRange[range]
+
+    if (!metrics || metrics.range !== range) {
       throw new Error(`Metrics range "${range}" is not available in the mock yet`)
     }
 

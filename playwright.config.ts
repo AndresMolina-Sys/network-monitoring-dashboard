@@ -1,5 +1,14 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const portValue = process.env.PLAYWRIGHT_PORT ?? '5173'
+const port = Number(portValue)
+
+if (!/^\d+$/.test(portValue) || !Number.isInteger(port) || port < 1 || port > 65535) {
+  throw new Error('PLAYWRIGHT_PORT must be an integer between 1 and 65535')
+}
+
+const baseURL = `http://127.0.0.1:${port}`
+
 export default defineConfig({
   testDir: './e2e',
   testMatch: '**/network-monitoring.spec.ts',
@@ -10,7 +19,7 @@ export default defineConfig({
   reporter: 'list',
 
   use: {
-    baseURL: 'http://127.0.0.1:5173',
+    baseURL,
     trace: 'on-first-retry',
   },
 
@@ -32,8 +41,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev -- --host 127.0.0.1',
-    url: 'http://127.0.0.1:5173',
+    command: `npm run dev -- --host 127.0.0.1 --port ${port} --strictPort`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
   },
 })
