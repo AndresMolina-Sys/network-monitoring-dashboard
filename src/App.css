@@ -476,6 +476,28 @@ a {
   min-height: 280px;
 }
 
+.node-packet-loss-chart {
+  margin: 2rem 0;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(14px);
+}
+
+.node-packet-loss-chart figcaption {
+  margin-bottom: 1rem;
+  color: var(--color-foreground);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.node-packet-loss-chart__canvas {
+  width: 100%;
+  min-height: 280px;
+}
+
 .app-shell table {
   width: 100%;
   border-collapse: collapse;
@@ -544,6 +566,10 @@ a {
     padding: 0.85rem;
   }
 
+  .node-packet-loss-chart {
+    padding: 0.85rem;
+  }
+
   .app-shell table {
     display: block;
     overflow-x: auto;
@@ -565,21 +591,24 @@ a {
   }
 }
 
-.node-latency-chart .recharts-default-tooltip {
+.node-latency-chart .recharts-default-tooltip,
+.node-packet-loss-chart .recharts-default-tooltip {
   border: 1px solid var(--color-border) !important;
   border-radius: var(--radius-sm) !important;
   background: var(--color-surface-solid) !important;
   box-shadow: var(--shadow-panel) !important;
 }
 
-.node-latency-chart .recharts-tooltip-label {
+.node-latency-chart .recharts-tooltip-label,
+.node-packet-loss-chart .recharts-tooltip-label {
   margin-bottom: 0.35rem !important;
   color: var(--color-muted-foreground) !important;
   font-family: var(--font-mono) !important;
   font-size: 0.75rem !important;
 }
 
-.node-latency-chart .recharts-tooltip-item {
+.node-latency-chart .recharts-tooltip-item,
+.node-packet-loss-chart .recharts-tooltip-item {
   color: var(--color-kicker) !important;
   font-family: var(--font-body) !important;
 }

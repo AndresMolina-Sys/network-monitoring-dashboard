@@ -9,7 +9,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La API usa tres nodos de prueba en memoria y soporta métricas `1h`, `24h` y `7d`; no hay persistencia ni telemetría en tiempo real.
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
-- `specs/002-grafica-perdida-de-paquetes/spec.md`, `plan.md` y `tasks.md` están aprobados; no se ha iniciado implementación.
+- `specs/002-grafica-perdida-de-paquetes/spec.md`, `plan.md` y `tasks.md` están aprobados; T-001 está completa y T-002 es la siguiente.
 - T-010 se verificó en producción tras el commit `0bd3b22`: la UI ofrece `1h`, `24h` y `7d`, muestra “Simulated data” y la API responde 200 con 4, 25 y 29 puntos.
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
@@ -35,7 +35,8 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 - `quick_validate.py` requiere PyYAML, ausente en los Python disponibles; no agregues una dependencia solo para esta validación sin aprobación.
 - Las pruebas TypeScript del repo usan Vitest; `node --test` no carga el setup ni la resolución de módulos del proyecto. Ejecutar Vitest con `npm run test -- <ruta>`.
+- En Recharts 3, las etiquetas del eje se renderizan en un grupo hermano; las stories deben consultar `.recharts-yAxis-tick-labels`. Para probar tooltips, enviar `mousemove` a las coordenadas del punto y esperar el valor renderizado.
 
 ## Próximos pasos
 
-- Implementar solo la tarea T-xxx de Spec 002 que el usuario solicite explícitamente.
+- Continuar con T-002 de Spec 002: integrar la gráfica aprobada en el detalle del nodo.

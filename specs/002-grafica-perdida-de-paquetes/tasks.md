@@ -2,7 +2,7 @@
 
 Estado: Aprobado por el usuario
 
-- [ ] **T-001 — Crear la gráfica de pérdida de paquetes**
+- [x] **T-001 — Crear la gráfica de pérdida de paquetes**
 
   **Estimación:** 30 min · **Dependencias:** Ninguna · **RF:** RF-2, RF-3, RF-4
 
