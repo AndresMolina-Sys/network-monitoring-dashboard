@@ -16,10 +16,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       Revisar primero si la dirección aprobada trae una referencia específica para `/`; si no, usar `concept-seed --scope surface --mode operate` en esa superficie. Solo si no produce boceto HTML, usar el fallback oficial `serve-question --schema`.
       **Hecho cuando:** Se presenta una referencia visual identificada con `/` y la persona usuaria la aprueba explícitamente; no se inicia código.
 
-- [ ] **T-003 — Obtener y aprobar referencia code-first del detalle**
+- [x] **T-003 — Obtener y aprobar referencia code-first del detalle**
       **Estimación:** 25 min · **Dependencias:** T-001 · **RF:** RF-1, RF-4, RF-12, RF-13
       Revisar primero si la dirección aprobada trae una referencia específica para `/nodes/:nodeId`; si no, usar `concept-seed --scope surface --mode operate` en esa superficie. Solo si no produce boceto HTML, usar el fallback oficial `serve-question --schema`.
       **Hecho cuando:** Se presenta una referencia independiente identificada con `/nodes/:nodeId` y la persona usuaria la aprueba explícitamente; no se inicia código.
+      **Aprobación:** “Evidence Margin”, con la gráfica de latencia como foco y la pérdida/anotación en una columna lateral; aprobada para la composición de escritorio.
 
 - [ ] **T-004 — Registrar y releer el contrato visual**
       **Estimación:** 25 min · **Dependencias:** T-002, T-003 · **RF:** RF-13
