@@ -51,7 +51,9 @@ export const BoundaryValues: Story = {
       throw new Error('The packet loss chart surface was not rendered')
     }
 
-    await expect(canvas.getByText('Packet loss trend for core-router (UTC)')).toBeInTheDocument()
+    await expect(
+      canvas.getByText('Packet loss trend for core-router (percent, 1h, UTC)'),
+    ).toBeInTheDocument()
     await expect(yAxisLabels).toHaveTextContent('0%')
     await expect(yAxisLabels).toHaveTextContent('100%')
     await expect(dots).toHaveLength(PACKET_LOSS_METRICS.points.length)
@@ -83,5 +85,44 @@ export const BoundaryValues: Story = {
         expect(tooltip).toHaveTextContent(percentage)
       })
     }
+  },
+}
+
+export const KeyboardNavigation: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const chartSurface = canvasElement.querySelector<SVGSVGElement>('.recharts-surface')
+    const tooltip = canvasElement.querySelector('.recharts-default-tooltip')
+
+    if (!chartSurface || !tooltip) {
+      throw new Error('The packet loss chart or its tooltip was not rendered')
+    }
+
+    await expect(
+      canvas.getByText('Packet loss trend for core-router (percent, 1h, UTC)'),
+    ).toBeInTheDocument()
+    await expect(chartSurface).toHaveAttribute('role', 'application')
+    await expect(chartSurface).toHaveAttribute('tabindex', '0')
+    await expect(chartSurface).toHaveAccessibleName(
+      'Packet loss trend for core-router in percent, range 1h, UTC',
+    )
+    await expect(chartSurface.querySelector('desc')).toHaveTextContent(
+      'Use the left and right arrow keys to inspect measurements. Exact values are listed in the table below.',
+    )
+
+    chartSurface.focus()
+
+    await waitFor(() => {
+      expect(tooltip).toHaveAttribute('role', 'status')
+      expect(tooltip).toHaveTextContent(PACKET_LOSS_METRICS.points[0].timestamp)
+      expect(tooltip).toHaveTextContent('0%')
+    })
+
+    await fireEvent.keyDown(chartSurface, { key: 'ArrowRight' })
+
+    await waitFor(() => {
+      expect(tooltip).toHaveTextContent(PACKET_LOSS_METRICS.points[1].timestamp)
+      expect(tooltip).toHaveTextContent('0.2%')
+    })
   },
 }

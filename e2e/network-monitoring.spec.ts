@@ -93,15 +93,16 @@ test.describe('Network monitoring dashboard', () => {
       { value: '7d', heading: 'Last 7 days performance (7d)', samples: 29 },
     ]
     const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
-    const latencyChart = page.getByRole('figure', {
-      name: 'Latency trend for core-router (UTC)',
-    })
-    const packetLossChart = page.getByRole('figure', {
-      name: 'Packet loss trend for core-router (UTC)',
-    })
     const table = page.getByRole('table')
 
     for (const range of ranges) {
+      const latencyChart = page.getByRole('figure', {
+        name: `Latency trend for core-router (ms, ${range.value}, UTC)`,
+      })
+      const packetLossChart = page.getByRole('figure', {
+        name: `Packet loss trend for core-router (percent, ${range.value}, UTC)`,
+      })
+
       await rangeSelector.getByRole('button', { name: range.value, exact: true }).click()
 
       await expect(
@@ -130,7 +131,7 @@ test.describe('Network monitoring dashboard', () => {
         range.samples,
       )
       await expect(table.locator('caption')).toHaveText(
-        `Latency and packet loss measurements for core-router (${range.value})`,
+        `Full data for both charts: latency and packet loss measurements for core-router (${range.value})`,
       )
       await expect(table.locator('thead th')).toHaveText(['Timestamp', 'Latency', 'Packet loss'])
       await expect(table.locator('tbody tr')).toHaveCount(range.samples)

@@ -32,7 +32,7 @@ export function NodePacketLossChart({ metrics }: NodePacketLossChartProps) {
   return (
     <figure className="node-packet-loss-chart" aria-labelledby="packet-loss-chart-title">
       <figcaption id="packet-loss-chart-title">
-        Packet loss trend for {metrics.nodeId} (UTC)
+        Packet loss trend for {metrics.nodeId} (percent, {metrics.range}, UTC)
       </figcaption>
 
       <div className="node-packet-loss-chart__canvas">
@@ -40,6 +40,8 @@ export function NodePacketLossChart({ metrics }: NodePacketLossChartProps) {
           <LineChart
             data={chartData}
             accessibilityLayer
+            title={`Packet loss trend for ${metrics.nodeId} in percent, range ${metrics.range}, UTC`}
+            desc="Use the left and right arrow keys to inspect measurements. Exact values are listed in the table below."
             margin={{ top: 12, right: 16, bottom: 8, left: 0 }}
           >
             <CartesianGrid stroke="rgba(148, 163, 184, 0.16)" strokeDasharray="3 3" />

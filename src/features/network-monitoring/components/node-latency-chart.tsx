@@ -31,13 +31,17 @@ export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
 
   return (
     <figure className="node-latency-chart" aria-labelledby="latency-chart-title">
-      <figcaption id="latency-chart-title">Latency trend for {metrics.nodeId} (UTC)</figcaption>
+      <figcaption id="latency-chart-title">
+        Latency trend for {metrics.nodeId} (ms, {metrics.range}, UTC)
+      </figcaption>
 
       <div className="node-latency-chart__canvas">
         <ResponsiveContainer width="100%" height={280}>
           <LineChart
             data={chartData}
             accessibilityLayer
+            title={`Latency trend for ${metrics.nodeId} in milliseconds, range ${metrics.range}, UTC`}
+            desc="Use the left and right arrow keys to inspect measurements. Exact values are listed in the table below."
             margin={{ top: 12, right: 16, bottom: 8, left: 0 }}
           >
             <CartesianGrid stroke="rgba(148, 163, 184, 0.16)" strokeDasharray="3 3" />
@@ -56,7 +60,10 @@ export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
               axisLine={false}
               width={52}
             />
-            <Tooltip labelFormatter={(_, payload) => payload[0]?.payload.timestamp ?? ''} />
+            <Tooltip
+              labelFormatter={(_, payload) => payload[0]?.payload.timestamp ?? ''}
+              formatter={(value) => [`${value} ms`, 'Latency']}
+            />
             <Line
               type="monotone"
               dataKey="latencyMs"

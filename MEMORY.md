@@ -14,7 +14,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
 - El coordinador de Codex delega SDD a perfiles de proyecto: planificador, implementador de una tarea y revisor; los perfiles se versionan en `.codex/agents/`.
-- La Skill local `$feature` registra cambios pequeños en `feature.md`; por decisión del usuario, una vez documentado el plan no hace falta una aprobación separada para cambios localizados solicitados. F-001 está completo; F-002 está en curso.
+- La Skill local `$feature` registra cambios pequeños en `feature.md`; por decisión del usuario, basta documentar el plan antes de implementar solicitudes localizadas, sin aprobación separada. F-001 y F-002 están completos.
 
 ## Decisiones (y por qué)
 
@@ -44,4 +44,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Completar F-002 de `feature.md`; mantener el flujo SDD para cambios grandes o que crucen contratos/capas.
+- No hay propuestas pequeñas pendientes; mantener el flujo SDD para cambios grandes o que crucen contratos/capas.

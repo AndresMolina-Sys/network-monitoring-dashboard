@@ -1,8 +1,8 @@
 # Propuestas de cambios pequeños — Network Monitoring Dashboard
 
-Este documento registra mejoras localizadas antes de implementarlas. No sustituye el flujo SDD: cambios de API, contratos, datos entre capas, persistencia, autenticación, polling o alcance amplio deben pasar por `$sdd`.
+Este documento registra y planifica mejoras localizadas del dashboard. No sustituye el flujo SDD: cambios de API, contratos, datos entre capas, persistencia, autenticación, polling o alcance amplio deben pasar por `$sdd`.
 
-Estado general: **En curso**. F-001 está completo; F-002 está en implementación. Los cambios pequeños registrados no requieren una aprobación adicional al plan.
+Estado general: **Completado**. F-001 y F-002 están implementados y verificados. Los cambios pequeños registrados no requieren una aprobación adicional al plan.
 
 ## F-001 — Identificar el inventario como simulado
 
@@ -31,7 +31,7 @@ Estado general: **En curso**. F-001 está completo; F-002 está en implementaci�
 
 ## F-002 — Mejorar la accesibilidad de las gráficas
 
-**Estado:** En curso
+**Estado:** Completado
 **Objetivo:** Hacer que la latencia y la pérdida de paquetes se entiendan sin depender exclusivamente de la lectura visual o del hover.
 
 **Contexto verificado:** Las dos gráficas ya tienen `figure`/`figcaption` y `accessibilityLayer`; el detalle ya ofrece una tabla estructurada con las muestras. La implementación debe conservar y aprovechar esas alternativas, no duplicarlas sin necesidad.
@@ -43,7 +43,9 @@ Estado general: **En curso**. F-001 está completo; F-002 está en implementaci�
 - `src/features/network-monitoring/components/node-latency-chart.tsx`: corregir nombre, descripción o interacción accesible solo donde la revisión encuentre una brecha.
 - `src/features/network-monitoring/components/node-packet-loss-chart.tsx`: aplicar el mismo criterio para pérdida de paquetes y porcentaje.
 - `src/features/network-monitoring/pages/network-node-details-page.tsx`: tocar únicamente si hace falta reforzar la relación semántica con la tabla existente.
-- `src/features/network-monitoring/pages/network-node-details-page.test.tsx` y `e2e/network-monitoring.spec.ts`: cubrir la alternativa tabular y la navegación por teclado que corresponda.
+- `src/features/network-monitoring/pages/network-node-details-page.test.tsx`: cubrir la alternativa tabular y la sincronización del periodo; las stories de ambas gráficas verifican teclado y tooltip, y `e2e/network-monitoring.spec.ts` verifica rangos y comportamiento responsive.
+
+**Verificación:** Las stories de ambas gráficas verifican nombre accesible, descripción, navegación con flechas y tooltip anunciado. La prueba de página confirma que la tabla contiene los datos completos para el periodo seleccionado; E2E verifica las tres gráficas y ausencia de overflow a 390 × 844. `npm run test` (99/99), `npm run lint`, `npm run format:check`, `npm run build` y `npm run test:e2e` (10/10) pasaron.
 
 **Criterios de aceptación:**
 
@@ -54,4 +56,4 @@ Estado general: **En curso**. F-001 está completo; F-002 está en implementaci�
 
 **Casos límite:** Estados de carga, vacío, error y nodo inexistente no deben exponer valores obsoletos; las muestras densas de `7d` deben seguir siendo navegables; no se deben duplicar anuncios o tablas.
 
-**Dudas abiertas:** Ninguna bloqueante. Antes de editar, verificar con tecnología asistiva qué información ya se anuncia para limitar el cambio a brechas observadas.
+**Dudas abiertas:** Ninguna. Las pruebas verifican semántica y teclado en el navegador; esto no constituye una auditoría formal de conformidad WCAG.

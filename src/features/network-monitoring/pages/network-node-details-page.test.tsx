@@ -13,10 +13,12 @@ import { NetworkNodeDetailsPage } from './network-node-details-page'
 vi.mock('../components/node-latency-chart', () => ({
   NodeLatencyChart: vi.fn(({ metrics }: { readonly metrics: NodeMetrics }) => (
     <figure
-      aria-label={`Latency chart for ${metrics.range}`}
+      aria-label={`Latency chart for ${metrics.nodeId} in milliseconds (${metrics.range}, UTC)`}
       data-point-count={metrics.points.length}
     >
-      <figcaption>Latency trend for {metrics.nodeId} (UTC)</figcaption>
+      <figcaption>
+        Latency trend for {metrics.nodeId} (ms, {metrics.range}, UTC)
+      </figcaption>
     </figure>
   )),
 }))
@@ -24,12 +26,14 @@ vi.mock('../components/node-latency-chart', () => ({
 vi.mock('../components/node-packet-loss-chart', () => ({
   NodePacketLossChart: vi.fn(({ metrics }: { readonly metrics: NodeMetrics }) => (
     <figure
-      aria-label={`Packet loss chart for ${metrics.nodeId} (${metrics.range})`}
+      aria-label={`Packet loss chart for ${metrics.nodeId} in percent (${metrics.range}, UTC)`}
       data-node-id={metrics.nodeId}
       data-range={metrics.range}
       data-point-count={metrics.points.length}
     >
-      <figcaption>Packet loss trend for {metrics.nodeId} (UTC)</figcaption>
+      <figcaption>
+        Packet loss trend for {metrics.nodeId} (percent, {metrics.range}, UTC)
+      </figcaption>
     </figure>
   )),
 }))
@@ -68,22 +72,27 @@ describe('NetworkNodeDetailsPage', () => {
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
     expect(screen.getByRole('button', { name: '1h' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByText('Latency trend for core-router (UTC)')).toBeInTheDocument()
-    expect(screen.getByRole('figure', { name: 'Latency chart for 1h' })).toHaveAttribute(
-      'data-point-count',
-      '4',
-    )
+    expect(screen.getByText('Latency trend for core-router (ms, 1h, UTC)')).toBeInTheDocument()
     expect(
-      screen.getByRole('figure', { name: 'Packet loss chart for core-router (1h)' }),
+      screen.getByRole('figure', {
+        name: 'Latency chart for core-router in milliseconds (1h, UTC)',
+      }),
+    ).toHaveAttribute('data-point-count', '4')
+    expect(
+      screen.getByRole('figure', {
+        name: 'Packet loss chart for core-router in percent (1h, UTC)',
+      }),
     ).toHaveAttribute('data-point-count', '4')
     expectChartsShareMetrics()
 
-    const latencyChart = screen.getByRole('figure', { name: 'Latency chart for 1h' })
+    const latencyChart = screen.getByRole('figure', {
+      name: 'Latency chart for core-router in milliseconds (1h, UTC)',
+    })
     const packetLossChart = screen.getByRole('figure', {
-      name: 'Packet loss chart for core-router (1h)',
+      name: 'Packet loss chart for core-router in percent (1h, UTC)',
     })
     const table = screen.getByRole('table', {
-      name: 'Latency and packet loss measurements for core-router (1h)',
+      name: 'Full data for both charts: latency and packet loss measurements for core-router (1h)',
     })
     expect(
       latencyChart.compareDocumentPosition(packetLossChart) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -127,19 +136,22 @@ describe('NetworkNodeDetailsPage', () => {
         'aria-pressed',
         'false',
       )
-      expect(screen.getByRole('figure', { name: `Latency chart for ${range}` })).toHaveAttribute(
-        'data-point-count',
-        String(RANGE_FIXTURES[range].sampleCount),
-      )
       expect(
-        screen.getByRole('figure', { name: `Packet loss chart for core-router (${range})` }),
+        screen.getByRole('figure', {
+          name: `Latency chart for core-router in milliseconds (${range}, UTC)`,
+        }),
+      ).toHaveAttribute('data-point-count', String(RANGE_FIXTURES[range].sampleCount))
+      expect(
+        screen.getByRole('figure', {
+          name: `Packet loss chart for core-router in percent (${range}, UTC)`,
+        }),
       ).toHaveAttribute('data-point-count', String(RANGE_FIXTURES[range].sampleCount))
       expectChartsShareMetrics()
       expectSimulatedDataLabel()
       expect(getTableRows()).toHaveLength(RANGE_FIXTURES[range].sampleCount + 1)
       expect(
         screen.getByRole('table', {
-          name: `Latency and packet loss measurements for core-router (${range})`,
+          name: `Full data for both charts: latency and packet loss measurements for core-router (${range})`,
         }),
       ).toBeInTheDocument()
       expect(
@@ -193,7 +205,9 @@ describe('NetworkNodeDetailsPage', () => {
     renderDetailsPage(service)
 
     expect(
-      await screen.findByRole('figure', { name: 'Packet loss chart for core-router (1h)' }),
+      await screen.findByRole('figure', {
+        name: 'Packet loss chart for core-router in percent (1h, UTC)',
+      }),
     ).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '24h' }))
 

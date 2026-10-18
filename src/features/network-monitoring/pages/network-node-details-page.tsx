@@ -187,7 +187,8 @@ export function NetworkNodeDetailsPage({
           <div className="network-metrics__table-wrapper">
             <table>
               <caption>
-                Latency and packet loss measurements for {nodeId} ({selectedRange})
+                Full data for both charts: latency and packet loss measurements for {nodeId} (
+                {selectedRange})
               </caption>
               <thead>
                 <tr>
