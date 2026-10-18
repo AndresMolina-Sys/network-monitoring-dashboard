@@ -1,6 +1,6 @@
 # Plan 002 — Gráfica de pérdida de paquetes
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
 ## Alcance y enfoque
 

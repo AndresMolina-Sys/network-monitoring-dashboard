@@ -9,7 +9,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La API usa tres nodos de prueba en memoria y soporta métricas `1h`, `24h` y `7d`; no hay persistencia ni telemetría en tiempo real.
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
-- `specs/002-grafica-perdida-de-paquetes/spec.md` está aprobada; `plan.md` está creado y pendiente de aprobación; aún no hay `tasks.md`.
+- `specs/002-grafica-perdida-de-paquetes/spec.md` y `plan.md` están aprobados; `tasks.md` está creado y pendiente de aprobación.
 - T-010 se verificó en producción tras el commit `0bd3b22`: la UI ofrece `1h`, `24h` y `7d`, muestra “Simulated data” y la API responde 200 con 4, 25 y 29 puntos.
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
@@ -38,4 +38,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Obtener aprobación del `plan.md` de Spec 002 y después preparar `tasks.md`.
+- Obtener aprobación de `tasks.md` de Spec 002; después implementar solo la tarea que el usuario solicite.
