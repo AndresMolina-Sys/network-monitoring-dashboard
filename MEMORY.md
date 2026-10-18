@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-028 y T-029 completadas; T-029 pasó format, lint, Vitest (109/109), build y Storybook. Storybook conserva la advertencia no bloqueante de chunks >500 kB. T-030 quedó pendiente porque el puerto 5173 estaba ocupado; `AGENTS.md` indica reintentar con `PLAYWRIGHT_PORT=4173`.
+- Spec 003: T-028/T-029 completas (109/109 Vitest; build y Storybook pasan, con advertencia de chunks >500 kB). T-030 ejecutó con puerto 4173: 24/26 E2E pasan; el caso de IDs largos falla en ambos navegadores porque busca el selector obsoleto `.app-header__lede code`. Pendiente corregirlo en una reparación autorizada y repetir.
