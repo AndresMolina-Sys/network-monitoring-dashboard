@@ -21,7 +21,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 - Mantener `NetworkMonitoringService` como límite entre UI y datos para poder alternar mock/API y probar componentes con servicios inyectados.
 - Mantener “Simulated data” junto al selector, visible sin hover en carga, éxito, vacío y error; no prometer uptime, alertas, autenticación o telemetría en tiempo real.
-- Mantener `graphify-out` generado y enlazado desde README; actualizarlo al completar todas las tareas de una spec y ante cambios significativos fuera de una spec, no tras cada tarea individual.
+- Mantener `graphify-out` generado y enlazado desde README; `AGENTS.md` exige actualizarlo al completar una spec y ante cambios significativos fuera de ella, no tras cada tarea individual.
 - Crear siempre un commit local al terminar cambios solicitados, con asunto convencional en inglés; hacer push solo cuando el usuario lo pida explícitamente. No añadir líneas `Co-authored-by` ni otra atribución de autor/agente.
 - No exponer claves, tokens ni secretos en archivos, logs, comandos, capturas o respuestas.
 - Mantener todo el código y contenido de la aplicación en inglés (identificadores, comentarios, pruebas, mensajes de API y textos visibles); la documentación puede seguir el idioma solicitado.
