@@ -179,6 +179,8 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       Ejecutar `npm run format:check`, `npm run lint`, `npm run test`, `npm run build` y `npm run build-storybook`. No ejecutar xUnit ni full-stack si no cambió API/contrato. Si cualquier comando falla, detenerse y reportar el resultado; esta tarea no incluye diagnóstico ni correcciones.
       **Hecho cuando:** Todos los comandos terminan correctamente y las advertencias se reportan sin ocultarlas; ante un fallo, la tarea queda sin completar y el coordinador recibe el comando y resultado fallidos, sin iniciar reparaciones dentro de esta verificación.
 
+      **Resultado (fallo; tarea pendiente):** `npm run format:check` fue el primer comando y reportó 49 archivos locales de Impeccable fuera de formato. Se detuvo el flujo aquí, tal como indica la tarea; lint, tests y builds restantes no se ejecutaron en T-029. No se reformatearon archivos.
+
 - [ ] **T-030 — Ejecutar la suite E2E completa**
       **Estimación:** 30 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023, T-029 · **RF:** RF-2 a RF-12
       Ejecutar únicamente `npm run test:e2e` como verificación integral final. Si falla, detenerse y reportar el resultado; esta tarea no incluye diagnóstico ni correcciones.

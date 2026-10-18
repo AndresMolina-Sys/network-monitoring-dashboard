@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 003: T-028 completada: DESIGN.md y sidecar documentan tokens y contrastes; bordes de filtros, periodo y reintento pasan con mínimos 3.21:1, 3.33:1 y 3.17:1. Ratios calculados desde CSS; DevTools local no conectó. Siguiente: T-029.
+- Spec 003: T-028 completada: DESIGN.md/sidecar y contrastes documentados. T-029 pendiente: `npm run format:check` falla con 49 archivos locales de Impeccable; los comandos posteriores no se ejecutaron. Requiere decidir cómo tratar esos recursos antes de reintentar.
