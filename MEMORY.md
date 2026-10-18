@@ -11,7 +11,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
-- `specs/003-redisenio-visual-dashboard/spec.md` está redactada y pasó QA; espera aprobación del usuario. La dirección visual deberá seleccionarse y aprobarse antes del plan de implementación.
+- Spec 003 está aprobada; `plan.md` queda pendiente de aprobación. La dirección visual se seleccionará y aprobará antes de implementar.
 - Graphify refrescado tras `12b7913`: 595 nodos, 815 enlaces y 94 comunidades con nombre; el diagnóstico no detectó enlaces huérfanos, endpoints faltantes ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.

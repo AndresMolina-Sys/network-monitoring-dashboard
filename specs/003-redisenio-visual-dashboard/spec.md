@@ -1,6 +1,6 @@
 # Spec 003 — Rediseño visual integral del dashboard
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
 ## Contexto y objetivo
 
