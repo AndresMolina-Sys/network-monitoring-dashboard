@@ -44,7 +44,13 @@ export const BoundaryValues: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const yAxisLabels = canvasElement.querySelector('.recharts-yAxis-tick-labels')
+    const axisTicks = Array.from(
+      canvasElement.querySelectorAll(
+        '.recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value',
+      ),
+    ).map((tick) => tick.textContent)
     const dots = canvasElement.querySelectorAll('.recharts-dot.recharts-line-dot')
+    const line = canvasElement.querySelector('.recharts-line-curve')
     const chartSurface = canvasElement.querySelector('.recharts-surface')
 
     if (!chartSurface) {
@@ -56,7 +62,9 @@ export const BoundaryValues: Story = {
     ).toBeInTheDocument()
     await expect(yAxisLabels).toHaveTextContent('0%')
     await expect(yAxisLabels).toHaveTextContent('100%')
+    await expect(axisTicks).toEqual(['0%', '20%', '40%', '60%', '80%', '100%'])
     await expect(dots).toHaveLength(PACKET_LOSS_METRICS.points.length)
+    await expect(line).toHaveAttribute('stroke', '#e8b07e')
 
     const tooltip = canvasElement.querySelector('.recharts-default-tooltip')
     const expectedPoints = [

@@ -191,6 +191,16 @@ describe('NetworkNodeDetailsPage', () => {
       expect(
         within(screen.getByRole('table')).getByText(createMetrics(range).points[0].timestamp),
       ).toBeInTheDocument()
+      const expectedRows = createMetrics(range).points
+      const tableRows = within(screen.getByRole('table')).getAllByRole('row').slice(1)
+
+      expectedRows.forEach((point, index) => {
+        expect(
+          within(tableRows[index])
+            .getAllByRole('cell')
+            .map((cell) => cell.textContent),
+        ).toEqual([point.timestamp, `${point.latencyMs} ms`, `${point.packetLossPercent}%`])
+      })
       expect(service.getNodeMetrics).toHaveBeenLastCalledWith(
         'core-router',
         range,

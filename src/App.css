@@ -638,25 +638,39 @@ a {
 }
 
 .node-packet-loss-chart {
-  margin: 2rem 0;
-  padding: 1.25rem;
-  border: 1px solid var(--color-border);
+  margin: 1.5rem 0 2rem;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  border: 1px solid var(--color-border-soft);
+  border-top: 2px solid rgba(200, 165, 125, 0.62);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-panel);
-  backdrop-filter: blur(14px);
+  background:
+    linear-gradient(135deg, rgba(200, 165, 125, 0.045), transparent 45%), var(--color-surface);
+  box-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.16);
 }
 
 .node-packet-loss-chart figcaption {
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
   color: var(--color-foreground);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .node-packet-loss-chart__canvas {
   width: 100%;
   min-height: 280px;
+}
+
+.node-packet-loss-chart .recharts-cartesian-axis-tick-value {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.node-packet-loss-chart .recharts-line-curve {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 5px rgba(232, 176, 126, 0.16));
 }
 
 .app-shell table {
@@ -1103,7 +1117,7 @@ a {
   overflow-x: auto;
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-md);
-  background: rgba(27, 35, 54, 0.45);
+  background: var(--color-surface);
 }
 
 .network-metrics__table-wrapper table {
@@ -1113,6 +1127,24 @@ a {
 
 .network-metrics__table-wrapper caption {
   padding: 1rem 1rem 0.25rem;
+}
+
+.network-metrics__table-wrapper thead {
+  background: rgba(200, 165, 125, 0.045);
+}
+
+.network-metrics__table-wrapper th {
+  color: var(--color-subtle-foreground);
+  font-size: 0.6875rem;
+  letter-spacing: 0.015em;
+}
+
+.network-metrics__table-wrapper td:first-child {
+  color: var(--color-foreground);
+}
+
+.network-metrics__table-wrapper tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .node-latency-chart .recharts-default-tooltip {

@@ -76,10 +76,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Pruebas y story dirigidas confirman valores, ejes, unidades, tooltip y alternativa tabular/accesible; la marca y sus etiquetas cumplen los criterios de contraste aplicables.
       **Resultado:** Se aplicó la paleta cobre a la serie y se afinó el marco, la cuadrícula y los ejes. La story comprueba nombre accesible, ticks/unidades, muestras y navegación/tooltip por teclado; la prueba de página mantiene la tabla alternativa. Stories y pruebas de detalle: 12/12; contraste calculado contra la superficie: etiquetas 7.81:1 y línea 8.12:1; lint, build, Prettier dirigido y `git diff --check` pasan.
 
-- [ ] **T-013 — Rediseñar la gráfica de pérdida y la tabla**
+- [x] **T-013 — Rediseñar la gráfica de pérdida y la tabla**
       **Estimación:** 25 min · **Dependencias:** T-012 · **RF:** RF-4, RF-8, RF-9, RF-11, RF-12
       Aplicar la dirección a `node-packet-loss-chart.tsx` y la tabla de mediciones; mantener los valores 0 %, 100 % y fraccionarios y su sincronía con latencia.
       **Hecho cuando:** Pruebas y story dirigidas confirman escala, valores, tooltip, marcas legibles y tabla textual con los puntos del nodo/rango seleccionados.
+      **Resultado:** La gráfica adopta la serie cobre, ejes legibles y superficies coherentes; la tabla mantiene todos los puntos del rango y una superficie cálida. Story y pruebas del detalle: 12/12; Chrome confirmó 1440/1440 px, cuatro filas para `1h` y consola sin errores. Lint, build, Prettier dirigido y `git diff --check` pasan.
 
 - [ ] **T-014 — Rediseñar estados del detalle y añadir la story vacía autorizada**
       **Estimación:** 25 min · **Dependencias:** T-011 · **RF:** RF-6, RF-7, RF-8, RF-12
