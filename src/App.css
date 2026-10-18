@@ -458,10 +458,10 @@ a {
 
 .node-latency-chart code {
   padding: 0.2rem 0.4rem;
-  border: 1px solid rgba(103, 232, 249, 0.16);
+  border: 1px solid rgba(232, 176, 126, 0.2);
   border-radius: 0.35rem;
   color: var(--color-kicker);
-  background: rgba(14, 116, 144, 0.18);
+  background: rgba(200, 165, 125, 0.1);
   font-family: var(--font-mono);
   font-size: 0.78rem;
 }
@@ -602,25 +602,39 @@ a {
 }
 
 .node-latency-chart {
-  margin: 2rem 0;
-  padding: 1.25rem;
-  border: 1px solid var(--color-border);
+  margin: 1.5rem 0 2rem;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  border: 1px solid var(--color-border-soft);
+  border-top: 2px solid rgba(200, 165, 125, 0.62);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-panel);
-  backdrop-filter: blur(14px);
+  background:
+    linear-gradient(135deg, rgba(200, 165, 125, 0.045), transparent 45%), var(--color-surface);
+  box-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.16);
 }
 
 .node-latency-chart figcaption {
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
   color: var(--color-foreground);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .node-latency-chart__canvas {
   width: 100%;
   min-height: 280px;
+}
+
+.node-latency-chart .recharts-cartesian-axis-tick-value {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.node-latency-chart .recharts-line-curve {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 5px rgba(232, 176, 126, 0.16));
 }
 
 .node-packet-loss-chart {

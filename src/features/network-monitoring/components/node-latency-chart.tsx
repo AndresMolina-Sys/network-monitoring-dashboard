@@ -19,6 +19,14 @@ interface LatencyChartPoint {
   readonly latencyMs: number
 }
 
+const CHART_COLORS = {
+  axis: '#bcb7af',
+  grid: 'rgba(188, 183, 175, 0.14)',
+  line: '#e8b07e',
+  pointOutline: '#222426',
+  pointFocus: '#eee9df',
+} as const
+
 export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
   const chartData: readonly LatencyChartPoint[] = metrics.points.map((point) => ({
     label:
@@ -44,18 +52,18 @@ export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
             desc="Use the left and right arrow keys to inspect measurements. Exact values are listed in the table below."
             margin={{ top: 12, right: 16, bottom: 8, left: 0 }}
           >
-            <CartesianGrid stroke="rgba(148, 163, 184, 0.16)" strokeDasharray="3 3" />
+            <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="2 5" />
             <XAxis
               dataKey="label"
               interval={metrics.range === '7d' ? 3 : 'preserveStartEnd'}
-              tick={{ fill: '#94a3b8', fontSize: 12 }}
+              tick={{ fill: CHART_COLORS.axis, fontSize: 12 }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               dataKey="latencyMs"
               unit=" ms"
-              tick={{ fill: '#94a3b8', fontSize: 12 }}
+              tick={{ fill: CHART_COLORS.axis, fontSize: 12 }}
               tickLine={false}
               axisLine={false}
               width={52}
@@ -68,10 +76,15 @@ export function NodeLatencyChart({ metrics }: NodeLatencyChartProps) {
               type="monotone"
               dataKey="latencyMs"
               name="Latency"
-              stroke="#22d3ee"
-              strokeWidth={3}
-              dot={{ r: 4, fill: '#22d3ee' }}
-              activeDot={{ r: 6 }}
+              stroke={CHART_COLORS.line}
+              strokeWidth={2.5}
+              dot={{ r: 3.5, fill: CHART_COLORS.line, stroke: CHART_COLORS.pointOutline }}
+              activeDot={{
+                r: 6,
+                fill: CHART_COLORS.line,
+                stroke: CHART_COLORS.pointFocus,
+                strokeWidth: 2,
+              }}
             />
           </LineChart>
         </ResponsiveContainer>

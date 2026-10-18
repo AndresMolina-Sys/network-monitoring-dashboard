@@ -19,12 +19,25 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
+    const chartSurface = canvasElement.querySelector<SVGSVGElement>('.recharts-surface')
 
     await expect(
       canvas.getByText('Latency trend for core-router (ms, 1h, UTC)'),
     ).toBeInTheDocument()
+    await expect(chartSurface).not.toBeNull()
+    await expect(chartSurface).toHaveAccessibleName(
+      'Latency trend for core-router in milliseconds, range 1h, UTC',
+    )
+    const axisLabels = Array.from(
+      chartSurface?.querySelectorAll('.recharts-cartesian-axis-tick-value') ?? [],
+    ).map((label) => label.textContent)
+    await expect(axisLabels).toContain('17:00')
+    await expect(axisLabels.some((label) => label?.includes('ms'))).toBe(true)
+    await expect(chartSurface?.querySelectorAll('.recharts-dot')).toHaveLength(
+      args.metrics.points.length,
+    )
   },
 }
 

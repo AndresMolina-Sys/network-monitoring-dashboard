@@ -70,10 +70,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Las pruebas confirman sincronía entre nodo/rango/valores, visibilidad de la etiqueta en estados aplicables y ausencia de métricas obsoletas.
       **Resultado:** Se armonizaron el selector, los valores del resumen y la etiqueta persistente con la paleta cobre, sin modificar lógica, unidades, rangos ni textos. Las pruebas del detalle confirman sincronía, etiqueta en carga/éxito/vacío/error y ausencia de métricas anteriores (10/10); lint, build, Prettier dirigido y `git diff --check` pasan.
 
-- [ ] **T-012 — Rediseñar la gráfica de latencia**
+- [x] **T-012 — Rediseñar la gráfica de latencia**
       **Estimación:** 25 min · **Dependencias:** T-011 · **RF:** RF-4, RF-8, RF-9, RF-11, RF-12
       Aplicar la referencia aprobada a `node-latency-chart.tsx` y sus stories existentes; conservar tooltip, alternativa textual y asociación con el periodo.
       **Hecho cuando:** Pruebas y story dirigidas confirman valores, ejes, unidades, tooltip y alternativa tabular/accesible; la marca y sus etiquetas cumplen los criterios de contraste aplicables.
+      **Resultado:** Se aplicó la paleta cobre a la serie y se afinó el marco, la cuadrícula y los ejes. La story comprueba nombre accesible, ticks/unidades, muestras y navegación/tooltip por teclado; la prueba de página mantiene la tabla alternativa. Stories y pruebas de detalle: 12/12; contraste calculado contra la superficie: etiquetas 7.81:1 y línea 8.12:1; lint, build, Prettier dirigido y `git diff --check` pasan.
 
 - [ ] **T-013 — Rediseñar la gráfica de pérdida y la tabla**
       **Estimación:** 25 min · **Dependencias:** T-012 · **RF:** RF-4, RF-8, RF-9, RF-11, RF-12
