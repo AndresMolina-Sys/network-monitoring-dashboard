@@ -28,10 +28,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Hecho cuando:** Una lectura posterior confirma los seis bloques y las asociaciones aprobadas para inventario y detalle; si la herramienta no puede registrarlas, se detiene y se consulta al usuario.
       **Resultado:** `.impeccable/surfaces/src-app-tsx.md` registra los seis bloques y relaciona los dos HTML aprobados mediante `related_targets`.
 
-- [ ] **T-005 — Auditar la interfaz existente antes del build**
+- [x] **T-005 — Auditar la interfaz existente antes del build**
       **Estimación:** 25 min · **Dependencias:** T-004 · **RF:** RF-2, RF-3, RF-4, RF-6, RF-8, RF-9, RF-10, RF-11, RF-12
       Realizar una revisión independiente de solo lectura de scanability, funciones existentes, estados, accesibilidad y riesgos visuales; usar el perfil revisor cuando esté disponible. Si no hay subagentes, el coordinador asume el rol en una pasada separada y lo declara.
       **Hecho cuando:** El coordinador recibe un informe de línea base con riesgos y campos/acciones que deben seguir localizables, sin modificaciones de archivos.
+      **Resultado:** El revisor delegado no devolvió informe; el coordinador hizo la pasada independiente de solo lectura. Hechos: nombre, estado, ID, dirección, ubicación, última comprobación, búsqueda/filtro/limpieza, navegación, reintento, selector, resumen, ambas gráficas y tabla completa están presentes; controles y gráficas tienen semántica, hay foco visible y se reduce movimiento. Riesgos por validar: el hero dominante puede retrasar controles; timestamps largos pueden verse densos en móvil; pérdidas inferiores a 0.5% quedan cerca de la base en escala 0–100%; el E2E de rangos comprueba 390/1440 px, no los anchos intermedios; falta medir contraste final.
 
 - [ ] **T-006 — Abrir el build gate de Impeccable**
       **Estimación:** 20 min · **Dependencias:** T-005 · **RF:** RF-13
