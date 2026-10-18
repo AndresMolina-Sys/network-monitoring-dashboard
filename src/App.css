@@ -131,6 +131,7 @@ a {
   color: var(--color-muted-foreground);
   font-size: 0.9rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .app-header--inventory .app-header__topline {
@@ -492,6 +493,7 @@ a {
   margin: 0.75rem 0 0;
   color: var(--color-muted-foreground);
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
 .network-node-state--error {
@@ -907,6 +909,7 @@ a {
 }
 
 .network-node-summary__heading {
+  min-width: 0;
   padding-top: 0.25rem;
 }
 
@@ -921,6 +924,7 @@ a {
 .network-node-summary h2 {
   font-size: clamp(1.5rem, 2.6vw, 2rem);
   letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
 }
 
 .network-node-summary__details {

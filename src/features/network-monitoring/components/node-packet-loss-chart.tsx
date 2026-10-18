@@ -55,7 +55,7 @@ export function NodePacketLossChart({ metrics }: NodePacketLossChartProps) {
             <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="2 5" />
             <XAxis
               dataKey="label"
-              interval={metrics.range === '7d' ? 3 : 'preserveStartEnd'}
+              interval={metrics.range === '7d' ? 4 : 'preserveStartEnd'}
               tick={{ fill: CHART_COLORS.axis, fontSize: 12 }}
               tickLine={false}
               axisLine={false}

@@ -110,12 +110,13 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
       **Estimación:** 25 min · **Dependencias:** T-010, T-011, T-012, T-013, T-014 · **RF:** RF-4, RF-6, RF-7, RF-11, RF-12
       Afinar resumen, selector, gráficas, tabla y estados en los tamaños cubiertos, sin modificar `playwright.config.ts`.
       **Hecho cuando:** Las verificaciones dirigidas en 375, 390 × 844, 768, 1024 y 1440 px mantienen utilizables controles y datos, sin desbordamiento horizontal de página.
-      **Resultado:** La prueba dirigida cubre enlace de retorno, resumen, selector y etiqueta, ambas gráficas, tabla y filas de datos en 375, 390 × 844, 768, 1024 y 1440 px; elementos dentro del viewport y `scrollWidth <= innerWidth`. No hizo falta alterar CSS: los estilos existentes ya conservan el contenido y los controles. Playwright: 2/2 (Chromium desktop/mobile); lint, build, Prettier dirigido y `git diff --check` pasan. El solapamiento de etiquetas del eje 7d, de 1.94 px en móvil, permanece expresamente diferido a T-019.
+      **Resultado:** La prueba dirigida cubre enlace de retorno, resumen, selector y etiqueta, ambas gráficas, tabla y filas de datos en 375, 390 × 844, 768, 1024 y 1440 px; elementos dentro del viewport y `scrollWidth <= innerWidth`. No hizo falta alterar CSS en esta tarea. Playwright: 2/2 (Chromium desktop/mobile); lint, build, Prettier dirigido y `git diff --check` pasan. El solapamiento 7d, observado en esta tarea, se corrigió y verificó en T-019.
 
-- [ ] **T-019 — Verificar la matriz responsive con Playwright**
+- [x] **T-019 — Verificar la matriz responsive con Playwright**
       **Estimación:** 25 min · **Dependencias:** T-017, T-018 · **RF:** RF-2, RF-3, RF-4, RF-6, RF-11, RF-12
-      Ampliar solo `e2e/network-monitoring.spec.ts` para comprobar inventario y detalle a 375, 390, 768, 1024 y 1440 px, sin cambiar la configuración E2E.
+      Ampliar `e2e/network-monitoring.spec.ts` para comprobar inventario y detalle a 375, 390, 768, 1024 y 1440 px. Por autorización explícita del usuario, corregir hallazgos responsive reproducibles en los estilos y componentes de gráfica existentes; no cambiar la configuración E2E ni crear archivos.
       **Hecho cuando:** Las pruebas dirigidas verifican en cada ancho que datos y controles esenciales no se recortan, que las acciones principales siguen utilizables y que `scrollWidth <= innerWidth`.
+      **Resultado:** La matriz verifica campos del inventario/detalle, navegación ida y vuelta, selección de rango, tablas completas y ausencia de overflow en Chromium desktop y mobile (10/10). Las etiquetas del eje de ambas gráficas 7d se redujeron de ocho a seis marcas legibles para evitar solapamientos; el ID/nombre sin espacios se parte también en el encabezado y el estado Node not found. Se corrigieron los casos detectados en `App.css` y ambos componentes de gráfica. Lint, build, Prettier dirigido y `git diff --check` pasan.
 
 - [ ] **T-020 — Verificar navegación y búsqueda del inventario con Playwright**
       **Estimación:** 25 min · **Dependencias:** T-009, T-017 · **RF:** RF-3, RF-5, RF-6

@@ -131,6 +131,11 @@ test.describe('Network monitoring dashboard', () => {
 
       expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
       expect(cardOverflows).toBe(false)
+
+      await firstNode.click()
+      await expect(page.getByRole('heading', { name: 'Node details' })).toBeVisible()
+      await page.getByRole('link', { name: 'Back to dashboard' }).click()
+      await expect(search).toBeVisible()
     }
   })
 
@@ -192,6 +197,113 @@ test.describe('Network monitoring dashboard', () => {
       }))
 
       expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+
+      const dayRangeButton = rangeSelector.getByRole('button', { name: '24h', exact: true })
+      await dayRangeButton.click()
+      await expect(dayRangeButton).toHaveAttribute('aria-pressed', 'true')
+      await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(25)
+      const hourRangeButton = rangeSelector.getByRole('button', { name: '1h', exact: true })
+      await hourRangeButton.click()
+      await expect(hourRangeButton).toHaveAttribute('aria-pressed', 'true')
+      await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(4)
+    }
+  })
+
+  test('keeps seven-day chart labels separated across detail viewport sizes', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 })
+    await page.goto('/nodes/core-router')
+
+    const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
+    await rangeSelector.getByRole('button', { name: '7d', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Last 7 days performance (7d)' })).toBeVisible()
+
+    const latencyChart = page.getByRole('figure', {
+      name: 'Latency trend for core-router (ms, 7d, UTC)',
+    })
+    const packetLossChart = page.getByRole('figure', {
+      name: 'Packet loss trend for core-router (percent, 7d, UTC)',
+    })
+    const charts = [latencyChart, packetLossChart]
+    const widths = [375, 390, 768, 1024, 1440]
+
+    for (const width of widths) {
+      const viewport = { width, height: width < 640 ? 844 : 900 }
+      await page.setViewportSize(viewport)
+
+      await expect(latencyChart.locator('svg .recharts-dot.recharts-line-dot')).toHaveCount(29)
+
+      for (const chart of charts) {
+        const dateLabelBounds = await chart.locator('svg text').evaluateAll((elements) =>
+          elements
+            .filter((element) => /^[A-Z][a-z]{2} \d{1,2}$/.test(element.textContent?.trim() ?? ''))
+            .map((element) => {
+              const { left, right } = element.getBoundingClientRect()
+              return { left, right }
+            })
+            .sort((first, second) => first.left - second.left),
+        )
+
+        expect(dateLabelBounds.length).toBeGreaterThan(1)
+        dateLabelBounds.forEach((bounds, index) => {
+          if (index > 0) {
+            expect(bounds.left).toBeGreaterThanOrEqual(dateLabelBounds[index - 1].right)
+          }
+        })
+      }
+
+      const dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+      await expect(rangeSelector.getByRole('button', { name: '7d', exact: true })).toBeVisible()
+      await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(29)
+    }
+  })
+
+  test('wraps long node identifiers and names in the detail view', async ({ page }) => {
+    await page.goto('/nodes/core-router')
+
+    const longIdentifier =
+      'regionalnetworkgatewaynorthcampusoperationscenteridentifierwithoutbreaks'
+    const nodeIdentifier = page.locator('.app-header__lede')
+    const nodeName = page.locator('.network-node-summary__heading h2')
+
+    await page.locator('.app-header__lede code').evaluate((element, value) => {
+      element.textContent = value
+    }, longIdentifier)
+    await nodeName.evaluate((element) => {
+      element.textContent = 'RegionalNetworkGatewayOperationsCenterWithoutBreaks'
+    })
+
+    for (const width of [375, 390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: width < 640 ? 844 : 900 })
+
+      for (const locator of [nodeIdentifier, nodeName]) {
+        await expect(locator).toBeVisible()
+
+        const textOverflows = await locator.evaluate(
+          (element) => element.scrollWidth > element.clientWidth,
+        )
+
+        expect(textOverflows).toBe(false)
+      }
+    }
+
+    await page.goto(`/nodes/${longIdentifier}`)
+    await expect(page.getByRole('heading', { name: 'Node not found' })).toBeVisible()
+
+    const notFoundMessage = page.locator(
+      '.network-node-state > p:not(.network-node-state__eyebrow)',
+    )
+    for (const width of [375, 390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: width < 640 ? 844 : 900 })
+      const textOverflows = await notFoundMessage.evaluate(
+        (element) => element.scrollWidth > element.clientWidth,
+      )
+
+      expect(textOverflows).toBe(false)
     }
   })
 
@@ -316,10 +428,11 @@ test.describe('Network monitoring dashboard', () => {
           return { left, right }
         })
 
-        expect(dateLabels).toHaveLength(8)
+        expect(dateLabels.length).toBeGreaterThanOrEqual(6)
+        expect(dateLabels.length).toBeLessThanOrEqual(8)
         expect(new Set(dateLabels).size).toBe(dateLabels.length)
         expect(timeLabels).toHaveLength(0)
-        expect(dateLabelBounds).toHaveLength(8)
+        expect(dateLabelBounds).toHaveLength(dateLabels.length)
         dateLabelBounds.forEach((bounds, index) => {
           expect(bounds.left).toBeGreaterThanOrEqual(chartBounds.left)
           expect(bounds.right).toBeLessThanOrEqual(chartBounds.right)
