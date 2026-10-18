@@ -924,6 +924,7 @@ a {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0 0.75rem;
+  overflow-wrap: anywhere;
 }
 
 .app-header__node-id {
@@ -932,6 +933,7 @@ a {
   font-size: 0.34em;
   font-weight: 500;
   letter-spacing: 0;
+  overflow-wrap: anywhere;
 }
 
 .app-header__node-meta {

@@ -181,11 +181,11 @@ En cada tarea de implementación se ejecuta primero la prueba dirigida pertinent
 
       **Resultado:** Después de la ejecución inicial fallida, se corrigieron en una reparación separada las dos expectativas de encabezado obsoletas, se instaló Chromium y se repitió la secuencia completa: `npm run format:check`, `npm run lint`, `npm run test` (109/109), `npm run build` y `npm run build-storybook` pasan. Storybook termina con la advertencia conocida de chunks mayores a 500 kB; no bloquea el build.
 
-- [ ] **T-030 — Ejecutar la suite E2E completa**
+- [x] **T-030 — Ejecutar la suite E2E completa**
       **Estimación:** 30 min · **Dependencias:** T-019, T-020, T-021, T-022, T-023, T-029 · **RF:** RF-2 a RF-12
       Ejecutar únicamente `npm run test:e2e` como verificación integral final. Si falla, detenerse y reportar el resultado; esta tarea no incluye diagnóstico ni correcciones.
       **Hecho cuando:** La suite completa termina correctamente; ante un fallo, la tarea queda sin completar y el coordinador recibe el test y resultado fallidos para decidir el siguiente paso, sin reparar nada dentro de esta verificación.
-      **Resultado (fallo; tarea pendiente):** Con `PLAYWRIGHT_PORT=4173`, `npm run test:e2e` ejecutó 26 casos: 24 pasaron y falló en Chromium y mobile-chromium el caso de identificadores largos. La prueba busca `.app-header__lede code`, selector que ya no existe en el diseño actual; su timeout fue de 30 s en ambos navegadores. No se modificó la prueba ni se hicieron reintentos.
+      **Resultado:** Tras la reparación aprobada, la prueba de identificadores largos pasa en Chromium y mobile-chromium, y la suite E2E completa pasa 26/26 con `PLAYWRIGHT_PORT=4173`. No hubo errores; se mantuvieron avisos conocidos de React Router (`HydrateFallback`) y del entorno (`NO_COLOR`).
 
 ## Cierre del coordinador (posterior al checklist)
 

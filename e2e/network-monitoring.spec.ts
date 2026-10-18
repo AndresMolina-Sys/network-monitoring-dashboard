@@ -338,28 +338,34 @@ test.describe('Network monitoring dashboard', () => {
 
     const longIdentifier =
       'regionalnetworkgatewaynorthcampusoperationscenteridentifierwithoutbreaks'
-    const nodeIdentifier = page.locator('.app-header__lede')
-    const nodeName = page.locator('.network-node-summary__heading h2')
+    const longName = 'RegionalNetworkGatewayOperationsCenterWithoutBreaks'
+    const nodeIdentifier = page.locator('.app-header__node-id')
+    const nodeHeading = page.locator('.app-header--detail h1')
 
-    await page.locator('.app-header__lede code').evaluate((element, value) => {
+    await nodeIdentifier.evaluate((element, value) => {
       element.textContent = value
     }, longIdentifier)
-    await nodeName.evaluate((element) => {
-      element.textContent = 'RegionalNetworkGatewayOperationsCenterWithoutBreaks'
-    })
+    await nodeHeading.evaluate((element, value) => {
+      const textNode = element.firstChild
+
+      if (textNode?.nodeType !== Node.TEXT_NODE) {
+        throw new Error('Node heading is missing its name text')
+      }
+
+      textNode.textContent = value
+    }, longName)
 
     for (const width of [375, 390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: width < 640 ? 844 : 900 })
 
-      for (const locator of [nodeIdentifier, nodeName]) {
-        await expect(locator).toBeVisible()
+      await expect(nodeIdentifier).toBeVisible()
+      await expect(nodeHeading).toBeVisible()
 
-        const textOverflows = await locator.evaluate(
-          (element) => element.scrollWidth > element.clientWidth,
-        )
+      const headingOverflows = await nodeHeading.evaluate(
+        (element) => element.scrollWidth > element.clientWidth,
+      )
 
-        expect(textOverflows).toBe(false)
-      }
+      expect(headingOverflows).toBe(false)
     }
 
     await page.goto(`/nodes/${longIdentifier}`)
