@@ -9,6 +9,9 @@ describe('AppRouter', () => {
 
     render(<AppRouter />)
 
+    expect(screen.getByText('Simulated inventory')).toBeVisible()
+    expect(screen.queryByText('Live inventory')).not.toBeInTheDocument()
+
     const nodeLink = await screen.findByRole(
       'link',
       {

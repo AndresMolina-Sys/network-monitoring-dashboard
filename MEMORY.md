@@ -14,7 +14,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - CI para `0bd3b22` terminó correctamente; el despliegue de Vercel quedó `READY`.
 - El mock y la API ofrecen fixtures deterministas `1h`, `24h` y `7d` para los tres nodos; cada apertura inicia en `1h` y el selector conserva el rango actual.
 - El coordinador de Codex delega SDD a perfiles de proyecto: planificador, implementador de una tarea y revisor; los perfiles se versionan en `.codex/agents/`.
-- La Skill local `$feature` registra cambios pequeños en `feature.md`; F-001 (etiqueta del inventario) y F-002 (accesibilidad de gráficas) están pendientes de aprobación y no autorizan cambios de producto.
+- La Skill local `$feature` registra cambios pequeños en `feature.md`; por decisión del usuario, una vez documentado el plan no hace falta una aprobación separada para cambios localizados solicitados. F-001 está completo; F-002 está en curso.
 
 ## Decisiones (y por qué)
 
@@ -31,6 +31,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La spec 001 cubre modo mock local y dashboard de producción; conserva el comportamiento existente de nodo inexistente y reintentos.
 - La Skill `$sdd` está en `.agents/skills/sdd/` y permanece local porque `.agents/` se ignora intencionalmente en Git.
 - Mantener al agente principal como único coordinador de aprobación; pasar a subagentes el alcance y contexto exactos, serializar escrituras y paralelizar solo revisiones independientes de solo lectura. Los perfiles heredan permisos del coordinador; sus instrucciones no son sandbox.
+- Para cambios pequeños solicitados, usar `feature.md` como registro/plan y proceder sin una puerta adicional de aprobación; detenerse ante decisiones materiales nuevas o límites de alcance.
 
 ## Aprendizajes y errores a evitar
 
@@ -43,4 +44,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Aprobar o ajustar F-001 y F-002 en `feature.md`; mantener el flujo SDD para cambios grandes o que crucen contratos/capas.
+- Completar F-002 de `feature.md`; mantener el flujo SDD para cambios grandes o que crucen contratos/capas.

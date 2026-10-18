@@ -9,7 +9,7 @@ function App() {
           <p className="app-eyebrow">Network operations</p>
           <p className="app-header__signal">
             <span aria-hidden="true" />
-            Live inventory
+            Simulated inventory
           </p>
         </div>
 

@@ -2,11 +2,12 @@
 
 Este documento registra mejoras localizadas antes de implementarlas. No sustituye el flujo SDD: cambios de API, contratos, datos entre capas, persistencia, autenticación, polling o alcance amplio deben pasar por `$sdd`.
 
-Estado general: **Pendiente de aprobación**. No se han autorizado cambios en archivos del producto.
+Estado general: **En curso**. F-001 está completo; F-002 está en implementación. Los cambios pequeños registrados no requieren una aprobación adicional al plan.
 
 ## F-001 — Identificar el inventario como simulado
 
-**Estado:** Pendiente de aprobación  
+**Estado:** Completado
+
 **Objetivo:** Evitar que la etiqueta actual “Live inventory” sugiera telemetría o actualización en tiempo real, capacidades que el dashboard no tiene.
 
 **Enfoque propuesto:** Cambiar la etiqueta visible a “Simulated inventory”, manteniendo intactos el diseño y el comportamiento del inventario.
@@ -22,13 +23,15 @@ Estado general: **Pendiente de aprobación**. No se han autorizado cambios en ar
 - No se presenta el inventario como telemetría en vivo ni se modifica la carga de nodos.
 - La prueba del dashboard cubre el texto visible.
 
+**Verificación:** `npm run test -- src/app/router.test.tsx --reporter=verbose` y `npm run format:check` pasaron.
+
 **Casos límite:** La etiqueta debe conservar legibilidad en móvil y no cambiar la indicación de datos simulados de la página de métricas.
 
-**Dudas abiertas:** Ninguna bloqueante; el texto propuesto queda sujeto a aprobación.
+**Dudas abiertas:** Ninguna.
 
 ## F-002 — Mejorar la accesibilidad de las gráficas
 
-**Estado:** Pendiente de aprobación  
+**Estado:** En curso
 **Objetivo:** Hacer que la latencia y la pérdida de paquetes se entiendan sin depender exclusivamente de la lectura visual o del hover.
 
 **Contexto verificado:** Las dos gráficas ya tienen `figure`/`figcaption` y `accessibilityLayer`; el detalle ya ofrece una tabla estructurada con las muestras. La implementación debe conservar y aprovechar esas alternativas, no duplicarlas sin necesidad.
