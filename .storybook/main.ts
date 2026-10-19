@@ -10,5 +10,13 @@ const config: StorybookConfig = {
     '@storybook/addon-onboarding',
   ],
   framework: '@storybook/react-vite',
+  viteFinal: async (config) => {
+    config.build = {
+      ...config.build,
+      chunkSizeWarningLimit: 1200,
+    }
+
+    return config
+  },
 }
 export default config
