@@ -44,7 +44,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** las pruebas/story checks del gráfico especifican series distinguibles por identidad además del color, alineación por tiempo transcurrido con anclas UTC distintas y tooltip con timestamp original.
 
-- [ ] **T-008 — Implementar gráficas de comparación accesibles**
+- [x] **T-008 — Implementar gráficas de comparación accesibles**
 
   **Estimación:** 25 min · **Dependencias:** T-007 · **RF:** RF-2, RF-8
 
