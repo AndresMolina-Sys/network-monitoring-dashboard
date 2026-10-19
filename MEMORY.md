@@ -12,7 +12,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
 - `specs/004-comparacion-de-nodos/` está aprobada y T-001 a T-017 completas. `/compare` presenta selección, gráficas, leyendas, tabla y estados responsive; Playwright pasó 34/34, full-stack 2/2 y Graphify quedó actualizado con 795 nodos/1.125 relaciones sin endpoints huérfanos.
-- `specs/005-resumen-por-nodo-en-comparacion/spec.md` está aprobada por el usuario; `plan.md` está redactado y pendiente de aprobación. Aún no hay tareas ni cambios de código.
+- `specs/005-resumen-por-nodo-en-comparacion/spec.md` y `plan.md` están aprobados por el usuario; `tasks.md` está redactado y pendiente de aprobación. Aún no hay cambios de código.
 - Spec, plan y tareas de Spec 003 están aprobados; T-001 a T-030 completas. Se verificaron accesibilidad, responsive, Vitest, build, Storybook y E2E; se corrigieron los avisos priorizados. Graphify se actualizó e inspeccionó; diagnóstico sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Aprobar el plan de Spec 005 para crear después las tareas y mantener sus aprobaciones separadas.
+- Aprobar las tareas de Spec 005 antes de iniciar su implementación.
