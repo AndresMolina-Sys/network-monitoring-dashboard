@@ -62,7 +62,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `network-node-comparison-page.tsx` conecta selección, rango y hook; muestra gráficas y tabla para datos válidos, estados por nodo para los demás casos y “Simulated data” en todos los estados, con una story representativa.
 
-- [ ] **T-011 — Conectar la ruta de comparación**
+- [x] **T-011 — Conectar la ruta de comparación**
 
   **Estimación:** 20 min · **Dependencias:** T-006, T-010 · **RF:** RF-1, RF-9
 
