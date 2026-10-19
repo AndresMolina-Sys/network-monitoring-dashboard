@@ -80,7 +80,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `src/App.css` mantiene selección, gráficas, leyendas, controles, estados y tabla comprensibles a 390 × 844 y escritorio, sin desbordamiento horizontal y respetando foco visible y movimiento reducido.
 
-- [ ] **T-014 — Ejecutar verificaciones frontend y Storybook**
+- [x] **T-014 — Ejecutar verificaciones frontend y Storybook**
 
   **Estimación:** 30 min · **Dependencias:** T-001 a T-013 · **RF:** RF-1 a RF-9
 
