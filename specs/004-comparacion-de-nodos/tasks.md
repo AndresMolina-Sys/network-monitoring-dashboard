@@ -86,7 +86,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `npm run format:check`, `npm run lint`, `npm run test`, `npm run build` y `npm run build-storybook` terminan correctamente; cualquier fallo se registra y se corrige antes de continuar.
 
-- [ ] **T-015 — Ejecutar E2E con mocks en escritorio y móvil**
+- [x] **T-015 — Ejecutar E2E con mocks en escritorio y móvil**
 
   **Estimación:** 25 min · **Dependencias:** T-014 · **RF:** RF-1 a RF-9; requisitos no funcionales
 
