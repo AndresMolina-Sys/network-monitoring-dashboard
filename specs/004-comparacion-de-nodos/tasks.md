@@ -14,7 +14,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `metrics-validation.ts` expone la validación pura reutilizable por el detalle y la comparación, y `use-node-metrics.test.ts` conserva verdes sus casos actuales de respuesta, ventana y valores inválidos.
 
-- [ ] **T-003 — Escribir pruebas del estado de comparación por nodo**
+- [x] **T-003 — Escribir pruebas del estado de comparación por nodo**
 
   **Estimación:** 25 min · **Dependencias:** T-002 · **RF:** RF-3, RF-4, RF-5, RF-6, RF-9
 
