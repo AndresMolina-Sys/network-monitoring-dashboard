@@ -38,7 +38,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `network-nodes-panel.tsx` y `network-node-card.tsx` permiten seleccionar hasta tres nodos con controles independientes del enlace de detalle, muestran el conteo y habilitan iniciar solo con dos o tres.
 
-- [ ] **T-007 — Escribir pruebas de las gráficas comparativas**
+- [x] **T-007 — Escribir pruebas de las gráficas comparativas**
 
   **Estimación:** 25 min · **Dependencias:** T-002 · **RF:** RF-2, RF-8
 
