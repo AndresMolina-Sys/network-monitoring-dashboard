@@ -98,7 +98,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `npm run test:e2e:full-stack` pasa contra la API local y confirma que las rutas y contratos existentes siguen compatibles; esta regresión no se presenta como prueba específica de comparación y no altera backend ni despliegue.
 
-- [ ] **T-017 — Actualizar e inspeccionar Graphify al cerrar la spec**
+- [x] **T-017 — Actualizar e inspeccionar Graphify al cerrar la spec**
 
   **Estimación:** 30 min · **Dependencias:** T-001 a T-016 completadas · **RF:** RF-1 a RF-9
 
