@@ -8,7 +8,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `metrics-validation.test.ts` cubre los tres rangos, anclaje UTC, extremos inclusivos, conteo, cadencia, orden, duplicados, ventana y límites de latencia/pérdida; las pruebas fallan por ausencia del módulo, no por configuración.
 
-- [ ] **T-002 — Extraer la validación de métricas existente**
+- [x] **T-002 — Extraer la validación de métricas existente**
 
   **Estimación:** 25 min · **Dependencias:** T-001 · **RF:** RF-3, RF-5
 

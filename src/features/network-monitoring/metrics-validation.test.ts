@@ -158,11 +158,10 @@ describe('assertValidMetricPoints', () => {
   })
 
   it('rejects duplicate instants even when their timestamp strings use different offsets', () => {
-    const points = createPoints('1h')
-    points[1] = {
-      ...points[1],
-      timestamp: formatTimestampWithOffset(points[0].timestamp, -300),
-    }
+    const originalPoints = createPoints('1h')
+    const points = replacePoint(originalPoints, 1, {
+      timestamp: formatTimestampWithOffset(originalPoints[0].timestamp, -300),
+    })
 
     expect(() => assertValidMetricPoints(points, '1h')).toThrow()
   })
@@ -191,12 +190,13 @@ describe('assertValidMetricPoints', () => {
   })
 
   it('accepts zero latency and packet loss values at both inclusive loss boundaries', () => {
-    const points = createPoints('1h')
-    points[0] = { ...points[0], latencyMs: 0, packetLossPercent: 0 }
-    points[points.length - 1] = {
-      ...points[points.length - 1],
+    const zeroBoundaryPoints = replacePoint(createPoints('1h'), 0, {
+      latencyMs: 0,
+      packetLossPercent: 0,
+    })
+    const points = replacePoint(zeroBoundaryPoints, zeroBoundaryPoints.length - 1, {
       packetLossPercent: 100,
-    }
+    })
 
     expect(() => assertValidMetricPoints(points, '1h')).not.toThrow()
   })

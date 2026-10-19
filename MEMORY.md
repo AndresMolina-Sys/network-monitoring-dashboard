@@ -11,7 +11,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
-- `specs/004-comparacion-de-nodos/` está aprobada; T-001 completada y T-002 es la siguiente. La comparación cubre latencia y pérdida entre 2–3 nodos, con ventanas ancladas por nodo y alineación por tiempo transcurrido.
+- `specs/004-comparacion-de-nodos/` está aprobada; T-001 y T-002 completas, T-003 siguiente. La validación compartida cubre los tres rangos, anclaje UTC, cadencia, ventana y límites de métricas.
 - Spec, plan y tareas de Spec 003 están aprobados; T-001 a T-030 completas. Se verificaron accesibilidad, responsive, Vitest, build, Storybook y E2E; se corrigieron los avisos priorizados. Graphify se actualizó e inspeccionó; diagnóstico sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
