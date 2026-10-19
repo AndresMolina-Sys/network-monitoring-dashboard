@@ -50,13 +50,13 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `node-metrics-comparison-chart.tsx` presenta series por nodo agrupadas por métrica, usa tiempo transcurrido como eje y conserva identidad y timestamp UTC en tooltip y contenido accesible; su story muestra ambas métricas.
 
-- [ ] **T-009 — Escribir pruebas de la página comparativa**
+- [x] **T-009 — Escribir pruebas de la página comparativa**
 
   **Estimación:** 25 min · **Dependencias:** T-004, T-008 · **RF:** RF-3, RF-4, RF-5, RF-6, RF-7, RF-8
 
   **Hecho cuando:** `network-node-comparison-page.test.tsx` verifica rango inicial y cambios, etiqueta “Simulated data” en carga/éxito/vacío/error, estados parciales por nodo y tabla accesible con valores y timestamps UTC.
 
-- [ ] **T-010 — Implementar la página de comparación**
+- [x] **T-010 — Implementar la página de comparación**
 
   **Estimación:** 25 min · **Dependencias:** T-009 · **RF:** RF-2, RF-3, RF-4, RF-5, RF-6, RF-7, RF-8
 
