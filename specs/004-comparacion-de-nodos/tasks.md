@@ -1,8 +1,8 @@
 # Tasks 004 — Comparación de nodos
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
-- [ ] **T-001 — Escribir pruebas para la validación compartida de métricas**
+- [x] **T-001 — Escribir pruebas para la validación compartida de métricas**
 
   **Estimación:** 25 min · **Dependencias:** Ninguna · **RF:** RF-3, RF-5
 
