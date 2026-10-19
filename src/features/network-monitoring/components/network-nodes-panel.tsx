@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import type { NodeStatus } from '../../../domain/network'
+import { useNavigate } from 'react-router'
+import type { NetworkNode, NodeStatus } from '../../../domain/network'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { useNetworkNodes } from '../hooks/use-network-nodes'
 import { NetworkNodeCard } from './network-node-card'
@@ -15,8 +16,10 @@ type StatusFilter = NodeStatus | 'all'
 
 export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
   const { status, nodes, retry } = useNetworkNodes(service)
+  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [selectedNodeIds, setSelectedNodeIds] = useState<NetworkNode['id'][]>([])
 
   if (status === 'loading') {
     return <NetworkNodesSkeleton />
@@ -41,6 +44,20 @@ export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
 
     return matchesQuery && matchesStatus
   })
+
+  const toggleNodeSelection = (nodeId: NetworkNode['id'], isSelected: boolean) => {
+    setSelectedNodeIds((currentSelection) => {
+      if (isSelected) {
+        if (currentSelection.includes(nodeId) || currentSelection.length >= 3) {
+          return currentSelection
+        }
+
+        return [...currentSelection, nodeId]
+      }
+
+      return currentSelection.filter((selectedNodeId) => selectedNodeId !== nodeId)
+    })
+  }
 
   return (
     <section className="network-nodes-panel" aria-labelledby="network-nodes-title">
@@ -84,10 +101,34 @@ export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
         </p>
       </div>
 
+      <div className="network-nodes-panel__selection">
+        <p aria-live="polite" aria-atomic="true">
+          {selectedNodeIds.length} of 3 nodes selected for comparison
+        </p>
+        <button
+          type="button"
+          disabled={selectedNodeIds.length < 2 || selectedNodeIds.length > 3}
+          onClick={() => {
+            const query = new URLSearchParams({ nodes: selectedNodeIds.join(',') })
+            navigate(`/compare?${query.toString()}`)
+          }}
+        >
+          Compare selected nodes
+        </button>
+      </div>
+
       {filteredNodes.length > 0 ? (
         <div className="network-node-list">
           {filteredNodes.map((node) => (
-            <NetworkNodeCard key={node.id} node={node} />
+            <NetworkNodeCard
+              key={node.id}
+              node={node}
+              selection={{
+                checked: selectedNodeIds.includes(node.id),
+                disabled: selectedNodeIds.length >= 3 && !selectedNodeIds.includes(node.id),
+                onChange: (isSelected) => toggleNodeSelection(node.id, isSelected),
+              }}
+            />
           ))}
         </div>
       ) : (

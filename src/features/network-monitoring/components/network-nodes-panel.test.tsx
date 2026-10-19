@@ -187,17 +187,21 @@ describe('NetworkNodesPanel', () => {
     })
     const compareButton = screen.getByRole('button', { name: 'Compare selected nodes' })
 
+    expect(screen.getByText('0 of 3 nodes selected for comparison')).toBeInTheDocument()
+
     await user.click(coreRouter)
     await user.click(accessSwitch)
 
     expect(coreRouter).toBeChecked()
     expect(accessSwitch).toBeChecked()
     expect(compareButton).toBeEnabled()
+    expect(screen.getByText('2 of 3 nodes selected for comparison')).toBeInTheDocument()
 
     await user.click(branchGateway)
 
     expect(branchGateway).toBeChecked()
     expect(compareButton).toBeEnabled()
+    expect(screen.getByText('3 of 3 nodes selected for comparison')).toBeInTheDocument()
   })
 
   it('blocks selecting more than three nodes', async () => {

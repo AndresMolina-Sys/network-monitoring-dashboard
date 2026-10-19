@@ -32,7 +32,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `network-nodes-panel.test.tsx` verifica selección de dos y tres nodos, límite de tres, acción bloqueada con menos de dos y disponibilidad de la selección para completar el mínimo.
 
-- [ ] **T-006 — Añadir selección de nodos al inventario**
+- [x] **T-006 — Añadir selección de nodos al inventario**
 
   **Estimación:** 25 min · **Dependencias:** T-005 · **RF:** RF-1
 

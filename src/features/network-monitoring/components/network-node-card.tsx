@@ -3,6 +3,11 @@ import type { NetworkNode } from '../../../domain/network'
 
 interface NetworkNodeCardProps {
   readonly node: NetworkNode
+  readonly selection?: {
+    readonly checked: boolean
+    readonly disabled: boolean
+    readonly onChange: (isSelected: boolean) => void
+  }
 }
 
 const STATUS_LABELS: Record<NetworkNode['status'], string> = {
@@ -25,7 +30,7 @@ const NODE_TIME_FORMATTER = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
 })
 
-export function NetworkNodeCard({ node }: NetworkNodeCardProps) {
+export function NetworkNodeCard({ node, selection }: NetworkNodeCardProps) {
   const titleId = `network-node-${node.id}`
   const statusClassName = [
     'network-node-card__status',
@@ -34,55 +39,69 @@ export function NetworkNodeCard({ node }: NetworkNodeCardProps) {
   const cardClassName = ['network-node-card', `network-node-card--${node.status}`].join(' ')
 
   return (
-    <Link
-      to={`/nodes/${node.id}`}
-      className="network-node-card-link"
-      aria-label={`View metrics for ${node.name}`}
-    >
-      <article className={cardClassName} aria-labelledby={titleId}>
-        <div className="network-node-card__identity">
-          <p className="network-node-card__eyebrow">
-            Node / <span>{node.id}</span>
-          </p>
+    <div>
+      {selection ? (
+        <label className="network-node-card__selection">
+          <input
+            type="checkbox"
+            aria-label={`Select ${node.name} for comparison`}
+            checked={selection.checked}
+            disabled={selection.disabled}
+            onChange={(event) => selection.onChange(event.target.checked)}
+          />
+          <span>Select to compare</span>
+        </label>
+      ) : null}
+      <Link
+        to={`/nodes/${node.id}`}
+        className="network-node-card-link"
+        aria-label={`View metrics for ${node.name}`}
+      >
+        <article className={cardClassName} aria-labelledby={titleId}>
+          <div className="network-node-card__identity">
+            <p className="network-node-card__eyebrow">
+              Node / <span>{node.id}</span>
+            </p>
 
-          <h3 className="network-node-card__title" id={titleId}>
-            {node.name}
-          </h3>
-        </div>
-
-        <dl className="network-node-card__details">
-          <div className="network-node-card__detail">
-            <dt>Status</dt>
-            <dd>
-              <span className={statusClassName} data-status={node.status}>
-                <span className="network-node-card__status-mark" aria-hidden="true" />
-                {STATUS_LABELS[node.status]}
-              </span>
-            </dd>
+            <h3 className="network-node-card__title" id={titleId}>
+              {node.name}
+            </h3>
           </div>
 
-          <div className="network-node-card__detail">
-            <dt>Address</dt>
-            <dd>
-              <code>{node.address}</code>
-            </dd>
-          </div>
+          <dl className="network-node-card__details">
+            <div className="network-node-card__detail">
+              <dt>Status</dt>
+              <dd>
+                <span className={statusClassName} data-status={node.status}>
+                  <span className="network-node-card__status-mark" aria-hidden="true" />
+                  {STATUS_LABELS[node.status]}
+                </span>
+              </dd>
+            </div>
 
-          <div className="network-node-card__detail network-node-card__detail--location">
-            <dt>Location</dt>
-            <dd>{node.location}</dd>
-            <dt>Last checked</dt>
-            <dd>
-              <time dateTime={node.lastCheckedAt}>{formatNodeDate(node.lastCheckedAt)}</time>
-            </dd>
-          </div>
-        </dl>
+            <div className="network-node-card__detail">
+              <dt>Address</dt>
+              <dd>
+                <code>{node.address}</code>
+              </dd>
+            </div>
 
-        <span className="network-node-card__action" aria-hidden="true">
-          Open metrics <span>↗</span>
-        </span>
-      </article>
-    </Link>
+            <div className="network-node-card__detail network-node-card__detail--location">
+              <dt>Location</dt>
+              <dd>{node.location}</dd>
+              <dt>Last checked</dt>
+              <dd>
+                <time dateTime={node.lastCheckedAt}>{formatNodeDate(node.lastCheckedAt)}</time>
+              </dd>
+            </div>
+          </dl>
+
+          <span className="network-node-card__action" aria-hidden="true">
+            Open metrics <span>↗</span>
+          </span>
+        </article>
+      </Link>
+    </div>
   )
 }
 
