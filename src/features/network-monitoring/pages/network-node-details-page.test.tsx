@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { MetricsRange, NetworkNode, NodeMetrics } from '../../../domain/network'
 import { NetworkNodeNotFoundError } from '../../../services/network-monitoring-errors'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
+import { formatMetricValue, summarizeMetrics } from '../metrics-summary'
 import { NodeLatencyChart } from '../components/node-latency-chart'
 import { NodePacketLossChart } from '../components/node-packet-loss-chart'
 import { NetworkNodeDetailsPage } from './network-node-details-page'
@@ -74,6 +75,43 @@ const RANGE_SUMMARIES: Record<
   '24h': { latestLatency: '22 ms', averageLatency: '20 ms', peakPacketLoss: '0.2%' },
   '7d': { latestLatency: '21 ms', averageLatency: '19.9 ms', peakPacketLoss: '0.2%' },
 }
+
+describe('metrics summary helpers', () => {
+  it('uses the latest timestamp and retains the sample with peak packet loss', () => {
+    const points = [
+      {
+        timestamp: '2026-09-13T18:00:00Z',
+        latencyMs: 21,
+        packetLossPercent: 0.2,
+      },
+      {
+        timestamp: '2026-09-13T17:00:00Z',
+        latencyMs: 18,
+        packetLossPercent: 0.7,
+      },
+      {
+        timestamp: '2026-09-13T17:30:00Z',
+        latencyMs: 19.5,
+        packetLossPercent: 0.1,
+      },
+    ]
+
+    expect(summarizeMetrics(points)).toEqual({
+      latestLatencyMs: 21,
+      averageLatencyMs: 19.5,
+      peakPacketLossPercent: 0.7,
+      peakPacketLossPoint: points[1],
+    })
+  })
+
+  it.each([
+    [20, '20'],
+    [19.5, '19.5'],
+    [0.2, '0.2'],
+  ])('formats %s without unnecessary decimal places', (value, expected) => {
+    expect(formatMetricValue(value)).toBe(expected)
+  })
+})
 
 describe('NetworkNodeDetailsPage', () => {
   it('shows the node identity, breadcrumb, and metadata in the page heading', async () => {

@@ -1,9 +1,10 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Link } from 'react-router'
 import type { MetricsRange } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NodeMetricsComparisonChart } from '../components/node-metrics-comparison-chart'
+import { formatMetricValue, summarizeMetrics } from '../metrics-summary'
 import { useNodeComparison } from '../hooks/use-node-comparison'
 
 interface NetworkNodeComparisonPageProps {
@@ -12,17 +13,54 @@ interface NetworkNodeComparisonPageProps {
 }
 
 const METRICS_RANGES: readonly MetricsRange[] = ['1h', '24h', '7d']
+const EMPTY_NODE_NAMES: ReadonlyMap<string, string> = new Map()
+
+interface NodeNameCatalog {
+  readonly service: NetworkMonitoringService
+  readonly names: ReadonlyMap<string, string>
+}
 
 export function NetworkNodeComparisonPage({
   nodeIds,
   service = networkMonitoringService,
 }: NetworkNodeComparisonPageProps) {
   const [selectedRange, setSelectedRange] = useState<MetricsRange>('1h')
+  const [nodeNameCatalog, setNodeNameCatalog] = useState<NodeNameCatalog | null>(null)
   const comparison = useNodeComparison(nodeIds, selectedRange, service)
   const stateIdPrefix = useId()
-  const availableMetrics = comparison.nodes.flatMap((node) =>
-    node.status === 'success' && node.metrics ? [node.metrics] : [],
+  const nodeNames = nodeNameCatalog?.service === service ? nodeNameCatalog.names : EMPTY_NODE_NAMES
+  const successfulNodes = comparison.nodes.flatMap((node) =>
+    node.status === 'success' && node.metrics?.points.length
+      ? [{ nodeId: node.nodeId, metrics: node.metrics }]
+      : [],
   )
+  const availableMetrics = successfulNodes.map(({ metrics }) => metrics)
+
+  useEffect(() => {
+    let isActive = true
+
+    void service
+      .listNodes()
+      .then((nodes) => {
+        if (!isActive) {
+          return
+        }
+
+        const names = new Map(
+          nodes.flatMap(({ id, name }) => (name.trim() ? [[id, name.trim()] as const] : [])),
+        )
+        setNodeNameCatalog({ service, names })
+      })
+      .catch(() => {
+        if (isActive) {
+          setNodeNameCatalog({ service, names: EMPTY_NODE_NAMES })
+        }
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [service])
 
   return (
     <main className="app-shell">
@@ -125,6 +163,48 @@ export function NetworkNodeComparisonPage({
           </section>
         )
       })}
+
+      {successfulNodes.length > 0 ? (
+        <section className="network-node-comparison-summaries" aria-label="Node metric summaries">
+          {successfulNodes.map(({ nodeId, metrics }) => {
+            const summary = summarizeMetrics(metrics.points)
+            const titleId = `${stateIdPrefix}-${nodeId}-summary-title`
+            const nodeName = nodeNames.get(nodeId)
+
+            return (
+              <article
+                key={nodeId}
+                className="network-node-comparison-summary"
+                aria-labelledby={titleId}
+              >
+                <h2 id={titleId}>
+                  {nodeName ? (
+                    <>
+                      {nodeName} <span>({nodeId})</span>
+                    </>
+                  ) : (
+                    nodeId
+                  )}
+                </h2>
+                <dl className="network-node-comparison-summary__metrics">
+                  <div>
+                    <dt>Latest latency</dt>
+                    <dd>{formatMetricValue(summary.latestLatencyMs)} ms</dd>
+                  </div>
+                  <div>
+                    <dt>Average latency</dt>
+                    <dd>{formatMetricValue(summary.averageLatencyMs)} ms</dd>
+                  </div>
+                  <div>
+                    <dt>Peak packet loss</dt>
+                    <dd>{formatMetricValue(summary.peakPacketLossPercent)}%</dd>
+                  </div>
+                </dl>
+              </article>
+            )
+          })}
+        </section>
+      ) : null}
 
       {availableMetrics.length > 0 ? (
         <section className="network-metrics" aria-labelledby="comparison-metrics-title">

@@ -149,7 +149,7 @@ describe('useNodeComparison', () => {
     expect(getNodeState(result.current.nodes, NODE_IDS[1]).metrics?.points).toHaveLength(4)
   })
 
-  it.each(['identity mismatch', 'incomplete sample set'] as const)(
+  it.each(['identity mismatch', 'incomplete sample set', 'out-of-range packet loss'] as const)(
     'marks an invalid response as an error for only that node (%s)',
     async (invalidCase) => {
       const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>(async (nodeId) => {
@@ -161,6 +161,15 @@ describe('useNodeComparison', () => {
 
         if (invalidCase === 'identity mismatch') {
           return { ...metrics, nodeId: 'branch-gateway' } as NodeMetrics
+        }
+
+        if (invalidCase === 'out-of-range packet loss') {
+          return {
+            ...metrics,
+            points: metrics.points.map((point, index) =>
+              index === 0 ? { ...point, packetLossPercent: 101 } : point,
+            ),
+          }
         }
 
         return { ...metrics, points: metrics.points.slice(1) } as NodeMetrics
@@ -222,6 +231,8 @@ describe('useNodeComparison', () => {
 
     expect(result.current.nodes.map((node) => node.nodeId)).toEqual(nextSelection)
     expect(result.current.nodes.map((node) => node.metrics?.nodeId)).toEqual(nextSelection)
+    expect(result.current.nodes.map((node) => node.metrics?.range)).toEqual(['1h', '1h'])
+    expect(result.current.nodes.map((node) => node.status)).toEqual(['success', 'success'])
   })
 
   it('clears old range data and ignores deferred responses that resolve out of order', async () => {
@@ -262,6 +273,7 @@ describe('useNodeComparison', () => {
 
     expect(result.current.nodes.map((node) => node.metrics?.range)).toEqual(['24h', '24h'])
     expect(result.current.nodes.map((node) => node.metrics?.nodeId)).toEqual(NODE_IDS)
+    expect(result.current.nodes.map((node) => node.status)).toEqual(['success', 'success'])
   })
 })
 

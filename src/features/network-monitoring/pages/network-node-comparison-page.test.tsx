@@ -1,8 +1,9 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
-import type { MetricsRange, NodeMetrics } from '../../../domain/network'
+import type { MetricsRange, NetworkNode, NodeMetrics } from '../../../domain/network'
+import { NetworkNodeNotFoundError } from '../../../services/network-monitoring-errors'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NetworkNodeComparisonPage } from './network-node-comparison-page'
 
@@ -35,6 +36,18 @@ const RANGE_DETAILS: Record<
   '7d': { sampleCount: 29, cadenceMs: 6 * 60 * 60 * 1000 },
 }
 
+const EXPECTED_SUMMARIES: Record<
+  MetricsRange,
+  {
+    readonly coreRouter: readonly [string, string, string]
+    readonly accessSwitch: readonly [string, string, string]
+  }
+> = {
+  '1h': { coreRouter: ['21 ms', '19.5 ms', '0.2%'], accessSwitch: ['27 ms', '25.5 ms', '0.7%'] },
+  '24h': { coreRouter: ['42 ms', '30 ms', '0.2%'], accessSwitch: ['48 ms', '36 ms', '2.8%'] },
+  '7d': { coreRouter: ['46 ms', '32 ms', '0.2%'], accessSwitch: ['52 ms', '38 ms', '3.2%'] },
+}
+
 describe('NetworkNodeComparisonPage', () => {
   it('starts at 1h and shows accessible measurements for each selected node', async () => {
     const service = createService()
@@ -47,6 +60,9 @@ describe('NetworkNodeComparisonPage', () => {
     expect(screen.getByRole('button', { name: '1h' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText('Simulated data', { exact: true })).toBeVisible()
     expect(screen.getByRole('region', { name: 'Comparison charts for 1h' })).toBeVisible()
+    expect(screen.getAllByRole('article')).toHaveLength(NODE_IDS.length)
+    expectNodeSummary('core-router', EXPECTED_SUMMARIES['1h'].coreRouter)
+    expectNodeSummary('access-switch-01', EXPECTED_SUMMARIES['1h'].accessSwitch)
 
     const table = screen.getByRole('table')
     const headers = within(table)
@@ -64,6 +80,35 @@ describe('NetworkNodeComparisonPage', () => {
     expect(rows[0]).toHaveTextContent('18 ms')
     expect(rows[0]).toHaveTextContent('0%')
     expect(rows.some((row) => row.textContent?.includes('access-switch-01'))).toBe(true)
+  })
+
+  it('places identifiable node summaries between the period controls and charts', async () => {
+    const service = createService(undefined, async () => [
+      createNode(NODE_IDS[0], 'Core Router'),
+      createNode(NODE_IDS[1], 'Access Switch 01'),
+    ])
+
+    renderComparisonPage(service)
+
+    const controls = screen
+      .getByRole('group', { name: 'Metrics range' })
+      .closest('.network-metrics__toolbar')
+    const summaries = await screen.findByRole('region', { name: 'Node metric summaries' })
+    const charts = await screen.findByRole('region', { name: 'Comparison charts for 1h' })
+
+    expect(controls).not.toBeNull()
+    expect(
+      controls!.compareDocumentPosition(summaries) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      summaries.compareDocumentPosition(charts) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      within(summaries).getByRole('article', { name: 'Core Router (core-router)' }),
+    ).toBeVisible()
+    expect(
+      within(summaries).getByRole('article', { name: 'Access Switch 01 (access-switch-01)' }),
+    ).toBeVisible()
   })
 
   it.each(['24h', '7d'] as const)(
@@ -88,6 +133,8 @@ describe('NetworkNodeComparisonPage', () => {
         )
         expect(service.getNodeMetrics).toHaveBeenCalledWith(NODE_IDS[0], range, expect.anything())
         expect(service.getNodeMetrics).toHaveBeenCalledWith(NODE_IDS[1], range, expect.anything())
+        expectNodeSummary(NODE_IDS[0], EXPECTED_SUMMARIES[range].coreRouter)
+        expectNodeSummary(NODE_IDS[1], EXPECTED_SUMMARIES[range].accessSwitch)
       })
 
       const rows = within(screen.getByRole('table')).getAllByRole('row').slice(1)
@@ -121,6 +168,7 @@ describe('NetworkNodeComparisonPage', () => {
       expect(screen.getByText('Simulated data', { exact: true })).toBeVisible()
 
       if (state === 'loading') {
+        expect(screen.queryByRole('article')).not.toBeInTheDocument()
         expect(screen.queryByRole('table')).not.toBeInTheDocument()
         expect(screen.queryByRole('region', { name: /Comparison charts/ })).not.toBeInTheDocument()
         return
@@ -139,6 +187,7 @@ describe('NetworkNodeComparisonPage', () => {
 
       expect(screen.queryByRole('table')).not.toBeInTheDocument()
       expect(screen.queryByRole('region', { name: /Comparison charts/ })).not.toBeInTheDocument()
+      expect(screen.queryByRole('article')).not.toBeInTheDocument()
     },
   )
 
@@ -160,19 +209,248 @@ describe('NetworkNodeComparisonPage', () => {
     )
     expect(rows).toHaveLength(RANGE_DETAILS['1h'].sampleCount)
     expect(rows.every((row) => row.textContent?.includes('access-switch-01'))).toBe(true)
+    expect(screen.getAllByRole('article')).toHaveLength(1)
+    expect(screen.queryByRole('article', { name: 'core-router' })).not.toBeInTheDocument()
+    expectNodeSummary('access-switch-01', EXPECTED_SUMMARIES['1h'].accessSwitch)
     expect(screen.getByText('Simulated data', { exact: true })).toBeVisible()
   })
+
+  it.each(['not-found', 'invalid'] as const)(
+    'omits the summary for a %s node while retaining the valid node summary',
+    async (state) => {
+      const service = createService((nodeId, range) => {
+        if (nodeId === NODE_IDS[1]) {
+          return Promise.resolve(createMetrics(range, nodeId))
+        }
+
+        if (state === 'not-found') {
+          return Promise.reject(new NetworkNodeNotFoundError(nodeId))
+        }
+
+        const metrics = createMetrics(range, nodeId)
+        return Promise.resolve({ ...metrics, points: metrics.points.slice(1) })
+      })
+
+      renderComparisonPage(service)
+
+      await screen.findByRole('table')
+
+      if (state === 'not-found') {
+        expect(await screen.findByText('Node not found: core-router')).toBeVisible()
+      } else {
+        expect(await screen.findByRole('alert')).toHaveTextContent('core-router')
+      }
+
+      expect(screen.getAllByRole('article')).toHaveLength(1)
+      expect(screen.queryByRole('article', { name: 'core-router' })).not.toBeInTheDocument()
+      expectNodeSummary('access-switch-01', EXPECTED_SUMMARIES['1h'].accessSwitch)
+    },
+  )
+
+  it.each(['empty', 'error', 'not-found', 'invalid'] as const)(
+    'does not retain a previous summary when the next range is %s',
+    async (state) => {
+      const service = createService((nodeId, range) => {
+        const metrics = createMetrics(range, nodeId)
+
+        if (range === '1h' || nodeId === NODE_IDS[1]) {
+          return Promise.resolve(metrics)
+        }
+
+        if (state === 'empty') {
+          return Promise.resolve({ ...metrics, points: [] })
+        }
+
+        if (state === 'not-found') {
+          return Promise.reject(new NetworkNodeNotFoundError(nodeId))
+        }
+
+        if (state === 'invalid') {
+          return Promise.resolve({ ...metrics, points: metrics.points.slice(1) })
+        }
+
+        return Promise.reject(new Error('Metrics request failed'))
+      })
+      const user = userEvent.setup()
+
+      renderComparisonPage(service)
+      await screen.findByRole('table')
+      expectNodeSummary('core-router', EXPECTED_SUMMARIES['1h'].coreRouter)
+
+      await user.click(screen.getByRole('button', { name: '24h' }))
+
+      if (state === 'empty') {
+        expect(await screen.findByText('No metrics available for core-router')).toBeVisible()
+      } else if (state === 'not-found') {
+        expect(await screen.findByText('Node not found: core-router')).toBeVisible()
+      } else {
+        expect(await screen.findByRole('alert')).toHaveTextContent('core-router')
+      }
+
+      await waitFor(() => {
+        expect(screen.getAllByRole('article')).toHaveLength(1)
+        expectNodeSummary('access-switch-01', EXPECTED_SUMMARIES['24h'].accessSwitch)
+      })
+      expect(screen.queryByRole('article', { name: 'core-router' })).not.toBeInTheDocument()
+    },
+  )
+
+  it('clears stale summaries across range and selection changes', async () => {
+    const nextNodeIds = ['branch-gateway', 'remote-switch'] as const
+    const pendingRequests: PendingRequest[] = []
+    const service = createService((nodeId, range) => {
+      if (range === '1h') {
+        return Promise.resolve(createMetrics(range, nodeId))
+      }
+
+      const deferred = createDeferred<NodeMetrics>()
+      pendingRequests.push({ nodeId, range, deferred })
+      return deferred.promise
+    })
+    const user = userEvent.setup()
+    const view = renderComparisonPage(service)
+
+    await screen.findByRole('table')
+    expect(screen.getAllByRole('article')).toHaveLength(NODE_IDS.length)
+
+    await user.click(screen.getByRole('button', { name: '24h' }))
+    await waitFor(() => expect(pendingRequests).toHaveLength(NODE_IDS.length))
+
+    expect(screen.queryByRole('article')).not.toBeInTheDocument()
+    expect(screen.queryByText('21 ms', { exact: true })).not.toBeInTheDocument()
+    expect(screen.queryByText('19.5 ms', { exact: true })).not.toBeInTheDocument()
+
+    view.rerender(
+      <MemoryRouter>
+        <NetworkNodeComparisonPage nodeIds={nextNodeIds} service={service} />
+      </MemoryRouter>,
+    )
+    await waitFor(() => expect(pendingRequests).toHaveLength(NODE_IDS.length * 2))
+
+    expect(screen.queryByRole('article')).not.toBeInTheDocument()
+    expect(screen.queryByText('core-router')).not.toBeInTheDocument()
+    expect(screen.queryByText('access-switch-01')).not.toBeInTheDocument()
+
+    await act(async () => {
+      pendingRequests[2].deferred.resolve(createMetrics('24h', nextNodeIds[0]))
+      pendingRequests[3].deferred.resolve(createMetrics('24h', nextNodeIds[1]))
+    })
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('article')).toHaveLength(nextNodeIds.length)
+      expectNodeSummary(nextNodeIds[0], EXPECTED_SUMMARIES['24h'].accessSwitch)
+      expectNodeSummary(nextNodeIds[1], EXPECTED_SUMMARIES['24h'].accessSwitch)
+    })
+
+    await act(async () => {
+      pendingRequests[0].deferred.resolve(createMetrics('24h', NODE_IDS[0]))
+      pendingRequests[1].deferred.resolve(createMetrics('24h', NODE_IDS[1]))
+    })
+
+    expect(screen.getAllByRole('article')).toHaveLength(nextNodeIds.length)
+    expect(screen.queryByRole('article', { name: 'core-router' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('article', { name: 'access-switch-01' })).not.toBeInTheDocument()
+    expectNodeSummary(nextNodeIds[0], EXPECTED_SUMMARIES['24h'].accessSwitch)
+    expectNodeSummary(nextNodeIds[1], EXPECTED_SUMMARIES['24h'].accessSwitch)
+  })
+
+  it('shows each recognized node name together with its ID', async () => {
+    const service = createService(undefined, async () => [
+      createNode('core-router', 'Core Router'),
+      createNode('access-switch-01', 'Access Switch 01'),
+    ])
+
+    renderComparisonPage(service)
+
+    await screen.findByRole('table')
+
+    expect(screen.getByRole('article', { name: 'Core Router (core-router)' })).toBeVisible()
+    expect(
+      screen.getByRole('article', { name: 'Access Switch 01 (access-switch-01)' }),
+    ).toBeVisible()
+  })
+
+  it('uses the ID while the node catalogue is pending without blocking metrics', async () => {
+    const listNodes = vi.fn(() => new Promise<readonly NetworkNode[]>(() => undefined))
+    const service = createService(undefined, listNodes)
+
+    renderComparisonPage(service)
+
+    const table = await screen.findByRole('table')
+
+    expect(listNodes).toHaveBeenCalledOnce()
+    expect(screen.getByRole('article', { name: 'core-router' })).toBeVisible()
+    expectNodeSummary('core-router', EXPECTED_SUMMARIES['1h'].coreRouter)
+    expect(within(table).getAllByRole('row')).toHaveLength(
+      1 + RANGE_DETAILS['1h'].sampleCount * NODE_IDS.length,
+    )
+  })
+
+  it('uses the ID when the node catalogue request is rejected', async () => {
+    const listNodes = vi.fn(async () => {
+      throw new Error('Catalogue unavailable')
+    })
+    const service = createService(undefined, listNodes)
+
+    renderComparisonPage(service)
+
+    await screen.findByRole('table')
+
+    expect(listNodes).toHaveBeenCalledOnce()
+    expect(screen.getByRole('article', { name: 'core-router' })).toBeVisible()
+    expectNodeSummary('core-router', EXPECTED_SUMMARIES['1h'].coreRouter)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('uses the ID when the catalogue does not contain the selected node', async () => {
+    const service = createService(undefined, async () => [createNode('other-node', 'Other Node')])
+
+    renderComparisonPage(service)
+
+    await screen.findByRole('table')
+
+    expect(screen.getByRole('article', { name: 'core-router' })).toBeVisible()
+    expect(screen.getByRole('article', { name: 'access-switch-01' })).toBeVisible()
+    expectNodeSummary('core-router', EXPECTED_SUMMARIES['1h'].coreRouter)
+    expectNodeSummary('access-switch-01', EXPECTED_SUMMARIES['1h'].accessSwitch)
+  })
 })
+
+function expectNodeSummary(
+  nodeId: string,
+  [latestLatency, averageLatency, peakPacketLoss]: readonly [string, string, string],
+) {
+  const summary = screen.getByRole('article', { name: nodeId })
+
+  expect(within(summary).getByText('Latest latency')).toBeInTheDocument()
+  expect(within(summary).getByText(latestLatency, { exact: true })).toBeInTheDocument()
+  expect(within(summary).getByText('Average latency')).toBeInTheDocument()
+  expect(within(summary).getByText(averageLatency, { exact: true })).toBeInTheDocument()
+  expect(within(summary).getByText('Peak packet loss')).toBeInTheDocument()
+  expect(within(summary).getByText(peakPacketLoss, { exact: true })).toBeInTheDocument()
+}
 
 function createService(
   getNodeMetrics: NetworkMonitoringService['getNodeMetrics'] = vi.fn(
     async (nodeId: string, range: MetricsRange) => createMetrics(range, nodeId),
   ),
+  listNodes: NetworkMonitoringService['listNodes'] = vi.fn(async () => []),
 ): NetworkMonitoringService {
   return {
-    listNodes: vi.fn(async () => []),
+    listNodes: vi.fn(listNodes),
     getNode: vi.fn(),
     getNodeMetrics: vi.fn(getNodeMetrics),
+  }
+}
+
+function createNode(id: string, name: string): NetworkNode {
+  return {
+    id,
+    name,
+    address: '192.0.2.1',
+    location: 'Test office',
+    status: 'online',
+    lastCheckedAt: '2026-10-19T15:00:00Z',
   }
 }
 
@@ -194,10 +472,33 @@ function createMetrics(range: MetricsRange, nodeId: string): NodeMetrics {
   }
 }
 
-function renderComparisonPage(service: NetworkMonitoringService) {
+interface Deferred<T> {
+  readonly promise: Promise<T>
+  readonly resolve: (value: T) => void
+}
+
+interface PendingRequest {
+  readonly nodeId: string
+  readonly range: MetricsRange
+  readonly deferred: Deferred<NodeMetrics>
+}
+
+function createDeferred<T>(): Deferred<T> {
+  let resolve!: (value: T) => void
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise
+  })
+
+  return { promise, resolve }
+}
+
+function renderComparisonPage(
+  service: NetworkMonitoringService,
+  nodeIds: readonly string[] = NODE_IDS,
+) {
   return render(
     <MemoryRouter>
-      <NetworkNodeComparisonPage nodeIds={NODE_IDS} service={service} />
+      <NetworkNodeComparisonPage nodeIds={nodeIds} service={service} />
     </MemoryRouter>,
   )
 }

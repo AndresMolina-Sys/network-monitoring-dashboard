@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import type { MetricPoint, MetricsRange, NetworkNode } from '../../../domain/network'
+import type { MetricsRange, NetworkNode } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NodeLatencyChart } from '../components/node-latency-chart'
@@ -8,6 +8,7 @@ import { NodePacketLossChart } from '../components/node-packet-loss-chart'
 import { NetworkNodeNotFoundState } from '../components/network-node-not-found-state'
 import { useNetworkNode } from '../hooks/use-network-node'
 import { useNodeMetrics } from '../hooks/use-node-metrics'
+import { formatMetricValue, summarizeMetrics } from '../metrics-summary'
 
 interface NetworkNodeDetailsPageProps {
   readonly service?: NetworkMonitoringService
@@ -260,26 +261,6 @@ function getMetricsHeading(range: MetricsRange): string {
     case '7d':
       return 'Last 7 days performance (7d)'
   }
-}
-
-function summarizeMetrics(points: readonly MetricPoint[]) {
-  const latencyTotal = points.reduce((total, point) => total + point.latencyMs, 0)
-  const latestPoint = points[points.length - 1]
-  const peakPacketLossPoint = points.reduce(
-    (peak, point) => (point.packetLossPercent >= peak.packetLossPercent ? point : peak),
-    points[0],
-  )
-
-  return {
-    latestLatencyMs: latestPoint.latencyMs,
-    averageLatencyMs: latencyTotal / points.length,
-    peakPacketLossPercent: peakPacketLossPoint.packetLossPercent,
-    peakPacketLossPoint,
-  }
-}
-
-function formatMetricValue(value: number): string {
-  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(value)
 }
 
 function formatMetricTime(timestamp: string): string {

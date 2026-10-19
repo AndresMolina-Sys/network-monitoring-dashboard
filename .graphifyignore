@@ -1,0 +1,8 @@
+# Keep local agent/design tools and generated Graphify outputs out of the architecture graph.
+# Graphify intentionally scans graphify-out/memory/ as query feedback despite this rule.
+.codex/
+.github/agents/
+.github/hooks/
+.github/skills/
+.impeccable/
+graphify-out/
