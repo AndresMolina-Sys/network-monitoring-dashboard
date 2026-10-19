@@ -20,7 +20,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `use-node-comparison.test.ts` especifica llamadas por ID/rango, éxito independiente, error, no encontrado, vacío, datos inválidos, selección/rango cambiantes y respuestas diferidas fuera de orden.
 
-- [ ] **T-004 — Implementar la carga independiente de métricas comparadas**
+- [x] **T-004 — Implementar la carga independiente de métricas comparadas**
 
   **Estimación:** 25 min · **Dependencias:** T-003 · **RF:** RF-3, RF-4, RF-5, RF-6, RF-9
 

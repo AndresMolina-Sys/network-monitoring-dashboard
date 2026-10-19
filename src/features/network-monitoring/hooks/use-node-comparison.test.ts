@@ -181,8 +181,8 @@ describe('useNodeComparison', () => {
   )
 
   it('clears old node results when the selected node IDs change', async () => {
-    const firstSelection = NODE_IDS
-    const nextSelection = ['branch-gateway', 'remote-switch'] as const
+    const firstSelection: readonly string[] = NODE_IDS
+    const nextSelection: readonly string[] = ['branch-gateway', 'remote-switch']
     const pendingRequests: PendingRequest[] = []
     const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId, range) => {
       const deferred = createDeferred<NodeMetrics>()
@@ -194,7 +194,7 @@ describe('useNodeComparison', () => {
     const { result, rerender } = renderHook(
       ({ nodeIds, range }: { nodeIds: readonly string[]; range: MetricsRange }) =>
         useNodeComparison(nodeIds, range, service),
-      { initialProps: { nodeIds: firstSelection, range: '1h' as const } },
+      { initialProps: { nodeIds: firstSelection, range: '1h' as MetricsRange } },
     )
 
     await waitFor(() => expect(pendingRequests).toHaveLength(2))
@@ -235,7 +235,7 @@ describe('useNodeComparison', () => {
 
     const { result, rerender } = renderHook(
       ({ range }: { range: MetricsRange }) => useNodeComparison(NODE_IDS, range, service),
-      { initialProps: { range: '1h' as const } },
+      { initialProps: { range: '1h' as MetricsRange } },
     )
 
     await waitFor(() => expect(pendingRequests).toHaveLength(2))
