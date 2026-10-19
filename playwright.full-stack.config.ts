@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Playwright forces color in workers, so do not pass through a conflicting NO_COLOR setting.
+delete process.env.NO_COLOR
+
 const apiUrl = 'http://127.0.0.1:5075'
 const frontendUrl = 'http://127.0.0.1:4173'
 

@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Playwright forces color in workers, so do not pass through a conflicting NO_COLOR setting.
+delete process.env.NO_COLOR
+
 const portValue = process.env.PLAYWRIGHT_PORT ?? '5173'
 const port = Number(portValue)
 
