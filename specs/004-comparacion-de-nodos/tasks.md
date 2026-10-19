@@ -74,7 +74,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Playwright en `e2e/network-monitoring.spec.ts` cubre selección desde inventario, dos/tres nodos, rangos, estados, tabla, navegación por teclado y viewport móvil; comprueba que no hay desbordamiento horizontal ni datos de una selección anterior.
 
-- [ ] **T-013 — Ajustar presentación y responsive de comparación**
+- [x] **T-013 — Ajustar presentación y responsive de comparación**
 
   **Estimación:** 25 min · **Dependencias:** T-008, T-010, T-011, T-012 · **RF:** RF-1, RF-2, RF-7, RF-8; requisitos no funcionales
 

@@ -760,6 +760,7 @@ test.describe('Network monitoring dashboard', () => {
   test('allows keyboard selection of three nodes and fits the mobile viewport', async ({
     page,
   }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/')
 
@@ -772,18 +773,29 @@ test.describe('Network monitoring dashboard', () => {
     })
 
     await coreRouter.focus()
-    await expect(coreRouter).toBeFocused()
+    await expectVisibleKeyboardFocus(coreRouter)
     await page.keyboard.press('Space')
     await expect(coreRouter).toBeChecked()
     await accessSwitch.focus()
-    await expect(accessSwitch).toBeFocused()
+    await expectVisibleKeyboardFocus(accessSwitch)
     await page.keyboard.press('Space')
     await expect(accessSwitch).toBeChecked()
     await branchGateway.focus()
-    await expect(branchGateway).toBeFocused()
+    await expectVisibleKeyboardFocus(branchGateway)
     await page.keyboard.press('Space')
     await expect(branchGateway).toBeChecked()
     await expect(page.getByText('3 of 3 nodes selected for comparison')).toBeVisible()
+
+    const selectionTransitions = await page
+      .locator('.network-node-card__selection')
+      .first()
+      .evaluate((element) =>
+        getComputedStyle(element)
+          .transitionDuration.split(',')
+          .map((duration) => Number.parseFloat(duration) * 1_000),
+      )
+    expect(selectionTransitions.every((duration) => duration <= 0.01)).toBe(true)
+
     await page.getByRole('button', { name: 'Compare selected nodes' }).click()
 
     await expect(page.getByRole('group', { name: 'Metrics range' })).toBeVisible()
@@ -792,9 +804,55 @@ test.describe('Network monitoring dashboard', () => {
     await expect(page.getByRole('figure', { name: 'Latency by node (1h, ms)' })).toBeVisible()
     await expect(page.getByRole('figure', { name: 'Packet loss by node (1h, %)' })).toBeVisible()
 
+    const comparisonLegends = await page
+      .locator('.node-metrics-comparison-chart .recharts-legend-wrapper')
+      .evaluateAll((elements) =>
+        elements.map((element) =>
+          Array.from(element.querySelectorAll('.recharts-legend-item-text'), (item) =>
+            item.textContent?.trim(),
+          ).sort(),
+        ),
+      )
+    expect(comparisonLegends).toHaveLength(2)
+    expect(comparisonLegends).toEqual([
+      ['access-switch-01', 'branch-gateway', 'core-router'],
+      ['access-switch-01', 'branch-gateway', 'core-router'],
+    ])
+
+    await page.locator('body').click({ position: { x: 1, y: 1 } })
+    for (let tab = 0; tab < 3; tab += 1) {
+      await page.keyboard.press('Tab')
+    }
+
+    const initialRangeButton = page
+      .getByRole('group', { name: 'Metrics range' })
+      .getByRole('button', { name: '1h', exact: true })
+    await expectVisibleKeyboardFocus(initialRangeButton)
+
+    const rangeButtonTransitions = await initialRangeButton.evaluate((element) =>
+      getComputedStyle(element)
+        .transitionDuration.split(',')
+        .map((duration) => Number.parseFloat(duration) * 1_000),
+    )
+    expect(rangeButtonTransitions.every((duration) => duration <= 0.01)).toBe(true)
+
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: width === 390 ? 844 : 900 })
       await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(12)
+
+      const chartColumnCount = await page
+        .locator('.node-metrics-comparison-chart')
+        .evaluate(
+          (element) =>
+            getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean).length,
+        )
+      expect(chartColumnCount).toBe(width === 390 ? 1 : 2)
+
+      const tableDimensions = await page.getByRole('table').evaluate((element) => ({
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+      }))
+      expect(tableDimensions.scrollWidth).toBeLessThanOrEqual(tableDimensions.clientWidth)
 
       const dimensions = await page.evaluate(() => ({
         documentWidth: document.documentElement.scrollWidth,
@@ -805,28 +863,54 @@ test.describe('Network monitoring dashboard', () => {
   })
 
   test('preserves valid node data beside missing and failed comparison nodes', async ({ page }) => {
-    await page.goto('/compare?nodes=unknown-node,core-router')
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: width === 390 ? 844 : 900 })
+      await page.goto('/compare?nodes=unknown-node,core-router')
 
-    await expect(page.getByRole('heading', { name: 'Node not found: unknown-node' })).toBeVisible()
-    await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(4)
-    await expect(page.getByRole('table').locator('tbody tr').first()).toContainText('core-router')
-    await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+      await expect(
+        page.getByRole('heading', { name: 'Node not found: unknown-node' }),
+      ).toBeVisible()
+      await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(4)
+      await expect(page.getByRole('table').locator('tbody tr').first()).toContainText('core-router')
+      await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
 
-    await page.goto('/compare?nodes=core-router%2Caccess-switch-01&demo=error')
+      let dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
 
-    await expect(page.getByRole('alert')).toHaveCount(2)
-    await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
-    await expect(page.getByRole('table')).toHaveCount(0)
-    await expect(page.getByRole('figure')).toHaveCount(0)
+      await page.goto('/compare?nodes=core-router%2Caccess-switch-01&demo=error')
+
+      await expect(page.getByRole('alert')).toHaveCount(2)
+      await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+      await expect(page.getByRole('table')).toHaveCount(0)
+      await expect(page.getByRole('figure')).toHaveCount(0)
+
+      dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+    }
   })
 
   test('keeps loading identified and rejects invalid comparison selections', async ({ page }) => {
-    await page.goto('/compare?nodes=core-router%2Caccess-switch-01&demo=slow')
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: width === 390 ? 844 : 900 })
+      await page.goto('/compare?nodes=core-router%2Caccess-switch-01&demo=slow')
 
-    await expect(page.getByRole('group', { name: 'Metrics range' })).toBeVisible()
-    await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
-    await expect(page.getByRole('status', { name: /Loading metrics for/ })).toHaveCount(2)
-    await expect(page.getByRole('table')).toHaveCount(0)
+      await expect(page.getByRole('group', { name: 'Metrics range' })).toBeVisible()
+      await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+      await expect(page.getByRole('status', { name: /Loading metrics for/ })).toHaveCount(2)
+      await expect(page.getByRole('table')).toHaveCount(0)
+
+      const dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+    }
 
     for (const selection of [
       'core-router',

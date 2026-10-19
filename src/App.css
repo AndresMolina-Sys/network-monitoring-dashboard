@@ -341,6 +341,54 @@ a {
   background: rgba(238, 233, 223, 0.035);
 }
 
+.network-node-card__selection {
+  display: flex;
+  width: fit-content;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.65rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--color-subtle-foreground);
+  background: rgba(200, 165, 125, 0.045);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  transition:
+    border-color var(--motion-fast),
+    color var(--motion-fast),
+    background var(--motion-fast);
+}
+
+.network-node-card__selection:hover,
+.network-node-card__selection:focus-within {
+  border-color: var(--color-range-selected-border);
+  color: var(--color-foreground);
+  background: rgba(200, 165, 125, 0.09);
+}
+
+.network-node-card__selection input {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+  margin: 0;
+  accent-color: var(--color-focus);
+  cursor: inherit;
+}
+
+.network-node-card__selection input:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.network-node-card__selection input:disabled {
+  opacity: 0.55;
+}
+
 .network-node-card__identity {
   min-width: 0;
 }
@@ -1111,6 +1159,54 @@ a {
   outline-offset: 2px;
 }
 
+.node-metrics-comparison-chart {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.node-metrics-comparison-chart__figure {
+  min-width: 0;
+  margin: 0;
+  padding: clamp(0.85rem, 1.5vw, 1.25rem);
+}
+
+.node-metrics-comparison-chart__figure figcaption {
+  min-height: 2.8rem;
+  margin-bottom: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.node-metrics-comparison-chart__figure .node-latency-chart__canvas,
+.node-metrics-comparison-chart__figure .node-packet-loss-chart__canvas {
+  min-width: 0;
+}
+
+.node-metrics-comparison-chart .recharts-legend-wrapper {
+  max-width: 100%;
+}
+
+.node-metrics-comparison-chart .recharts-default-legend {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 0.75rem;
+  padding-inline: 0.25rem;
+}
+
+.node-metrics-comparison-chart .recharts-legend-item {
+  display: inline-flex !important;
+  max-width: 100%;
+  margin-right: 0 !important;
+}
+
+.node-metrics-comparison-chart .recharts-legend-item-text {
+  overflow-wrap: anywhere;
+}
+
 .network-metrics {
   margin-top: 1.5rem;
 }
@@ -1193,6 +1289,10 @@ a {
 
 @media (max-width: 860px) {
   .network-metrics__visuals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .node-metrics-comparison-chart {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -1389,6 +1489,48 @@ a {
   .network-metrics__table-wrapper th:nth-child(3),
   .network-metrics__table-wrapper td:nth-child(3) {
     width: 26%;
+  }
+
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    table {
+    font-size: 0.6875rem;
+  }
+
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    th:nth-child(1),
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    td:nth-child(1) {
+    width: 20%;
+  }
+
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    th:nth-child(2),
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    td:nth-child(2) {
+    width: 44%;
+  }
+
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    th:nth-child(3),
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    td:nth-child(3) {
+    width: 16%;
+  }
+
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    th:nth-child(4),
+  section.network-metrics:has(.node-metrics-comparison-chart)
+    .network-metrics__table-wrapper
+    td:nth-child(4) {
+    width: 20%;
   }
 }
 
