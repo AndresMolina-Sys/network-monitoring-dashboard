@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useLocation, useSearchParams } from 'react-router'
 import type { MetricsRange } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
@@ -24,8 +24,15 @@ export function NetworkNodeComparisonPage({
   nodeIds,
   service = networkMonitoringService,
 }: NetworkNodeComparisonPageProps) {
-  const [selectedRange, setSelectedRange] = useState<MetricsRange>('1h')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const location = useLocation()
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'error'>('idle')
   const [nodeNameCatalog, setNodeNameCatalog] = useState<NodeNameCatalog | null>(null)
+  const selectedRange = getMetricsRange(searchParams)
+  const shareUrl = `${window.location.origin}${location.pathname}?${new URLSearchParams({
+    nodes: nodeIds.join(','),
+    range: selectedRange,
+  }).toString()}`
   const comparison = useNodeComparison(nodeIds, selectedRange, service)
   const stateIdPrefix = useId()
   const nodeNames = nodeNameCatalog?.service === service ? nodeNameCatalog.names : EMPTY_NODE_NAMES
@@ -35,6 +42,21 @@ export function NetworkNodeComparisonPage({
       : [],
   )
   const availableMetrics = successfulNodes.map(({ metrics }) => metrics)
+
+  useEffect(() => {
+    const requestedRanges = searchParams.getAll('range')
+
+    if (
+      requestedRanges.length === 1 &&
+      METRICS_RANGES.includes(requestedRanges[0] as MetricsRange)
+    ) {
+      return
+    }
+
+    const normalizedParams = new URLSearchParams(searchParams)
+    normalizedParams.set('range', '1h')
+    setSearchParams(normalizedParams, { replace: true })
+  }, [searchParams, setSearchParams])
 
   useEffect(() => {
     let isActive = true
@@ -62,6 +84,15 @@ export function NetworkNodeComparisonPage({
     }
   }, [service])
 
+  async function copyComparisonLink() {
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setShareStatus('copied')
+    } catch {
+      setShareStatus('error')
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header app-header--detail">
@@ -88,13 +119,42 @@ export function NetworkNodeComparisonPage({
                 className="network-metrics__range-button"
                 type="button"
                 aria-pressed={selectedRange === range}
-                onClick={() => setSelectedRange(range)}
+                onClick={() => {
+                  const nextParams = new URLSearchParams(searchParams)
+                  nextParams.set('range', range)
+                  setSearchParams(nextParams, { replace: true })
+                  setShareStatus('idle')
+                }}
               >
                 {range}
               </button>
             ))}
           </div>
           <p className="network-metrics__data-label">Simulated data</p>
+          <button className="network-metrics__copy-link" type="button" onClick={copyComparisonLink}>
+            Copy comparison link
+          </button>
+          {shareStatus !== 'idle' ? (
+            <div className="network-metrics__share-feedback">
+              <p role="status" aria-live="polite">
+                {shareStatus === 'copied'
+                  ? 'Comparison link copied.'
+                  : 'Could not copy automatically. Select and copy the comparison link below.'}
+              </p>
+              {shareStatus === 'error' ? (
+                <label>
+                  Comparison link
+                  <input
+                    type="text"
+                    readOnly
+                    value={shareUrl}
+                    onFocus={(event) => event.currentTarget.select()}
+                    onClick={(event) => event.currentTarget.select()}
+                  />
+                </label>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -247,6 +307,13 @@ export function NetworkNodeComparisonPage({
       ) : null}
     </main>
   )
+}
+
+function getMetricsRange(searchParams: URLSearchParams): MetricsRange {
+  const ranges = searchParams.getAll('range')
+  return ranges.length === 1 && METRICS_RANGES.includes(ranges[0] as MetricsRange)
+    ? (ranges[0] as MetricsRange)
+    : '1h'
 }
 
 function getComparisonHeading(range: MetricsRange): string {

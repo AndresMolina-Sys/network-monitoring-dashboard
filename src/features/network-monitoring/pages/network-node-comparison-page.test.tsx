@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter, useLocation } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
 import type { MetricsRange, NetworkNode, NodeMetrics } from '../../../domain/network'
 import { NetworkNodeNotFoundError } from '../../../services/network-monitoring-errors'
@@ -58,6 +58,9 @@ describe('NetworkNodeComparisonPage', () => {
 
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '1h' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByLabelText('Current comparison URL')).toHaveTextContent(
+      '/compare?nodes=core-router%2Caccess-switch-01&range=1h',
+    )
     expect(screen.getByText('Simulated data', { exact: true })).toBeVisible()
     expect(screen.getByRole('region', { name: 'Comparison charts for 1h' })).toBeVisible()
     expect(screen.getAllByRole('article')).toHaveLength(NODE_IDS.length)
@@ -80,6 +83,102 @@ describe('NetworkNodeComparisonPage', () => {
     expect(rows[0]).toHaveTextContent('18 ms')
     expect(rows[0]).toHaveTextContent('0%')
     expect(rows.some((row) => row.textContent?.includes('access-switch-01'))).toBe(true)
+  })
+
+  it.each(['24h', '7d'] as const)(
+    'loads the %s period from a direct comparison URL',
+    async (range) => {
+      renderComparisonPage(
+        createService(),
+        NODE_IDS,
+        `/compare?nodes=${NODE_IDS.join(',')}&range=${range}`,
+      )
+
+      await screen.findByRole('table')
+
+      expect(screen.getByRole('button', { name: range })).toHaveAttribute('aria-pressed', 'true')
+      expect(
+        screen.getByRole('region', { name: `Comparison charts for ${range}` }),
+      ).toHaveTextContent(`${RANGE_DETAILS[range].sampleCount} samples`)
+      expect(screen.getByLabelText('Current comparison URL')).toHaveTextContent(`range=${range}`)
+    },
+  )
+
+  it('normalizes an invalid period to 1h while preserving the other query parameters', async () => {
+    renderComparisonPage(
+      createService(),
+      NODE_IDS,
+      '/compare?nodes=core-router%2Caccess-switch-01&range=30d&demo=slow',
+    )
+
+    await screen.findByRole('table')
+
+    expect(screen.getByRole('button', { name: '1h' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByLabelText('Current comparison URL')).toHaveTextContent(
+      '/compare?nodes=core-router%2Caccess-switch-01&range=1h&demo=slow',
+    )
+  })
+
+  it('updates the URL when the selected period changes', async () => {
+    const user = userEvent.setup()
+
+    renderComparisonPage(createService())
+    await screen.findByRole('table')
+    await user.click(screen.getByRole('button', { name: '24h' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Current comparison URL')).toHaveTextContent('range=24h')
+      expect(screen.getByRole('button', { name: '24h' })).toHaveAttribute('aria-pressed', 'true')
+    })
+  })
+
+  it('copies a clean comparison URL and announces success', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    const restoreClipboard = mockClipboard(writeText)
+
+    try {
+      renderComparisonPage(
+        createService(),
+        NODE_IDS,
+        '/compare?nodes=core-router%2Caccess-switch-01&range=1h&demo=slow&debug=true',
+      )
+      await screen.findByRole('table')
+      await user.click(screen.getByRole('button', { name: 'Copy comparison link' }))
+
+      await waitFor(() =>
+        expect(screen.getByRole('status')).toHaveTextContent('Comparison link copied.'),
+      )
+      expect(writeText).toHaveBeenCalledWith(
+        `${window.location.origin}/compare?nodes=core-router%2Caccess-switch-01&range=1h`,
+      )
+    } finally {
+      restoreClipboard()
+    }
+  })
+
+  it('offers a clean comparison URL for manual copying when clipboard access fails', async () => {
+    const user = userEvent.setup()
+    const restoreClipboard = mockClipboard(vi.fn().mockRejectedValue(new Error('Clipboard denied')))
+
+    try {
+      renderComparisonPage(
+        createService(),
+        NODE_IDS,
+        '/compare?nodes=core-router%2Caccess-switch-01&range=7d&demo=slow',
+      )
+      await screen.findByRole('table')
+      await user.click(screen.getByRole('button', { name: 'Copy comparison link' }))
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'Could not copy automatically. Select and copy the comparison link below.',
+      )
+      expect(screen.getByRole('textbox', { name: 'Comparison link' })).toHaveValue(
+        `${window.location.origin}/compare?nodes=core-router%2Caccess-switch-01&range=7d`,
+      )
+    } finally {
+      restoreClipboard()
+    }
   })
 
   it('places identifiable node summaries between the period controls and charts', async () => {
@@ -321,7 +420,10 @@ describe('NetworkNodeComparisonPage', () => {
     expect(screen.queryByText('19.5 ms', { exact: true })).not.toBeInTheDocument()
 
     view.rerender(
-      <MemoryRouter>
+      <MemoryRouter
+        initialEntries={[`/compare?nodes=${encodeURIComponent(NODE_IDS.join(','))}&range=24h`]}
+      >
+        <CurrentComparisonUrl />
         <NetworkNodeComparisonPage nodeIds={nextNodeIds} service={service} />
       </MemoryRouter>,
     )
@@ -492,12 +594,41 @@ function createDeferred<T>(): Deferred<T> {
   return { promise, resolve }
 }
 
+function CurrentComparisonUrl() {
+  const location = useLocation()
+
+  return (
+    <div aria-label="Current comparison URL">
+      {location.pathname}
+      {location.search}
+    </div>
+  )
+}
+
+function mockClipboard(writeText: (text: string) => Promise<void>) {
+  const previousDescriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText },
+  })
+
+  return () => {
+    if (previousDescriptor) {
+      Object.defineProperty(navigator, 'clipboard', previousDescriptor)
+    } else {
+      Reflect.deleteProperty(navigator, 'clipboard')
+    }
+  }
+}
+
 function renderComparisonPage(
   service: NetworkMonitoringService,
   nodeIds: readonly string[] = NODE_IDS,
+  initialEntry = `/compare?nodes=${encodeURIComponent(nodeIds.join(','))}`,
 ) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <CurrentComparisonUrl />
       <NetworkNodeComparisonPage nodeIds={nodeIds} service={service} />
     </MemoryRouter>,
   )

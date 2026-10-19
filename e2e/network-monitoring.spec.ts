@@ -685,6 +685,18 @@ test.describe('Network monitoring dashboard', () => {
   test('keeps comparison summaries synchronized across desktop and mobile ranges', async ({
     page,
   }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: {
+          writeText: (text: string) => {
+            Object.assign(window, { comparisonClipboardText: text })
+            return Promise.resolve()
+          },
+        },
+      })
+    })
+
     const viewports = [
       { width: 1440, height: 900 },
       { width: 390, height: 844 },
@@ -705,9 +717,19 @@ test.describe('Network monitoring dashboard', () => {
 
       await expect(page.getByRole('heading', { name: 'Compare nodes' })).toBeVisible()
       await expect(initialRangeButton).toHaveAttribute('aria-pressed', 'true')
+      await expect(page).toHaveURL(/range=1h/)
       await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
       await expect(page.getByRole('table')).toBeVisible()
       await expectComparisonPeriod(page, ranges[0], viewport, summaries)
+
+      await page.getByRole('button', { name: 'Copy comparison link' }).click()
+      await expect(page.getByRole('status')).toHaveText('Comparison link copied.')
+      const copiedUrl = await page.evaluate(
+        () => (window as Window & { comparisonClipboardText?: string }).comparisonClipboardText,
+      )
+      expect(copiedUrl).toBe(
+        `${new URL(page.url()).origin}/compare?nodes=core-router%2Caccess-switch-01&range=1h`,
+      )
 
       for (const range of [ranges[1], ranges[2], ranges[0]]) {
         const rangeButton = rangeSelector.getByRole('button', {
@@ -717,6 +739,7 @@ test.describe('Network monitoring dashboard', () => {
         await rangeButton.click()
 
         await expect(rangeButton).toHaveAttribute('aria-pressed', 'true')
+        await expect(page).toHaveURL(new RegExp(`range=${range.value}`))
         await expect(summaries).toHaveCount(0)
         await expect(page.getByRole('status', { name: /Loading metrics for/ })).toHaveCount(2)
         await expect(page.getByRole('table')).toHaveCount(0)
@@ -725,6 +748,39 @@ test.describe('Network monitoring dashboard', () => {
         await expectComparisonPeriod(page, range, viewport, summaries)
       }
     }
+  })
+
+  test('normalizes direct comparison periods and replaces period history entries', async ({
+    page,
+  }) => {
+    await page.goto('/compare?nodes=core-router%2Caccess-switch-01&range=7d')
+    await expect(page.getByRole('button', { name: '7d', exact: true })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(page).toHaveURL(/range=7d/)
+
+    await page.goto('/compare?nodes=core-router%2Caccess-switch-01&range=invalid')
+    await expect(page.getByRole('button', { name: '1h', exact: true })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(page).toHaveURL(/range=1h/)
+
+    await page.goto('/')
+    await page.getByRole('checkbox', { name: 'Select Core Router for comparison' }).check()
+    await page.getByRole('checkbox', { name: 'Select Access Switch 01 for comparison' }).check()
+    await page.getByRole('button', { name: 'Compare selected nodes' }).click()
+    await expect(page).toHaveURL(/\/compare\?.*range=1h/)
+
+    await page.getByRole('button', { name: '24h', exact: true }).click()
+    await expect(page).toHaveURL(/range=24h/)
+    await page.getByRole('button', { name: '7d', exact: true }).click()
+    await expect(page).toHaveURL(/range=7d/)
+
+    await page.goBack()
+    await expect(page).toHaveURL(/\/$/)
+    await expect(page.getByRole('heading', { name: 'Monitored nodes' })).toBeVisible()
   })
 
   test('allows keyboard selection of three nodes and fits the mobile viewport', async ({
