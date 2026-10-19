@@ -41,10 +41,10 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - Las pruebas TypeScript del repo usan Vitest; `node --test` no carga el setup ni la resolución de módulos del proyecto. Ejecutar Vitest con `npm run test -- <ruta>`.
 - En Recharts 3, las etiquetas del eje se renderizan en un grupo hermano; las stories deben consultar `.recharts-yAxis-tick-labels`. Para tooltips, enviar `mousemove` a las coordenadas del punto. `ResponsiveContainer` mide cero en Vitest: simular `ResizeObserver` con dimensiones para renderizar SVG e interacciones.
 - En este entorno Windows, Vitest puede detenerse con `EPERM` en su caché temporal dentro del sandbox; repetirlo fuera del sandbox. `router.test.tsx` también puede expirar en una suite cargada y pasar aislado; repetir la suite completa antes de atribuir una regresión.
-- Playwright puede quedar detenido antes de descubrir tests dentro del sandbox; la ejecución autorizada fuera del sandbox pasó desktop y móvil. Playwright fuerza `FORCE_COLOR` en sus workers; limpiar `NO_COLOR` al cargar la configuración evita el warning cuando el shell lo hereda.
+- Playwright puede quedar detenido antes de descubrir tests dentro del sandbox; repetir fuera. Las anulaciones de movimiento reducido deben ir después de reglas interactivas como `:active`, o una transformación posterior las sobrescribe. Limpiar `NO_COLOR` en la configuración evita warnings de Playwright.
 - Storybook incluye chunks de runtime, documentación y axe mayores de 500 kB; su umbral de 1,200 kB está limitado a `.storybook/main.ts`. No trasladar esa excepción a la app ni afirmar que optimiza el tamaño del bundle.
 - En stories con servicios inyectados, evita pasarlos como `args` serializables: el panel de controles de Storybook puede fallar al imprimirlos; inyectarlos desde el `render`.
 
 ## Próximos pasos
 
-- F-004 está implementado y verificado localmente; no hacer push sin solicitud explícita.
+- F-004 se publicó en `e610116`; el arreglo de movimiento reducido está verificado localmente y queda sin push hasta solicitud explícita.

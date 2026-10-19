@@ -853,24 +853,6 @@ a {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  .network-metrics__range-button:active {
-    transform: none;
-  }
-}
-
 .node-latency-chart .recharts-default-tooltip,
 .node-packet-loss-chart .recharts-default-tooltip {
   border: 1px solid var(--color-border) !important;
@@ -1692,4 +1674,22 @@ body,
 body {
   display: block;
   overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .network-metrics__range-button:active {
+    transform: none;
+  }
 }
