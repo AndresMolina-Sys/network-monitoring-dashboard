@@ -10,7 +10,7 @@ test.describe('Network monitoring dashboard', () => {
       })
       .click()
 
-    await expect(page).toHaveURL(/\/nodes\/core-router$/)
+    await expect(page).toHaveURL(/\/nodes\/core-router\?range=1h$/)
     await expect(
       page.getByRole('heading', {
         name: 'Core Router',
@@ -58,6 +58,56 @@ test.describe('Network monitoring dashboard', () => {
     ).toBeVisible()
     await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible()
     expect(routeWarnings).toHaveLength(0)
+  })
+
+  test('loads a node detail from its shared period URL and normalizes invalid periods', async ({
+    page,
+  }) => {
+    for (const range of [
+      { value: '1h', heading: 'Last hour performance (1h)' },
+      { value: '24h', heading: 'Last 24 hours performance (24h)' },
+      { value: '7d', heading: 'Last 7 days performance (7d)' },
+    ]) {
+      await page.goto(`/nodes/core-router?range=${range.value}`)
+
+      await expect(page.getByRole('button', { name: range.value, exact: true })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+      await expect(page.getByRole('heading', { name: range.heading })).toBeVisible()
+      await expect(page).toHaveURL(new RegExp(`range=${range.value}`))
+    }
+
+    await page.goto('/nodes/core-router?debug=true&range=30d')
+    await expect(page.getByRole('button', { name: '1h', exact: true })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(page).toHaveURL(/debug=true.*range=1h/)
+  })
+
+  test('replaces period history and copies a clean node link', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await page.goto('/')
+    await page.getByRole('link', { name: 'View metrics for Core Router' }).click()
+    await expect(page).toHaveURL(/\/nodes\/core-router\?range=1h/)
+
+    await page.getByRole('button', { name: '24h', exact: true }).click()
+    await expect(page).toHaveURL(/range=24h/)
+    await page.getByRole('button', { name: '7d', exact: true }).click()
+    await expect(page).toHaveURL(/range=7d/)
+
+    await page.goBack()
+    await expect(page).toHaveURL(/\/$/)
+    await expect(page.getByRole('heading', { name: 'Monitored nodes' })).toBeVisible()
+
+    await page.goto('/nodes/core-router?range=24h&demo=slow&debug=true')
+    await expect(page.getByRole('table')).toBeVisible()
+    await page.getByRole('button', { name: 'Copy node link' }).click()
+    await expect(page.getByRole('status')).toHaveText('Node link copied.')
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe(`${new URL(page.url()).origin}/nodes/core-router?range=24h`)
   })
 
   test('shows a not-found state for an unknown node', async ({ page }) => {
@@ -156,6 +206,7 @@ test.describe('Network monitoring dashboard', () => {
 
     const summary = page.getByLabel('Metrics summary')
     const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
+    const copyLinkButton = page.getByRole('button', { name: 'Copy node link' })
     const latencyChart = page.getByRole('figure', { name: /Latency trend for core-router/ })
     const packetLossChart = page.getByRole('figure', {
       name: /Packet loss trend for core-router/,
@@ -170,6 +221,7 @@ test.describe('Network monitoring dashboard', () => {
     await expect(summary).toBeVisible()
     await expect(rangeSelector).toBeVisible()
     await expect(rangeSelector.getByRole('button', { name: '1h', exact: true })).toBeVisible()
+    await expect(copyLinkButton).toBeVisible()
     await expect(page.getByText('Simulated data')).toBeVisible()
     await expect(latencyChart.locator('svg')).toBeVisible()
     await expect(packetLossChart.locator('svg')).toBeVisible()
@@ -188,6 +240,7 @@ test.describe('Network monitoring dashboard', () => {
         page.getByRole('navigation', { name: 'Breadcrumb' }),
         summary,
         rangeSelector,
+        copyLinkButton,
         page.getByText('Simulated data'),
         latencyChart,
         packetLossChart,
@@ -637,7 +690,7 @@ test.describe('Network monitoring dashboard', () => {
     await page.keyboard.press('Tab')
     await expectVisibleKeyboardFocus(firstNode)
     await page.keyboard.press('Enter')
-    await expect(page).toHaveURL(/\/nodes\/core-router$/)
+    await expect(page).toHaveURL(/\/nodes\/core-router\?range=1h$/)
 
     await page.goto('/nodes/core-router')
 
@@ -650,6 +703,7 @@ test.describe('Network monitoring dashboard', () => {
     const rangeButtons = ['1h', '24h', '7d'].map((range) =>
       rangeGroup.getByRole('button', { name: range, exact: true }),
     )
+    const copyNodeLink = page.getByRole('button', { name: 'Copy node link' })
     const charts = [
       page
         .getByRole('figure', { name: 'Latency trend for core-router (ms, 1h, UTC)' })
@@ -667,7 +721,7 @@ test.describe('Network monitoring dashboard', () => {
     await page.keyboard.press('Tab')
     await expectVisibleKeyboardFocus(breadcrumbLinks[1])
 
-    for (const control of [...rangeButtons, ...charts]) {
+    for (const control of [...rangeButtons, copyNodeLink, ...charts]) {
       await page.keyboard.press('Tab')
       await expectVisibleKeyboardFocus(control)
     }

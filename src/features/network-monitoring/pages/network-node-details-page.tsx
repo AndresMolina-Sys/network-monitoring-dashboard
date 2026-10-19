@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { useCallback, useEffect, useState } from 'react'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router'
 import type { MetricsRange, NetworkNode } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
@@ -26,7 +26,13 @@ export function NetworkNodeDetailsPage({
   service = networkMonitoringService,
 }: NetworkNodeDetailsPageProps) {
   const { nodeId = 'unknown' } = useParams()
-  const [selectedRange, setSelectedRange] = useState<MetricsRange>('1h')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const location = useLocation()
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'error'>('idle')
+  const selectedRange = getMetricsRange(searchParams)
+  const shareUrl = `${window.location.origin}${location.pathname}?${new URLSearchParams({
+    range: selectedRange,
+  }).toString()}`
 
   const { status: nodeStatus, node, retry: retryNode } = useNetworkNode(nodeId, service)
 
@@ -45,6 +51,30 @@ export function NetworkNodeDetailsPage({
   const hasError = nodeStatus === 'error' || metricsStatus === 'error'
   const isLoading = nodeStatus === 'loading' || metricsStatus === 'loading'
   const metricsSummary = metrics?.points.length ? summarizeMetrics(metrics.points) : null
+
+  useEffect(() => {
+    const requestedRanges = searchParams.getAll('range')
+
+    if (
+      requestedRanges.length === 1 &&
+      METRICS_RANGES.includes(requestedRanges[0] as MetricsRange)
+    ) {
+      return
+    }
+
+    const normalizedParams = new URLSearchParams(searchParams)
+    normalizedParams.set('range', '1h')
+    setSearchParams(normalizedParams, { replace: true })
+  }, [searchParams, setSearchParams])
+
+  async function copyNodeLink() {
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setShareStatus('copied')
+    } catch {
+      setShareStatus('error')
+    }
+  }
 
   return (
     <main className="app-shell">
@@ -118,13 +148,42 @@ export function NetworkNodeDetailsPage({
                   className="network-metrics__range-button"
                   type="button"
                   aria-pressed={selectedRange === range}
-                  onClick={() => setSelectedRange(range)}
+                  onClick={() => {
+                    const nextParams = new URLSearchParams(searchParams)
+                    nextParams.set('range', range)
+                    setSearchParams(nextParams, { replace: true })
+                    setShareStatus('idle')
+                  }}
                 >
                   {range}
                 </button>
               ))}
             </div>
             <p className="network-metrics__data-label">Simulated data</p>
+            <button className="network-metrics__copy-link" type="button" onClick={copyNodeLink}>
+              Copy node link
+            </button>
+            {shareStatus !== 'idle' ? (
+              <div className="network-metrics__share-feedback">
+                <p role="status" aria-live="polite">
+                  {shareStatus === 'copied'
+                    ? 'Node link copied.'
+                    : 'Could not copy automatically. Select and copy the node link below.'}
+                </p>
+                {shareStatus === 'error' ? (
+                  <label>
+                    Node link
+                    <input
+                      type="text"
+                      readOnly
+                      value={shareUrl}
+                      onFocus={(event) => event.currentTarget.select()}
+                      onClick={(event) => event.currentTarget.select()}
+                    />
+                  </label>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </div>
       )}
@@ -250,6 +309,13 @@ export function NetworkNodeDetailsPage({
       ) : null}
     </main>
   )
+}
+
+function getMetricsRange(searchParams: URLSearchParams): MetricsRange {
+  const ranges = searchParams.getAll('range')
+  return ranges.length === 1 && METRICS_RANGES.includes(ranges[0] as MetricsRange)
+    ? (ranges[0] as MetricsRange)
+    : '1h'
 }
 
 function getMetricsHeading(range: MetricsRange): string {

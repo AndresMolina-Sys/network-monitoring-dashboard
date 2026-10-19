@@ -11,12 +11,12 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
-- `specs/004-comparacion-de-nodos/` está aprobada y T-001 a T-017 completas. `/compare` presenta selección, gráficas, leyendas, tabla y estados responsive; sus URLs codifican nodos y periodo, normalizan a `1h` cuando falta o es inválido, y los enlaces copiados omiten parámetros de demo para compartir un estado reproducible. Graphify quedó actualizado con 795 nodos/1.125 relaciones sin endpoints huérfanos.
+- `specs/004-comparacion-de-nodos/` está aprobada y T-001 a T-017 completas. `/compare` presenta selección, gráficas, leyendas, tabla y estados responsive; sus URLs codifican nodos y periodo. En `/nodes/:nodeId`, el periodo también se codifica en la URL. Ambas vistas normalizan rangos ausentes o inválidos a `1h`, reemplazan el historial al cambiar rango y copian enlaces limpios sin parámetros de demo. Graphify quedó actualizado con 795 nodos/1.125 relaciones sin endpoints huérfanos.
 - Spec 005 tiene spec, plan y tareas aprobados; T-001 a T-008 completas. Vitest 205/205, Playwright 34/34, lint, formato y build en verde. Graphify actualizado e inspeccionado: 787 nodos y 1.140 relaciones; diagnóstico sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
 - Spec, plan y tareas de Spec 003 están aprobados; T-001 a T-030 completas. Se verificaron accesibilidad, responsive, Vitest, build, Storybook y E2E; se corrigieron los avisos priorizados. Graphify se actualizó e inspeccionó; diagnóstico sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
-- `$feature` implementa cambios pequeños solicitados directamente, sin pasos, documento ni aprobación adicional; detiene alcance material nuevo. F-001, F-002 y F-003 están completos.
+- `$feature` implementa cambios pequeños solicitados directamente, sin pasos, documento ni aprobación adicional; detiene alcance material nuevo. F-001 a F-004 están completos; F-004 habilita enlaces compartibles por nodo con fallback manual para el portapapeles.
 - Impeccable está inicializado en `PRODUCT.md`; las superficies showcase son code-first y el detector está activado. Codex puede requerir aprobación inicial con `/hooks`.
 
 ## Decisiones (y por qué)
@@ -31,7 +31,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - Usar SDD spec-anchored: `specs/NNN-nombre/{spec.md,plan.md,tasks.md}`; fases con aprobación explícita, una tarea por implementación.
 - Para Spec 001, cada apertura inicia en `1h`; ventanas UTC se anclan a la muestra más reciente y la selección vigente prevalece. Datos inválidos producen error; se conservan nodo inexistente, reintentos, vacío excepcional y etiqueta visible en todos los estados.
 - Mantener al agente principal como único coordinador de aprobación; pasar a subagentes el alcance y contexto exactos, serializar escrituras y paralelizar solo revisiones independientes de solo lectura. Los perfiles heredan permisos del coordinador; sus instrucciones no son sandbox.
-- Al coordinar una solicitud nueva con `$sdd` sin fase explícita, clasificar primero: cambios localizados a `$feature`; cambios amplios o entre capas al flujo SDD. Las invocaciones con fase explícita conservan esa fase.
+- Al coordinar una solicitud nueva con `$sdd` sin fase explícita, clasificar primero: cambios localizados a `$feature`; cambios amplios o entre capas al flujo SDD. Las invocaciones con fase explícita conservan esa fase. Enlaces compartidos de detalle contienen solo ruta y periodo; los cambios de rango reemplazan historial.
 - Versionar solo las skills propias `feature`, `sdd`, `sdd-*`; las skills de terceros, como `frontend-design` y `ui-ux-pro-max`, permanecen locales e ignoradas.
 - Mantener honesta la narrativa del portfolio: demo full-stack con datos simulados explícitos, sin implicar telemetría real ni clientes verificados.
 
@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 005 está completa; el commit local cierra sus cambios. No hacer push sin solicitud explícita.
+- F-004 está implementado y verificado localmente; no hacer push sin solicitud explícita.

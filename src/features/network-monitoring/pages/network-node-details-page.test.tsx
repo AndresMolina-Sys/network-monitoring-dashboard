@@ -1,6 +1,6 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { createMemoryRouter } from 'react-router'
+import { createMemoryRouter, useLocation } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import { describe, expect, it, vi } from 'vitest'
 import type { MetricsRange, NetworkNode, NodeMetrics } from '../../../domain/network'
@@ -152,6 +152,11 @@ describe('NetworkNodeDetailsPage', () => {
     expect(screen.getByRole('group', { name: 'Metrics range' })).toBeInTheDocument()
     expectSimulatedDataLabel()
     expect(screen.getByRole('button', { name: '1h' })).toHaveAttribute('aria-pressed', 'true')
+    await waitFor(() =>
+      expect(screen.getByLabelText('Current node URL')).toHaveTextContent(
+        '/nodes/core-router?range=1h',
+      ),
+    )
     expect(screen.getByText('Latency trend for core-router (ms, 1h, UTC)')).toBeInTheDocument()
     expect(
       screen.getByRole('figure', {
@@ -213,6 +218,9 @@ describe('NetworkNodeDetailsPage', () => {
       expectMetricsSummary(range)
       expectPeakLossObservation(range)
       expect(screen.getByRole('button', { name: range })).toHaveAttribute('aria-pressed', 'true')
+      expect(screen.getByLabelText('Current node URL')).toHaveTextContent(
+        `/nodes/core-router?range=${range}`,
+      )
       const otherRange = range === '1h' ? '24h' : '1h'
       expect(screen.getByRole('button', { name: otherRange })).toHaveAttribute(
         'aria-pressed',
@@ -256,6 +264,79 @@ describe('NetworkNodeDetailsPage', () => {
       )
     },
   )
+
+  it.each(['24h', '7d'] as const)('loads the %s range from a direct detail URL', async (range) => {
+    const service = createService()
+
+    renderDetailsPage(service, `/nodes/core-router?range=${range}`)
+
+    expect(await screen.findByRole('heading', { name: RANGE_TITLES[range] })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: range })).toHaveAttribute('aria-pressed', 'true')
+    expect(service.getNodeMetrics).toHaveBeenCalledWith('core-router', range, expect.anything())
+  })
+
+  it('normalizes a missing or invalid range and preserves other query parameters', async () => {
+    const service = createService()
+
+    renderDetailsPage(service, '/nodes/core-router?range=30d&demo=slow&debug=true')
+
+    expect(await screen.findByRole('heading', { name: RANGE_TITLES['1h'] })).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getByLabelText('Current node URL')).toHaveTextContent(
+        '/nodes/core-router?range=1h&demo=slow&debug=true',
+      ),
+    )
+    expect(service.getNodeMetrics).toHaveBeenCalledWith('core-router', '1h', expect.anything())
+
+    const nextService = createService()
+    renderDetailsPage(nextService, '/nodes/core-router?debug=true')
+
+    expect(await screen.findByRole('heading', { name: RANGE_TITLES['1h'] })).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getAllByLabelText('Current node URL')[1]).toHaveTextContent(
+        '/nodes/core-router?debug=true&range=1h',
+      ),
+    )
+  })
+
+  it('copies a clean node detail URL and announces success', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    const restoreClipboard = mockClipboard(writeText)
+
+    try {
+      renderDetailsPage(createService(), '/nodes/core-router?range=24h&demo=slow&debug=true')
+      await screen.findByRole('heading', { name: RANGE_TITLES['24h'] })
+      await user.click(screen.getByRole('button', { name: 'Copy node link' }))
+
+      expect(await screen.findByRole('status')).toHaveTextContent('Node link copied.')
+      expect(writeText).toHaveBeenCalledWith(
+        `${window.location.origin}/nodes/core-router?range=24h`,
+      )
+    } finally {
+      restoreClipboard()
+    }
+  })
+
+  it('offers a clean node URL for manual copying when clipboard access fails', async () => {
+    const user = userEvent.setup()
+    const restoreClipboard = mockClipboard(vi.fn().mockRejectedValue(new Error('Clipboard denied')))
+
+    try {
+      renderDetailsPage(createService(), '/nodes/core-router?range=7d&demo=slow')
+      await screen.findByRole('heading', { name: RANGE_TITLES['7d'] })
+      await user.click(screen.getByRole('button', { name: 'Copy node link' }))
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'Could not copy automatically. Select and copy the node link below.',
+      )
+      expect(screen.getByRole('textbox', { name: 'Node link' })).toHaveValue(
+        `${window.location.origin}/nodes/core-router?range=7d`,
+      )
+    } finally {
+      restoreClipboard()
+    }
+  })
 
   it('returns to 1h when a new details view is opened', async () => {
     const user = userEvent.setup()
@@ -445,16 +526,48 @@ function expectSimulatedDataLabel(): void {
   expect(within(controls as HTMLElement).getByText('Simulated data', { exact: true })).toBeVisible()
 }
 
-function renderDetailsPage(service: NetworkMonitoringService) {
+function CurrentNodeUrl() {
+  const location = useLocation()
+
+  return (
+    <div aria-label="Current node URL">
+      {location.pathname}
+      {location.search}
+    </div>
+  )
+}
+
+function mockClipboard(writeText: (text: string) => Promise<void>) {
+  const previousDescriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText },
+  })
+
+  return () => {
+    if (previousDescriptor) {
+      Object.defineProperty(navigator, 'clipboard', previousDescriptor)
+    } else {
+      Reflect.deleteProperty(navigator, 'clipboard')
+    }
+  }
+}
+
+function renderDetailsPage(service: NetworkMonitoringService, initialEntry = '/nodes/core-router') {
   const router = createMemoryRouter(
     [
       {
         path: '/nodes/:nodeId',
-        element: <NetworkNodeDetailsPage service={service} />,
+        element: (
+          <>
+            <CurrentNodeUrl />
+            <NetworkNodeDetailsPage service={service} />
+          </>
+        ),
       },
     ],
     {
-      initialEntries: ['/nodes/core-router'],
+      initialEntries: [initialEntry],
     },
   )
 
