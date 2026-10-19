@@ -12,6 +12,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
 - `specs/004-comparacion-de-nodos/` está aprobada y T-001 a T-017 completas. `/compare` presenta selección, gráficas, leyendas, tabla y estados responsive; Playwright pasó 34/34, full-stack 2/2 y Graphify quedó actualizado con 795 nodos/1.125 relaciones sin endpoints huérfanos.
+- `specs/005-resumen-por-nodo-en-comparacion/spec.md` está redactada y revisada por QA; sigue pendiente de aprobación del usuario. No se han creado plan ni tareas.
 - Spec, plan y tareas de Spec 003 están aprobados; T-001 a T-030 completas. Se verificaron accesibilidad, responsive, Vitest, build, Storybook y E2E; se corrigieron los avisos priorizados. Graphify se actualizó e inspeccionó; diagnóstico sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
@@ -28,8 +29,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - No exponer claves, tokens ni secretos en archivos, logs, comandos, capturas o respuestas.
 - Mantener todo el código y contenido de la aplicación en inglés (identificadores, comentarios, pruebas, mensajes de API y textos visibles); la documentación puede seguir el idioma solicitado.
 - Usar SDD spec-anchored: `specs/NNN-nombre/{spec.md,plan.md,tasks.md}`; fases con aprobación explícita, una tarea por implementación.
-- Para Spec 001, cada apertura inicia en `1h`; las ventanas UTC se anclan a la muestra más reciente. Datos simulados cubren los tres rangos y la etiqueta permanece visible en todos los estados.
-- La selección más reciente prevalece; datos inválidos producen error sin cambiar el rango. Se conservan nodo inexistente, reintentos y vacío excepcional.
+- Para Spec 001, cada apertura inicia en `1h`; ventanas UTC se anclan a la muestra más reciente y la selección vigente prevalece. Datos inválidos producen error; se conservan nodo inexistente, reintentos, vacío excepcional y etiqueta visible en todos los estados.
 - Mantener al agente principal como único coordinador de aprobación; pasar a subagentes el alcance y contexto exactos, serializar escrituras y paralelizar solo revisiones independientes de solo lectura. Los perfiles heredan permisos del coordinador; sus instrucciones no son sandbox.
 - Al coordinar una solicitud nueva con `$sdd` sin fase explícita, clasificar primero: cambios localizados a `$feature`; cambios amplios o entre capas al flujo SDD. Las invocaciones con fase explícita conservan esa fase.
 - Versionar solo las skills propias `feature`, `sdd`, `sdd-*`; las skills de terceros, como `frontend-design` y `ui-ux-pro-max`, permanecen locales e ignoradas.
@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- Spec 004 está cerrada; elegir la siguiente funcionalidad cuando haya una nueva solicitud.
+- Aprobar Spec 005 para continuar con el plan técnico y las tareas, manteniendo sus aprobaciones separadas.
