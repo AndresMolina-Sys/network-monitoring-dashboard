@@ -1,6 +1,6 @@
 # Spec 005 — Resumen por nodo en la comparación
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
 ## Contexto y objetivo
 
