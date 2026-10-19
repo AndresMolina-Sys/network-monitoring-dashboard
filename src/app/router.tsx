@@ -10,6 +10,18 @@ const router = createBrowserRouter([
   },
   {
     path: '/nodes/:nodeId',
+    hydrateFallbackElement: (
+      <main className="app-shell">
+        <section
+          className="network-node-state network-node-state--loading"
+          role="status"
+          aria-busy="true"
+        >
+          <p className="network-node-state__eyebrow">Network node</p>
+          <h2>Loading node details...</h2>
+        </section>
+      </main>
+    ),
     lazy: async () => {
       const { NetworkNodeDetailsPage } =
         await import('../features/network-monitoring/pages/network-node-details-page')

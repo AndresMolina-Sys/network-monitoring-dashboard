@@ -12,7 +12,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 están completas.
 - `specs/002-grafica-perdida-de-paquetes/` está aprobada y T-001 a T-005 completas; aceptación de producción confirmada por el usuario. T-010 de Spec 001 verificó los tres periodos y CI/Vercel quedaron en verde.
 - Spec, plan y checklist de Spec 003 están aprobados; T-001 a T-030 completas. T-005/T-007/T-012 se revisaron localmente cuando los revisores no devolvieron informe; T-006 confirmó code-led sin phase gates. T-007 fijó base carbón/papel/cobre; T-008 roster; T-009 filtros/estados; T-010 resumen; T-011 selector; T-012/T-013 gráficas/tabla; T-014 estados/story vacía; T-015 movimiento reducido; T-016 teclado/foco; T-017 responsive del inventario; T-018 detalle; T-019 verificó cinco anchos y corrigió overflow; T-020 navegación/búsqueda/filtros; T-021 rangos; T-022 estados; T-023 teclado/movimiento reducido; T-024 avisos preexistentes P3; T-025 seis capturas desktop/móvil sin errores/overflow; T-026 revisión independiente; T-027 alineación de “Evidence Margin”; T-028 documentación de diseño y contraste; T-029 109/109 Vitest, build y Storybook; T-030 26/26 E2E. Se corrigió el quiebre de títulos largos; el build Storybook conserva aviso de chunks >500 kB y Playwright avisos de React Router `HydrateFallback`/`NO_COLOR`.
-- Graphify actualizado tras Spec 003; reporte, HTML y JSON inspeccionados. Diagnóstico limpio: sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
+- Graphify actualizado tras Spec 003; reporte, HTML y JSON inspeccionados. Diagnóstico limpio: sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos. La ruta directa del detalle muestra un fallback accesible mientras carga su módulo diferido; la advertencia `HydrateFallback` quedó resuelta y verificada en desktop y móvil. Siguen pendientes los chunks de Storybook y el conflicto `NO_COLOR`/`FORCE_COLOR`.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
 - `$feature` implementa cambios pequeños solicitados directamente, sin pasos, documento ni aprobación adicional; detiene alcance material nuevo. F-001, F-002 y F-003 están completos.
@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- No hay trabajo de producto pendiente; Spec 003 y la actualización de Graphify están completas.
+- Continuar la revisión de avisos, uno por uno: evaluar el bundle de Storybook y después normalizar `NO_COLOR`/`FORCE_COLOR` en el entorno de pruebas.

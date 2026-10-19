@@ -33,14 +33,31 @@ test.describe('Network monitoring dashboard', () => {
   })
 
   test('loads a node detail route directly', async ({ page }) => {
+    const routeWarnings: string[] = []
+    page.on('console', (message) => {
+      if (
+        message.type() === 'warning' &&
+        message.text().includes('No `HydrateFallback` element provided')
+      ) {
+        routeWarnings.push(message.text())
+      }
+    })
+
+    await page.route('**/network-node-details-page.tsx*', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 400))
+      await route.continue()
+    })
+
     await page.goto('/nodes/core-router')
 
+    await expect(page.getByText('Loading node details...')).toBeVisible()
     await expect(
       page.getByRole('heading', {
         name: 'Core Router',
       }),
     ).toBeVisible()
     await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible()
+    expect(routeWarnings).toHaveLength(0)
   })
 
   test('shows a not-found state for an unknown node', async ({ page }) => {
