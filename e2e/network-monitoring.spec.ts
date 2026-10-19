@@ -620,6 +620,9 @@ test.describe('Network monitoring dashboard', () => {
 
     const search = page.getByRole('searchbox', { name: 'Search nodes' })
     const statusFilter = page.getByRole('combobox', { name: 'Filter by status' })
+    const coreRouterSelection = page.getByRole('checkbox', {
+      name: 'Select Core Router for comparison',
+    })
     const firstNode = page.getByRole('link', { name: 'View metrics for Core Router' })
 
     await expect(search).toBeVisible()
@@ -629,6 +632,8 @@ test.describe('Network monitoring dashboard', () => {
     await expectVisibleKeyboardFocus(search)
     await page.keyboard.press('Tab')
     await expectVisibleKeyboardFocus(statusFilter)
+    await page.keyboard.press('Tab')
+    await expect(coreRouterSelection).toBeFocused()
     await page.keyboard.press('Tab')
     await expectVisibleKeyboardFocus(firstNode)
     await page.keyboard.press('Enter')
@@ -675,6 +680,167 @@ test.describe('Network monitoring dashboard', () => {
     await expect(charts[1]).toHaveAccessibleName(
       'Packet loss trend for core-router in percent, range 1h, UTC',
     )
+  })
+
+  test('compares two selected nodes across every range without stale rows', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/')
+
+    const coreRouter = page.getByRole('checkbox', { name: 'Select Core Router for comparison' })
+    const accessSwitch = page.getByRole('checkbox', {
+      name: 'Select Access Switch 01 for comparison',
+    })
+    const branchGateway = page.getByRole('checkbox', {
+      name: 'Select Branch Gateway for comparison',
+    })
+
+    await coreRouter.check()
+    await accessSwitch.check()
+    await expect(page.getByText('2 of 3 nodes selected for comparison')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Compare selected nodes' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Compare selected nodes' }).click()
+
+    await expect(page).toHaveURL(/\/compare\?nodes=core-router%2Caccess-switch-01$/)
+    await expect(page.getByRole('heading', { name: 'Compare nodes' })).toBeVisible()
+    await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+    await expect(branchGateway).toHaveCount(0)
+
+    const ranges = [
+      { value: '1h', heading: 'Last hour comparison (1h)', pointsPerNode: 4 },
+      { value: '24h', heading: 'Last 24 hours comparison (24h)', pointsPerNode: 25 },
+      { value: '7d', heading: 'Last 7 days comparison (7d)', pointsPerNode: 29 },
+    ]
+    const rangeSelector = page.getByRole('group', { name: 'Metrics range' })
+    const expectedNodeIds = ['core-router', 'access-switch-01'].sort()
+
+    for (const range of ranges) {
+      const rangeButton = rangeSelector.getByRole('button', { name: range.value, exact: true })
+      await rangeButton.click()
+
+      await expect(rangeButton).toHaveAttribute('aria-pressed', 'true')
+      await expect(page.getByRole('heading', { name: range.heading })).toBeVisible()
+      await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+      await expect(
+        page.getByRole('figure', { name: `Latency by node (${range.value}, ms)` }),
+      ).toBeVisible()
+      await expect(
+        page.getByRole('figure', { name: `Packet loss by node (${range.value}, %)` }),
+      ).toBeVisible()
+
+      const table = page.getByRole('table')
+      await expect(table).toBeVisible()
+      await expect(table.locator('caption')).toHaveText(
+        `Latency and packet loss measurements for selected nodes (${range.value})`,
+      )
+      await expect(table.locator('thead th')).toHaveText([
+        'Node',
+        'Timestamp',
+        'Latency',
+        'Packet loss',
+      ])
+      await expect(table.locator('tbody tr')).toHaveCount(range.pointsPerNode * 2)
+      await expect
+        .poll(() =>
+          table
+            .locator('tbody tr td:first-child')
+            .allTextContents()
+            .then((nodeIds) => [...new Set(nodeIds)].sort()),
+        )
+        .toEqual(expectedNodeIds)
+      await expect(table.locator('tbody time').first()).toHaveAttribute('datetime', /Z$/)
+
+      const dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+    }
+  })
+
+  test('allows keyboard selection of three nodes and fits the mobile viewport', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/')
+
+    const coreRouter = page.getByRole('checkbox', { name: 'Select Core Router for comparison' })
+    const accessSwitch = page.getByRole('checkbox', {
+      name: 'Select Access Switch 01 for comparison',
+    })
+    const branchGateway = page.getByRole('checkbox', {
+      name: 'Select Branch Gateway for comparison',
+    })
+
+    await coreRouter.focus()
+    await expect(coreRouter).toBeFocused()
+    await page.keyboard.press('Space')
+    await expect(coreRouter).toBeChecked()
+    await accessSwitch.focus()
+    await expect(accessSwitch).toBeFocused()
+    await page.keyboard.press('Space')
+    await expect(accessSwitch).toBeChecked()
+    await branchGateway.focus()
+    await expect(branchGateway).toBeFocused()
+    await page.keyboard.press('Space')
+    await expect(branchGateway).toBeChecked()
+    await expect(page.getByText('3 of 3 nodes selected for comparison')).toBeVisible()
+    await page.getByRole('button', { name: 'Compare selected nodes' }).click()
+
+    await expect(page.getByRole('group', { name: 'Metrics range' })).toBeVisible()
+    await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(12)
+    await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+    await expect(page.getByRole('figure', { name: 'Latency by node (1h, ms)' })).toBeVisible()
+    await expect(page.getByRole('figure', { name: 'Packet loss by node (1h, %)' })).toBeVisible()
+
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: width === 390 ? 844 : 900 })
+      await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(12)
+
+      const dimensions = await page.evaluate(() => ({
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+      }))
+      expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+    }
+  })
+
+  test('preserves valid node data beside missing and failed comparison nodes', async ({ page }) => {
+    await page.goto('/compare?nodes=unknown-node,core-router')
+
+    await expect(page.getByRole('heading', { name: 'Node not found: unknown-node' })).toBeVisible()
+    await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(4)
+    await expect(page.getByRole('table').locator('tbody tr').first()).toContainText('core-router')
+    await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+
+    await page.goto('/compare?nodes=core-router%2Caccess-switch-01&demo=error')
+
+    await expect(page.getByRole('alert')).toHaveCount(2)
+    await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+    await expect(page.getByRole('table')).toHaveCount(0)
+    await expect(page.getByRole('figure')).toHaveCount(0)
+  })
+
+  test('keeps loading identified and rejects invalid comparison selections', async ({ page }) => {
+    await page.goto('/compare?nodes=core-router%2Caccess-switch-01&demo=slow')
+
+    await expect(page.getByRole('group', { name: 'Metrics range' })).toBeVisible()
+    await expect(page.getByText('Simulated data', { exact: true })).toBeVisible()
+    await expect(page.getByRole('status', { name: /Loading metrics for/ })).toHaveCount(2)
+    await expect(page.getByRole('table')).toHaveCount(0)
+
+    for (const selection of [
+      'core-router',
+      'core-router,core-router',
+      'core-router,access-switch-01,branch-gateway,unknown-node',
+    ]) {
+      await page.goto(`/compare?nodes=${encodeURIComponent(selection)}`)
+      await expect(
+        page.getByRole('heading', { name: 'Select 2 or 3 nodes to compare' }),
+      ).toBeVisible()
+      await expect(page.getByRole('link', { name: 'Back to dashboard' })).toBeVisible()
+      await expect(page.getByRole('table')).toHaveCount(0)
+      await expect(page.getByRole('figure')).toHaveCount(0)
+    }
   })
 })
 

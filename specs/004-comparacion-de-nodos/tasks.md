@@ -68,7 +68,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `src/app/router.tsx` registra `/compare` con carga diferida y fallback accesible, interpreta los IDs seleccionados desde la URL y dirige al estado de selección insuficiente/inválida sin resultados obsoletos.
 
-- [ ] **T-012 — Escribir pruebas E2E del flujo y la ruta comparativa**
+- [x] **T-012 — Escribir pruebas E2E del flujo y la ruta comparativa**
 
   **Estimación:** 25 min · **Dependencias:** T-006, T-010, T-011 · **RF:** RF-1, RF-2, RF-3, RF-4, RF-7, RF-8, RF-9
 
