@@ -26,7 +26,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `use-node-comparison.ts` usa el servicio existente y validador compartido, cancela o ignora respuestas obsoletas y mantiene el resultado o estado correcto de cada nodo por separado.
 
-- [ ] **T-005 — Escribir pruebas de selección de nodos en el inventario**
+- [x] **T-005 — Escribir pruebas de selección de nodos en el inventario**
 
   **Estimación:** 25 min · **Dependencias:** Ninguna · **RF:** RF-1
 

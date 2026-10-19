@@ -2,9 +2,20 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { NETWORK_NODES } from '../../../mocks/network-fixtures'
+import type { NetworkNode } from '../../../domain/network'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NetworkNodesPanel } from './network-nodes-panel'
 import { MemoryRouter } from 'react-router'
+
+function createNetworkNodesService(
+  nodes: readonly NetworkNode[] = NETWORK_NODES,
+): NetworkMonitoringService {
+  return {
+    listNodes: vi.fn().mockResolvedValue(nodes),
+    getNode: vi.fn(),
+    getNodeMetrics: vi.fn(),
+  }
+}
 
 describe('NetworkNodesPanel', () => {
   it('renders the loading state while nodes are pending', () => {
@@ -154,6 +165,109 @@ describe('NetworkNodesPanel', () => {
     expect(screen.getByText('Showing 3 of 3 nodes')).toBeInTheDocument()
     expect(screen.getByRole('searchbox', { name: 'Search nodes' })).toHaveValue('')
     expect(screen.getByRole('combobox', { name: 'Filter by status' })).toHaveValue('all')
+  })
+
+  it('allows selecting two or three nodes for comparison', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService()} />
+      </MemoryRouter>,
+    )
+
+    const coreRouter = await screen.findByRole('checkbox', {
+      name: 'Select Core Router for comparison',
+    })
+    const accessSwitch = screen.getByRole('checkbox', {
+      name: 'Select Access Switch 01 for comparison',
+    })
+    const branchGateway = screen.getByRole('checkbox', {
+      name: 'Select Branch Gateway for comparison',
+    })
+    const compareButton = screen.getByRole('button', { name: 'Compare selected nodes' })
+
+    await user.click(coreRouter)
+    await user.click(accessSwitch)
+
+    expect(coreRouter).toBeChecked()
+    expect(accessSwitch).toBeChecked()
+    expect(compareButton).toBeEnabled()
+
+    await user.click(branchGateway)
+
+    expect(branchGateway).toBeChecked()
+    expect(compareButton).toBeEnabled()
+  })
+
+  it('blocks selecting more than three nodes', async () => {
+    const fourthNode: NetworkNode = {
+      ...NETWORK_NODES[0],
+      id: 'edge-router',
+      name: 'Edge Router',
+      address: '10.0.0.2',
+    }
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService([...NETWORK_NODES, fourthNode])} />
+      </MemoryRouter>,
+    )
+
+    const coreRouter = await screen.findByRole('checkbox', {
+      name: 'Select Core Router for comparison',
+    })
+    const accessSwitch = screen.getByRole('checkbox', {
+      name: 'Select Access Switch 01 for comparison',
+    })
+    const branchGateway = screen.getByRole('checkbox', {
+      name: 'Select Branch Gateway for comparison',
+    })
+    const edgeRouter = screen.getByRole('checkbox', {
+      name: 'Select Edge Router for comparison',
+    })
+
+    await user.click(coreRouter)
+    await user.click(accessSwitch)
+    await user.click(branchGateway)
+
+    expect(coreRouter).toBeChecked()
+    expect(accessSwitch).toBeChecked()
+    expect(branchGateway).toBeChecked()
+    expect(edgeRouter).toBeDisabled()
+    expect(edgeRouter).not.toBeChecked()
+  })
+
+  it('keeps selection available and blocks continuing until two nodes are selected', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService()} />
+      </MemoryRouter>,
+    )
+
+    const coreRouter = await screen.findByRole('checkbox', {
+      name: 'Select Core Router for comparison',
+    })
+    const accessSwitch = screen.getByRole('checkbox', {
+      name: 'Select Access Switch 01 for comparison',
+    })
+    const compareButton = screen.getByRole('button', { name: 'Compare selected nodes' })
+
+    expect(compareButton).toBeDisabled()
+
+    await user.click(coreRouter)
+
+    expect(coreRouter).toBeChecked()
+    expect(compareButton).toBeDisabled()
+    expect(accessSwitch).toBeEnabled()
+
+    await user.click(accessSwitch)
+
+    expect(accessSwitch).toBeChecked()
+    expect(compareButton).toBeEnabled()
   })
 
   it('renders the empty state when no nodes are returned', async () => {
