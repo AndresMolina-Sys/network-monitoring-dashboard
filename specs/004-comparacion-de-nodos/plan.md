@@ -1,6 +1,6 @@
 # Plan 004 — Comparación de nodos
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
 ## Enfoque técnico
 
