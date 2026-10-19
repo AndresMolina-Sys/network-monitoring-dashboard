@@ -92,7 +92,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** `npm run test:e2e` pasa la navegación de comparación, los tres rangos, estados y alternativa accesible, e informa cero desbordamiento horizontal a 390 × 844.
 
-- [ ] **T-016 — Ejecutar la regresión full-stack existente**
+- [x] **T-016 — Ejecutar la regresión full-stack existente**
 
   **Estimación:** 25 min · **Dependencias:** T-015 · **RF:** RF-3, RF-4, RF-9
 
