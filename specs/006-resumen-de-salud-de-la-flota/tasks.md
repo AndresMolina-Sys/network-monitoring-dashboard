@@ -10,7 +10,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Las pruebas del hook confirman una solicitud `1h` por nodo y que el estado inicial permanece cargando hasta resolverse todas las solicitudes.
 
-- [ ] **T-002 — Aislar respuestas de métricas inválidas**
+- [x] **T-002 — Aislar respuestas de métricas inválidas**
 
   **Estimación:** 25 min · **Dependencias:** T-001 · **RF:** RF-7, RF-8
 
