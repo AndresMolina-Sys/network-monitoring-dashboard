@@ -98,7 +98,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Playwright confirma que conteos y KPI son legibles, utilizables y no producen desbordamiento horizontal a 390 × 844 píxeles.
 
-- [ ] **T-013 — Comprobar formato y lint**
+- [x] **T-013 — Comprobar formato y lint**
 
   **Estimación:** 15 min · **Dependencias:** T-001 a T-012 · **RF:** RF-1 a RF-10
 
