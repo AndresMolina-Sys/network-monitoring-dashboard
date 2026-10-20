@@ -1,8 +1,8 @@
 # Tasks 006 — Resumen de salud de la flota
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
-- [ ] **T-001 — Cargar métricas 1h para la flota**
+- [x] **T-001 — Cargar métricas 1h para la flota**
 
   **Estimación:** 25 min · **Dependencias:** Ninguna · **RF:** RF-4, RF-6
 
