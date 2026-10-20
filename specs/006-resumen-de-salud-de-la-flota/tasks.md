@@ -26,7 +26,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Las pruebas distinguen la media de todas las muestras de una media de promedios por nodo y confirman la pérdida máxima y la cobertura para resultados completos, parciales y `0/N`.
 
-- [ ] **T-004 — Cancelar solicitudes y descartar resultados obsoletos**
+- [x] **T-004 — Cancelar solicitudes y descartar resultados obsoletos**
 
   **Estimación:** 20 min · **Dependencias:** T-001, T-002 · **RF:** RF-6, RF-9
 

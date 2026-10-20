@@ -129,9 +129,134 @@ describe('useFleetHealthSummary', () => {
 
     expect(result.current.status).toBe('loading')
     for (const [index, node] of NODES.entries()) {
-      expect(getNodeMetrics).toHaveBeenNthCalledWith(index + 1, node.id, '1h', undefined)
+      expect(getNodeMetrics).toHaveBeenNthCalledWith(index + 1, node.id, '1h', expect.anything())
       expect(pendingRequests.has(node.id)).toBe(true)
     }
+  })
+
+  it('aborts outstanding requests when the hook unmounts', async () => {
+    const signals: AbortSignal[] = []
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>(
+      (_nodeId, _range, signal) => {
+        signals.push(signal!)
+        return new Promise(() => {})
+      },
+    )
+    const service = createService(getNodeMetrics)
+
+    const { unmount } = renderHook(() => useFleetHealthSummary(NODES, service))
+
+    await waitFor(() => expect(getNodeMetrics).toHaveBeenCalledTimes(NODES.length))
+
+    expect(signals.every((signal) => !signal.aborted)).toBe(true)
+
+    unmount()
+
+    expect(signals.every((signal) => signal.aborted)).toBe(true)
+  })
+
+  it('ignores late results after the node population changes', async () => {
+    const nextNodes = [createNode('new-core-router'), createNode('new-access-switch')]
+    const requests: DeferredMetricsRequest[] = []
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>(
+      (nodeId, _range, signal) => {
+        const deferred = createDeferred<NodeMetrics>()
+        requests.push({ nodeId, deferred, signal: signal! })
+        return deferred.promise
+      },
+    )
+    const service = createService(getNodeMetrics)
+    const { result, rerender } = renderHook(
+      ({ nodes }: { nodes: readonly NetworkNode[] }) => useFleetHealthSummary(nodes, service),
+      { initialProps: { nodes: NODES } },
+    )
+
+    await waitFor(() => expect(requests).toHaveLength(NODES.length))
+    const staleRequests = [...requests]
+
+    rerender({ nodes: nextNodes })
+
+    await waitFor(() => expect(requests).toHaveLength(NODES.length + nextNodes.length))
+    const currentRequests = requests.slice(NODES.length)
+
+    expect(staleRequests.every((request) => request.signal.aborted)).toBe(true)
+
+    await act(async () => {
+      currentRequests.forEach((request, index) => {
+        request.deferred.resolve(
+          createMetricsWithValues(
+            request.nodeId,
+            Array(4).fill(index === 0 ? 50 : 70),
+            Array(4).fill(index === 0 ? 1 : 8),
+          ),
+        )
+      })
+      await Promise.all(currentRequests.map((request) => request.deferred.promise))
+    })
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+    expect(result.current.summary).toEqual({ averageLatencyMs: 60, peakPacketLossPercent: 8 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 2, totalNodeCount: 2 })
+
+    await act(async () => {
+      staleRequests.forEach((request) => {
+        request.deferred.resolve(
+          createMetricsWithValues(request.nodeId, Array(4).fill(200), Array(4).fill(99)),
+        )
+      })
+      await Promise.all(staleRequests.map((request) => request.deferred.promise))
+    })
+
+    expect(result.current.summary).toEqual({ averageLatencyMs: 60, peakPacketLossPercent: 8 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 2, totalNodeCount: 2 })
+    expect(result.current.metrics.map((metrics) => metrics.nodeId)).toEqual(
+      nextNodes.map((node) => node.id),
+    )
+  })
+
+  it('ignores late results after the service changes', async () => {
+    const staleRequests: DeferredMetricsRequest[] = []
+    const oldGetNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>(
+      (nodeId, _range, signal) => {
+        const deferred = createDeferred<NodeMetrics>()
+        staleRequests.push({ nodeId, deferred, signal: signal! })
+        return deferred.promise
+      },
+    )
+    const oldService = createService(oldGetNodeMetrics)
+    const currentGetNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) =>
+      Promise.resolve(createMetricsWithValues(nodeId, Array(4).fill(25), Array(4).fill(2))),
+    )
+    const currentService = createService(currentGetNodeMetrics)
+    const { result, rerender } = renderHook(
+      ({ service }: { service: NetworkMonitoringService }) => useFleetHealthSummary(NODES, service),
+      { initialProps: { service: oldService } },
+    )
+
+    await waitFor(() => expect(staleRequests).toHaveLength(NODES.length))
+
+    rerender({ service: currentService })
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+    expect(staleRequests.every((request) => request.signal.aborted)).toBe(true)
+    expect(currentGetNodeMetrics).toHaveBeenCalledTimes(NODES.length)
+    expect(result.current.summary).toEqual({ averageLatencyMs: 25, peakPacketLossPercent: 2 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 3, totalNodeCount: 3 })
+
+    await act(async () => {
+      staleRequests.forEach((request) => {
+        request.deferred.resolve(
+          createMetricsWithValues(request.nodeId, Array(4).fill(200), Array(4).fill(99)),
+        )
+      })
+      await Promise.all(staleRequests.map((request) => request.deferred.promise))
+    })
+
+    expect(result.current.summary).toEqual({ averageLatencyMs: 25, peakPacketLossPercent: 2 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 3, totalNodeCount: 3 })
+    expect(result.current.metrics.map((metrics) => metrics.nodeId)).toEqual(
+      NODES.map((node) => node.id),
+    )
   })
 
   it('keeps the initial summary loading until every request settles', async () => {
@@ -282,4 +407,10 @@ function createDeferred<T>() {
   })
 
   return { promise, resolve, reject }
+}
+
+interface DeferredMetricsRequest {
+  readonly nodeId: string
+  readonly deferred: ReturnType<typeof createDeferred<NodeMetrics>>
+  readonly signal: AbortSignal
 }

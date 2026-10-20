@@ -41,6 +41,9 @@ export function useFleetHealthSummary(
   })
 
   useEffect(() => {
+    const controller = new AbortController()
+    let active = true
+
     setState({
       status: 'loading',
       metrics: EMPTY_METRICS,
@@ -51,8 +54,13 @@ export function useFleetHealthSummary(
 
     const loadMetrics = async (): Promise<void> => {
       const results = await Promise.allSettled(
-        nodes.map((node) => service.getNodeMetrics(node.id, '1h')),
+        nodes.map((node) => service.getNodeMetrics(node.id, '1h', controller.signal)),
       )
+
+      if (!active) {
+        return
+      }
+
       const metrics: NodeMetrics[] = []
       const failedNodeIds: NetworkNode['id'][] = []
 
@@ -83,6 +91,11 @@ export function useFleetHealthSummary(
     }
 
     void loadMetrics()
+
+    return () => {
+      active = false
+      controller.abort()
+    }
   }, [nodes, service])
 
   return state
