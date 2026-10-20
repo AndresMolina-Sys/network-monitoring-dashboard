@@ -90,7 +90,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Playwright confirma los conteos independientes de búsqueda, la sincronización de filtros, la activación por teclado y la presentación de métricas simuladas en escritorio.
 
-- [ ] **T-012 — Verificar E2E responsive en móvil**
+- [x] **T-012 — Verificar E2E responsive en móvil**
 
   **Estimación:** 20 min · **Dependencias:** T-010, T-011 · **RF:** RF-1, RF-5; requisitos no funcionales de legibilidad responsive
 

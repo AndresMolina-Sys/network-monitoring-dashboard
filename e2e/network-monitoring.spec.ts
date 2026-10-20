@@ -547,6 +547,72 @@ test.describe('Network monitoring dashboard', () => {
     )
   })
 
+  test('keeps fleet counts and metrics summary usable without mobile overflow', async ({
+    page,
+  }) => {
+    test.skip(test.info().project.name !== 'mobile-chromium', 'Mobile viewport acceptance')
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/')
+
+    const statusCounts = page.getByRole('group', { name: 'Fleet status counts' })
+    const fleetMetrics = page.getByRole('region', { name: 'Fleet metrics' })
+    const search = page.getByRole('searchbox', { name: 'Search nodes' })
+    const statusFilter = page.getByRole('combobox', { name: 'Filter by status' })
+
+    await expect(page.getByRole('heading', { name: 'Monitored nodes' })).toBeVisible()
+    await expect(search).toBeVisible()
+    await expect(statusFilter).toBeVisible()
+    await expect(fleetMetrics.getByText('Simulated data', { exact: true })).toBeVisible()
+    await expect(fleetMetrics.getByText('65.5 ms', { exact: true })).toBeVisible()
+    await expect(fleetMetrics.getByText('4.2%', { exact: true })).toBeVisible()
+    await expect(fleetMetrics.getByText('3/3 nodes', { exact: true })).toBeVisible()
+
+    for (const status of ['Online', 'Degraded', 'Offline']) {
+      const statusButton = statusCounts.getByRole('button', { name: `${status}, 1` })
+      await expect(statusButton).toBeVisible()
+      const bounds = await statusButton.boundingBox()
+      expect(bounds).not.toBeNull()
+      expect(bounds!.height).toBeGreaterThanOrEqual(44)
+    }
+
+    const summaryRows = await fleetMetrics
+      .locator('.fleet-health-summary__metrics > div')
+      .evaluateAll((rows) =>
+        rows.map((row) => {
+          const label = row.querySelector('dt')!.getBoundingClientRect()
+          const value = row.querySelector('dd')!.getBoundingClientRect()
+          return {
+            labelRight: label.right,
+            valueLeft: value.left,
+            left: row.getBoundingClientRect().left,
+            right: row.getBoundingClientRect().right,
+          }
+        }),
+      )
+    expect(summaryRows).toHaveLength(3)
+    for (const row of summaryRows) {
+      expect(row.labelRight).toBeLessThanOrEqual(row.valueLeft)
+      expect(row.left).toBeGreaterThanOrEqual(0)
+      expect(row.right).toBeLessThanOrEqual(390)
+    }
+
+    await statusFilter.selectOption('degraded')
+    await expect(statusCounts.getByRole('button', { name: 'Degraded, 1' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(
+      page.getByRole('link', { name: 'View metrics for Access Switch 01' }),
+    ).toBeVisible()
+    await expect(page.getByText('Showing 1 of 3 nodes')).toBeVisible()
+
+    const dimensions = await page.evaluate(() => ({
+      documentWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+    }))
+    expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
+  })
+
   test('shows complete metric ranges without horizontal overflow', async ({ page }) => {
     const projectName = test.info().project.name
     const viewport =
