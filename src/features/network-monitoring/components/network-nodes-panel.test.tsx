@@ -24,11 +24,13 @@ function getFixtureMetrics(nodeId: string): Promise<NodeMetrics> {
 
 function createDeferred<T>() {
   let resolve!: (value: T) => void
-  const promise = new Promise<T>((resolvePromise) => {
+  let reject!: (reason?: unknown) => void
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
     resolve = resolvePromise
+    reject = rejectPromise
   })
 
-  return { promise, resolve }
+  return { promise, resolve, reject }
 }
 
 function expectFleetStatusCounts(statusCounts: HTMLElement) {
@@ -66,6 +68,8 @@ describe('NetworkNodesPanel', () => {
     expect(loadingStatus).toHaveTextContent('Loading network nodes...')
     expect(screen.queryByRole('searchbox', { name: 'Search nodes' })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Monitored nodes' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Fleet status counts' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Fleet metrics' })).not.toBeInTheDocument()
     expect(screen.queryAllByRole('link', { name: /^View metrics for/ })).toHaveLength(0)
   })
 
@@ -204,6 +208,44 @@ describe('NetworkNodesPanel', () => {
     expect(within(summary).getByRole('status')).toHaveTextContent('Loading fleet metrics...')
     expect(within(summary).getByText('Simulated data')).toBeVisible()
     expect(within(summary).queryByText('65.5 ms')).not.toBeInTheDocument()
+  })
+
+  it('hides the previous fleet summary while a replacement inventory is loading or empty', async () => {
+    const initialService = createNetworkNodesService(NETWORK_NODES, getFixtureMetrics)
+    const nextNodes = createDeferred<readonly NetworkNode[]>()
+    const nextService = {
+      listNodes: vi.fn(() => nextNodes.promise),
+      getNode: vi.fn(),
+      getNodeMetrics: vi.fn(),
+    } satisfies NetworkMonitoringService
+    const { rerender } = render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={initialService} />
+      </MemoryRouter>,
+    )
+
+    await screen.findByText('3/3 nodes')
+    expect(screen.getByRole('group', { name: 'Fleet status counts' })).toBeInTheDocument()
+
+    rerender(
+      <MemoryRouter>
+        <NetworkNodesPanel service={nextService} />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('Loading network nodes...')).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Fleet status counts' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Fleet metrics' })).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('link', { name: /^View metrics for/ })).toHaveLength(0)
+
+    await act(async () => {
+      nextNodes.resolve([])
+      await nextNodes.promise
+    })
+
+    expect(await screen.findByRole('heading', { name: 'No network nodes found' })).toBeVisible()
+    expect(screen.queryByRole('group', { name: 'Fleet status counts' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Fleet metrics' })).not.toBeInTheDocument()
   })
 
   it('shows partial coverage and retries only the failed node while preserving valid metrics', async () => {
@@ -584,6 +626,8 @@ describe('NetworkNodesPanel', () => {
     ).toBeInTheDocument()
     expect(screen.queryByRole('searchbox', { name: 'Search nodes' })).not.toBeInTheDocument()
     expect(screen.queryAllByRole('link', { name: /^View metrics for/ })).toHaveLength(0)
+    expect(screen.queryByRole('group', { name: 'Fleet status counts' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Fleet metrics' })).not.toBeInTheDocument()
   })
 
   it('retries after an error and renders the nodes', async () => {
@@ -614,6 +658,8 @@ describe('NetworkNodesPanel', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument()
     expect(screen.queryByRole('searchbox', { name: 'Search nodes' })).not.toBeInTheDocument()
     expect(screen.queryAllByRole('link', { name: /^View metrics for/ })).toHaveLength(0)
+    expect(screen.queryByRole('group', { name: 'Fleet status counts' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Fleet metrics' })).not.toBeInTheDocument()
 
     await user.click(
       screen.getByRole('button', {

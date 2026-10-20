@@ -14,21 +14,24 @@ export interface UseNetworkNodesState {
   readonly retry: () => void
 }
 
+interface NetworkNodesData extends Omit<UseNetworkNodesState, 'retry'> {
+  readonly service: NetworkMonitoringService
+  readonly requestKey: number
+}
+
 export function useNetworkNodes(
   service: NetworkMonitoringService = networkMonitoringService,
 ): UseNetworkNodesState {
-  const [status, setStatus] = useState<NetworkNodesStatus>('loading')
-
-  const [nodes, setNodes] = useState<readonly NetworkNode[]>(EMPTY_NODES)
-
-  const [error, setError] = useState<Error | null>(null)
-
   const [requestKey, setRequestKey] = useState(0)
+  const [state, setState] = useState<NetworkNodesData>(() =>
+    createLoadingState(service, requestKey),
+  )
+  const currentState =
+    state.service === service && state.requestKey === requestKey
+      ? state
+      : createLoadingState(service, requestKey)
 
   const retry = useCallback(() => {
-    setStatus('loading')
-    setNodes(EMPTY_NODES)
-    setError(null)
     setRequestKey((currentKey) => currentKey + 1)
   }, [])
 
@@ -43,17 +46,26 @@ export function useNetworkNodes(
           return
         }
 
-        setNodes(nextNodes)
-        setStatus(nextNodes.length > 0 ? 'success' : 'empty')
+        setState({
+          service,
+          requestKey,
+          status: nextNodes.length > 0 ? 'success' : 'empty',
+          nodes: nextNodes,
+          error: null,
+        })
       })
       .catch((cause: unknown) => {
         if (!isActive || isAbortError(cause)) {
           return
         }
 
-        setNodes(EMPTY_NODES)
-        setError(toError(cause))
-        setStatus('error')
+        setState({
+          service,
+          requestKey,
+          status: 'error',
+          nodes: EMPTY_NODES,
+          error: toError(cause),
+        })
       })
 
     return () => {
@@ -63,10 +75,23 @@ export function useNetworkNodes(
   }, [requestKey, service])
 
   return {
-    status,
-    nodes,
-    error,
+    status: currentState.status,
+    nodes: currentState.nodes,
+    error: currentState.error,
     retry,
+  }
+}
+
+function createLoadingState(
+  service: NetworkMonitoringService,
+  requestKey: number,
+): NetworkNodesData {
+  return {
+    service,
+    requestKey,
+    status: 'loading',
+    nodes: EMPTY_NODES,
+    error: null,
   }
 }
 

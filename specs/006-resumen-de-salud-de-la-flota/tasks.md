@@ -66,7 +66,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Las pruebas del panel verifican valores, unidades, cobertura, etiqueta visible sin hover y reintento desde los estados parciales y `0/N`.
 
-- [ ] **T-009 — Conservar estados de carga, error y vacío del inventario**
+- [x] **T-009 — Conservar estados de carga, error y vacío del inventario**
 
   **Estimación:** 20 min · **Dependencias:** T-008 · **RF:** RF-10
 
