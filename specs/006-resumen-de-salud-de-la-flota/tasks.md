@@ -18,7 +18,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Cada respuesta inválida excluye el conjunto completo de ese nodo, lo marca como fallido y las pruebas verifican que los nodos restantes siguen siendo utilizables.
 
-- [ ] **T-003 — Calcular KPI combinados y cobertura**
+- [x] **T-003 — Calcular KPI combinados y cobertura**
 
   **Estimación:** 25 min · **Dependencias:** T-002 · **RF:** RF-4, RF-5, RF-8
 

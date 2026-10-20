@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { NetworkNode, NodeMetrics } from '../../../domain/network'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
-import { useFleetHealthSummary } from './use-fleet-health-summary'
+import { summarizeFleetMetrics, useFleetHealthSummary } from './use-fleet-health-summary'
 
 const INVALID_RESPONSE_CASES: readonly [string, (metrics: NodeMetrics) => NodeMetrics][] = [
   ['an empty response', (metrics) => ({ ...metrics, points: [] })],
@@ -27,6 +27,91 @@ const NODES = [
 ]
 
 describe('useFleetHealthSummary', () => {
+  it('aggregates every point instead of averaging per-node averages', () => {
+    const summary = summarizeFleetMetrics([
+      {
+        nodeId: NODES[0].id,
+        range: '1h',
+        points: [createMetricPoint(0, 1)],
+      },
+      {
+        nodeId: NODES[1].id,
+        range: '1h',
+        points: [createMetricPoint(30, 2), createMetricPoint(30, 3), createMetricPoint(30, 4)],
+      },
+    ])
+
+    expect(summary).toEqual({ averageLatencyMs: 22.5, peakPacketLossPercent: 4 })
+  })
+
+  it('exposes combined metrics and complete coverage when every node response is valid', async () => {
+    const latencies = new Map([
+      [NODES[0].id, [10, 10, 10, 10]],
+      [NODES[1].id, [20, 20, 20, 20]],
+      [NODES[2].id, [30, 30, 30, 30]],
+    ])
+    const losses = new Map([
+      [NODES[0].id, [0.1, 0.2, 0.3, 0.4]],
+      [NODES[1].id, [0.5, 0.6, 0.7, 0.8]],
+      [NODES[2].id, [1, 2, 3, 4]],
+    ])
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) =>
+      Promise.resolve(createMetricsWithValues(nodeId, latencies.get(nodeId)!, losses.get(nodeId)!)),
+    )
+    const service = createService(getNodeMetrics)
+
+    const { result } = renderHook(() => useFleetHealthSummary(NODES, service))
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+
+    expect(result.current.summary).toEqual({ averageLatencyMs: 20, peakPacketLossPercent: 4 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 3, totalNodeCount: 3 })
+  })
+
+  it('aggregates valid nodes and reports partial coverage when another node fails', async () => {
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) => {
+      if (nodeId === NODES[1].id) {
+        return Promise.reject(new Error('Metrics request failed'))
+      }
+
+      const latency = nodeId === NODES[0].id ? 10 : 30
+      const loss = nodeId === NODES[0].id ? 1 : 4
+
+      return Promise.resolve(
+        createMetricsWithValues(nodeId, Array(4).fill(latency), Array(4).fill(loss)),
+      )
+    })
+    const service = createService(getNodeMetrics)
+
+    const { result } = renderHook(() => useFleetHealthSummary(NODES, service))
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+
+    expect(result.current.summary).toEqual({ averageLatencyMs: 20, peakPacketLossPercent: 4 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 2, totalNodeCount: 3 })
+    expect(result.current.failedNodeIds).toEqual([NODES[1].id])
+    expect(result.current.metrics.map((metrics) => metrics.nodeId)).toEqual([
+      NODES[0].id,
+      NODES[2].id,
+    ])
+  })
+
+  it('returns no summary and zero coverage when every node response is invalid', async () => {
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) =>
+      Promise.resolve({ ...createMetrics(nodeId), points: [] }),
+    )
+    const service = createService(getNodeMetrics)
+
+    const { result } = renderHook(() => useFleetHealthSummary(NODES, service))
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+
+    expect(result.current.summary).toBeNull()
+    expect(result.current.coverage).toEqual({ validNodeCount: 0, totalNodeCount: 3 })
+    expect(result.current.metrics).toEqual([])
+    expect(result.current.failedNodeIds).toEqual(NODES.map((node) => node.id))
+  })
+
   it('requests 1h metrics once for every loaded node in parallel', async () => {
     const pendingRequests = new Map<string, ReturnType<typeof createDeferred<NodeMetrics>>>()
     const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) => {
@@ -150,11 +235,41 @@ function createMetrics(nodeId: string): NodeMetrics {
   return {
     nodeId,
     range: '1h',
-    points: Array.from({ length: 4 }, (_, index) => ({
-      timestamp: new Date(latestTimestamp - (3 - index) * 20 * 60 * 1000).toISOString(),
-      latencyMs: 18 + index,
-      packetLossPercent: index / 10,
-    })),
+    points: Array.from({ length: 4 }, (_, index) =>
+      createMetricPoint(18 + index, index / 10, latestTimestamp - (3 - index) * 20 * 60 * 1000),
+    ),
+  }
+}
+
+function createMetricsWithValues(
+  nodeId: string,
+  latencies: readonly number[],
+  packetLoss: readonly number[],
+): NodeMetrics {
+  const latestTimestamp = Date.parse('2026-09-13T18:00:00Z')
+
+  return {
+    nodeId,
+    range: '1h',
+    points: latencies.map((latencyMs, index) =>
+      createMetricPoint(
+        latencyMs,
+        packetLoss[index],
+        latestTimestamp - (latencies.length - 1 - index) * 20 * 60 * 1000,
+      ),
+    ),
+  }
+}
+
+function createMetricPoint(
+  latencyMs: number,
+  packetLossPercent: number,
+  timestamp = Date.parse('2026-09-13T18:00:00Z'),
+) {
+  return {
+    timestamp: new Date(timestamp).toISOString(),
+    latencyMs,
+    packetLossPercent,
   }
 }
 
