@@ -14,6 +14,14 @@ interface NetworkNodesPanelProps {
 
 type StatusFilter = NodeStatus | 'all'
 
+const STATUS_LABELS: Record<NodeStatus, string> = {
+  online: 'Online',
+  degraded: 'Degraded',
+  offline: 'Offline',
+}
+
+const STATUS_ORDER: readonly NodeStatus[] = ['online', 'degraded', 'offline']
+
 export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
   const { status, nodes, retry } = useNetworkNodes(service)
   const navigate = useNavigate()
@@ -31,6 +39,16 @@ export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
 
   if (status === 'empty') {
     return <NetworkNodesEmptyState />
+  }
+
+  const statusCounts: Record<NodeStatus, number> = {
+    online: 0,
+    degraded: 0,
+    offline: 0,
+  }
+
+  for (const node of nodes) {
+    statusCounts[node.status] += 1
   }
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
@@ -71,6 +89,21 @@ export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
           {String(nodes.length).padStart(2, '0')} endpoints / last hour
         </p>
       </header>
+
+      <div
+        className="network-nodes-panel__status-counts"
+        role="group"
+        aria-label="Fleet status counts"
+      >
+        <dl>
+          {STATUS_ORDER.map((status) => (
+            <div key={status}>
+              <dt>{STATUS_LABELS[status]}</dt>
+              <dd>{statusCounts[status]}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
 
       <div className="network-nodes-panel__filters">
         <label className="network-nodes-panel__field">

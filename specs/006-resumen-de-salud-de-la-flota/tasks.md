@@ -42,7 +42,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Las pruebas verifican que el reintento omite nodos válidos, conserva temporalmente su agregado y actualiza valores y cobertura al terminar.
 
-- [ ] **T-006 — Mostrar conteos de toda la flota**
+- [x] **T-006 — Mostrar conteos de toda la flota**
 
   **Estimación:** 20 min · **Dependencias:** Ninguna · **RF:** RF-1, RF-2
 

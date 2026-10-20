@@ -17,6 +17,18 @@ function createNetworkNodesService(
   }
 }
 
+function expectFleetStatusCounts(statusCounts: HTMLElement) {
+  for (const [status, count] of [
+    ['Online', 1],
+    ['Degraded', 1],
+    ['Offline', 1],
+  ] as const) {
+    const label = within(statusCounts).getByText(status)
+
+    expect(label.nextElementSibling).toHaveTextContent(String(count))
+  }
+}
+
 describe('NetworkNodesPanel', () => {
   it('renders the loading state while nodes are pending', () => {
     const listNodes = vi.fn().mockReturnValue(new Promise(() => undefined))
@@ -81,6 +93,53 @@ describe('NetworkNodesPanel', () => {
     const lastChecked = within(coreRouterLink).getByText(/2026/)
     expect(lastChecked).toBeVisible()
     expect(lastChecked).toHaveAttribute('datetime', NETWORK_NODES[0].lastCheckedAt)
+  })
+
+  it('shows counts for each whole-fleet status below the header and before search and filters', async () => {
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService()} />
+      </MemoryRouter>,
+    )
+
+    const heading = await screen.findByRole('heading', { name: 'Monitored nodes' })
+    const inventoryHeader = heading.closest('header')
+    const statusCounts = screen.getByRole('group', { name: 'Fleet status counts' })
+    const search = screen.getByRole('searchbox', { name: 'Search nodes' })
+    const statusFilter = screen.getByRole('combobox', { name: 'Filter by status' })
+
+    expect(inventoryHeader).not.toBeNull()
+    expect(
+      inventoryHeader!.compareDocumentPosition(statusCounts) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      statusCounts.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      statusCounts.compareDocumentPosition(statusFilter) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expectFleetStatusCounts(statusCounts)
+  })
+
+  it('keeps whole-fleet status counts unchanged when search and status filters change', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService()} />
+      </MemoryRouter>,
+    )
+
+    const statusCounts = await screen.findByRole('group', { name: 'Fleet status counts' })
+    expectFleetStatusCounts(statusCounts)
+
+    await user.type(screen.getByRole('searchbox', { name: 'Search nodes' }), 'Branch')
+    expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(1)
+    expectFleetStatusCounts(statusCounts)
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Filter by status' }), 'online')
+    expect(screen.getByRole('heading', { name: 'No nodes match your filters' })).toBeInTheDocument()
+    expectFleetStatusCounts(statusCounts)
   })
 
   it.each([
