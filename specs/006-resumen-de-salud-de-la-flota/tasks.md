@@ -106,7 +106,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Ambos comandos terminan con código de salida cero y no quedan cambios de formato o lint pendientes en los archivos de la funcionalidad.
 
-- [ ] **T-014 — Ejecutar pruebas frontend y build**
+- [x] **T-014 — Ejecutar pruebas frontend y build**
 
   **Estimación:** 25 min · **Dependencias:** T-013 · **RF:** RF-1 a RF-10
 
