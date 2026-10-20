@@ -114,7 +114,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Vitest y el build de producción terminan correctamente, sin fallos de pruebas ni errores de compilación.
 
-- [ ] **T-015 — Ejecutar la suite E2E completa**
+- [x] **T-015 — Ejecutar la suite E2E completa**
 
   **Estimación:** 25 min · **Dependencias:** T-011, T-012, T-014 · **RF:** RF-1 a RF-10
 

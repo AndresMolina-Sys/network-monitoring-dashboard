@@ -792,6 +792,10 @@ test.describe('Network monitoring dashboard', () => {
   }) => {
     await page.goto('/')
 
+    const statusCounts = page.getByRole('group', { name: 'Fleet status counts' })
+    const statusButtons = ['Online', 'Degraded', 'Offline'].map((status) =>
+      statusCounts.getByRole('button', { name: `${status}, 1` }),
+    )
     const search = page.getByRole('searchbox', { name: 'Search nodes' })
     const statusFilter = page.getByRole('combobox', { name: 'Filter by status' })
     const coreRouterSelection = page.getByRole('checkbox', {
@@ -802,6 +806,10 @@ test.describe('Network monitoring dashboard', () => {
     await expect(search).toBeVisible()
     await page.locator('body').click({ position: { x: 1, y: 1 } })
     await page.bringToFront()
+    for (const statusButton of statusButtons) {
+      await page.keyboard.press('Tab')
+      await expectVisibleKeyboardFocus(statusButton)
+    }
     await page.keyboard.press('Tab')
     await expectVisibleKeyboardFocus(search)
     await page.keyboard.press('Tab')
