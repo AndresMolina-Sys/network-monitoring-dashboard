@@ -122,7 +122,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** La suite Playwright completa pasa en ambos tamaños y confirma el flujo de filtros, métricas, teclado y ausencia de desbordamiento móvil.
 
-- [ ] **T-016 — Actualizar e inspeccionar Graphify y cerrar memoria**
+- [x] **T-016 — Actualizar e inspeccionar Graphify y cerrar memoria**
 
   **Estimación:** 25 min · **Dependencias:** T-001 a T-015; solo tras aprobar Tasks y completar todas las tareas anteriores · **RF:** RF-1 a RF-10
 
