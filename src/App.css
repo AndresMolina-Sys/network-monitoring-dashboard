@@ -165,6 +165,219 @@ a {
   white-space: nowrap;
 }
 
+.network-nodes-panel__status-counts {
+  margin-bottom: 1rem;
+}
+
+.network-nodes-panel__status-counts dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--color-border-soft);
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.network-nodes-panel__status-counts dl > div {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+}
+
+.network-nodes-panel__status-counts dl > div + div {
+  border-left: 1px solid var(--color-border-soft);
+}
+
+.network-nodes-panel__status-counts dt {
+  min-width: 0;
+}
+
+.network-nodes-panel__status-counts button {
+  min-height: 2.75rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: left;
+  transition:
+    background var(--motion-fast),
+    box-shadow var(--motion-fast),
+    color var(--motion-fast);
+}
+
+.network-nodes-panel__status-counts dl > div:nth-child(1) button {
+  color: var(--color-online);
+}
+
+.network-nodes-panel__status-counts dl > div:nth-child(2) button {
+  color: var(--color-degraded);
+}
+
+.network-nodes-panel__status-counts dl > div:nth-child(3) button {
+  color: var(--color-offline);
+}
+
+.network-nodes-panel__status-counts button:hover {
+  background: rgba(200, 165, 125, 0.07);
+}
+
+.network-nodes-panel__status-counts button[aria-pressed='true'] {
+  background: rgba(200, 165, 125, 0.1);
+  box-shadow: inset 0 -2px var(--color-range-selected-border);
+}
+
+.network-nodes-panel__status-counts button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.network-nodes-panel__status-counts dd {
+  margin: 0;
+  color: var(--color-foreground);
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.fleet-health-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(105deg, rgba(200, 165, 125, 0.055), transparent 48%), var(--color-surface);
+}
+
+.fleet-health-summary__header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.fleet-health-summary__header h3 {
+  margin: 0;
+  color: var(--color-foreground);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.fleet-health-summary__header p {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(200, 165, 125, 0.2);
+  border-radius: 999px;
+  color: var(--color-kicker);
+  background: rgba(200, 165, 125, 0.07);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+.fleet-health-summary__header p::before {
+  width: 0.375rem;
+  height: 0.375rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+  content: '';
+}
+
+.fleet-health-summary__metrics {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.fleet-health-summary__metrics > div {
+  min-width: 0;
+}
+
+.fleet-health-summary__metrics > div + div {
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--color-border-soft);
+}
+
+.fleet-health-summary__metrics dt {
+  margin-bottom: 0.3rem;
+  color: var(--color-subtle-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+.fleet-health-summary__metrics dd {
+  margin: 0;
+  color: var(--color-foreground);
+  font-family: var(--font-mono);
+  font-size: clamp(0.9375rem, 1.4vw, 1.1rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.fleet-health-summary__loading {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border-soft);
+  color: var(--color-muted-foreground);
+  font-size: 0.875rem;
+}
+
+.fleet-health-summary button {
+  min-height: 2.75rem;
+  grid-column: 2;
+  grid-row: 1;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--color-action-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-foreground);
+  background: rgba(200, 165, 125, 0.12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition:
+    border-color var(--motion-fast),
+    background var(--motion-fast),
+    transform var(--motion-fast);
+}
+
+.fleet-health-summary button:hover {
+  border-color: var(--color-focus);
+  background: rgba(200, 165, 125, 0.2);
+  transform: translateY(-1px);
+}
+
+.fleet-health-summary button:active {
+  transform: translateY(0);
+}
+
+.fleet-health-summary button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
 .network-nodes-panel__filters {
   display: grid;
   grid-template-columns: minmax(12rem, 1fr) minmax(10rem, 0.55fr) max-content;
@@ -828,6 +1041,70 @@ a {
   .network-nodes-panel__filters {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  .network-nodes-panel__status-counts dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    justify-items: start;
+    gap: 0;
+    padding: 0.5rem;
+  }
+
+  .network-nodes-panel__status-counts button {
+    padding-inline: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .network-nodes-panel__status-counts dd {
+    padding-left: 0.25rem;
+    font-size: 1rem;
+  }
+
+  .fleet-health-summary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.9rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .fleet-health-summary__metrics {
+    grid-column: 1;
+    grid-row: 2;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+
+  .fleet-health-summary__metrics > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .fleet-health-summary__metrics > div + div {
+    padding: 0.65rem 0 0;
+    border-top: 1px solid var(--color-border-soft);
+    border-left: 0;
+  }
+
+  .fleet-health-summary__metrics dt {
+    margin: 0;
+  }
+
+  .fleet-health-summary__metrics dd {
+    flex: 0 0 auto;
+    text-align: right;
+  }
+
+  .fleet-health-summary__loading {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .fleet-health-summary button {
+    width: 100%;
+    grid-column: 1;
+    grid-row: 3;
   }
 
   .network-nodes-panel__results {

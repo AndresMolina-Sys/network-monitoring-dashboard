@@ -74,7 +74,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Las pruebas del panel confirman que carga, error y lista vacía muestran sus estados actuales sin resumen ni datos de una población anterior.
 
-- [ ] **T-010 — Dar estilo responsive al resumen**
+- [x] **T-010 — Dar estilo responsive al resumen**
 
   **Estimación:** 25 min · **Dependencias:** T-008, T-009 · **RF:** RF-1, RF-5; requisitos no funcionales de legibilidad responsive
 

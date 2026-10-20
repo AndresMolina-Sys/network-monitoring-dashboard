@@ -188,7 +188,7 @@ describe('NetworkNodesPanel', () => {
   })
 
   it('keeps fleet counts visible while the initial fleet-metrics requests are pending', async () => {
-    const pendingMetrics = new Map(
+    const pendingMetrics = new Map<string, ReturnType<typeof createDeferred<NodeMetrics>>>(
       NETWORK_NODES.map((node) => [node.id, createDeferred<NodeMetrics>()]),
     )
     const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>(
