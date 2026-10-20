@@ -24,8 +24,10 @@ function expectFleetStatusCounts(statusCounts: HTMLElement) {
     ['Offline', 1],
   ] as const) {
     const label = within(statusCounts).getByText(status)
+    const countItem = label.closest('div')
 
-    expect(label.nextElementSibling).toHaveTextContent(String(count))
+    expect(countItem).not.toBeNull()
+    expect(within(countItem!).getByText(String(count))).toBeInTheDocument()
   }
 }
 
@@ -170,10 +172,10 @@ describe('NetworkNodesPanel', () => {
   })
 
   it.each([
-    ['online', 'Core Router'],
-    ['degraded', 'Access Switch 01'],
-    ['offline', 'Branch Gateway'],
-  ])('filters nodes by %s status', async (status, expectedNode) => {
+    ['online', 'Online', 'Core Router'],
+    ['degraded', 'Degraded', 'Access Switch 01'],
+    ['offline', 'Offline', 'Branch Gateway'],
+  ])('filters nodes by %s status', async (status, statusLabel, expectedNode) => {
     const service = {
       listNodes: vi.fn().mockResolvedValue(NETWORK_NODES),
       getNode: vi.fn(),
@@ -196,6 +198,93 @@ describe('NetworkNodesPanel', () => {
       screen.getByRole('link', { name: `View metrics for ${expectedNode}` }),
     ).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(1)
+    expect(screen.getByRole('combobox', { name: 'Filter by status' })).toHaveValue(status)
+    expect(screen.getByRole('button', { name: new RegExp(`${statusLabel}, 1`) })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
+  it.each([
+    ['Online', 'Core Router'],
+    ['Degraded', 'Access Switch 01'],
+    ['Offline', 'Branch Gateway'],
+  ])('activates the %s fleet count with a pointer', async (status, expectedNode) => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService()} />
+      </MemoryRouter>,
+    )
+
+    const statusButton = await screen.findByRole('button', {
+      name: new RegExp(`${status}, 1`),
+    })
+
+    await user.click(statusButton)
+
+    expect(statusButton).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('combobox', { name: 'Filter by status' })).toHaveValue(
+      status.toLowerCase(),
+    )
+    expect(
+      screen.getByRole('link', { name: `View metrics for ${expectedNode}` }),
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(1)
+  })
+
+  it.each([
+    ['Enter', '{Enter}', 'Online', 'Core Router'],
+    ['Space', ' ', 'Degraded', 'Access Switch 01'],
+  ])(
+    'activates the %s fleet count from the keyboard',
+    async (_keyName, key, status, expectedNode) => {
+      const user = userEvent.setup()
+
+      render(
+        <MemoryRouter>
+          <NetworkNodesPanel service={createNetworkNodesService()} />
+        </MemoryRouter>,
+      )
+
+      const statusButton = await screen.findByRole('button', {
+        name: new RegExp(`${status}, 1`),
+      })
+      statusButton.focus()
+      await user.keyboard(key)
+
+      expect(statusButton).toHaveFocus()
+      expect(statusButton).toHaveAttribute('aria-pressed', 'true')
+      expect(
+        screen.getByRole('link', { name: `View metrics for ${expectedNode}` }),
+      ).toBeInTheDocument()
+    },
+  )
+
+  it('resets the pressed fleet count when All statuses is selected', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService()} />
+      </MemoryRouter>,
+    )
+
+    await user.click(await screen.findByRole('button', { name: /Online, 1/ }))
+    const statusFilter = screen.getByRole('combobox', { name: 'Filter by status' })
+    expect(statusFilter).toHaveValue('online')
+
+    await user.selectOptions(statusFilter, 'all')
+
+    expect(statusFilter).toHaveValue('all')
+    for (const status of ['Online', 'Degraded', 'Offline']) {
+      expect(screen.getByRole('button', { name: new RegExp(`${status}, 1`) })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
+    }
+    expect(screen.getAllByRole('link', { name: /^View metrics for/ })).toHaveLength(3)
   })
 
   it('shows an empty filter result and clears all filters', async () => {

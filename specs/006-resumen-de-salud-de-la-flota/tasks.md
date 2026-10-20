@@ -50,7 +50,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Las pruebas confirman los tres conteos correctos y que no cambian al modificar búsqueda o filtro.
 
-- [ ] **T-007 — Sincronizar contadores y filtro accesibles**
+- [x] **T-007 — Sincronizar contadores y filtro accesibles**
 
   **Estimación:** 25 min · **Dependencias:** T-006 · **RF:** RF-3
 

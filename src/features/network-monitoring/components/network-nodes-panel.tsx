@@ -98,7 +98,16 @@ export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
         <dl>
           {STATUS_ORDER.map((status) => (
             <div key={status}>
-              <dt>{STATUS_LABELS[status]}</dt>
+              <dt>
+                <button
+                  type="button"
+                  aria-label={`${STATUS_LABELS[status]}, ${statusCounts[status]}`}
+                  aria-pressed={statusFilter === status}
+                  onClick={() => setStatusFilter(status)}
+                >
+                  {STATUS_LABELS[status]}
+                </button>
+              </dt>
               <dd>{statusCounts[status]}</dd>
             </div>
           ))}
