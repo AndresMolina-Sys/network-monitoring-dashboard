@@ -492,6 +492,61 @@ test.describe('Network monitoring dashboard', () => {
     expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth)
   })
 
+  test('keeps fleet status counts independent of search and syncs keyboard filters on desktop', async ({
+    page,
+  }) => {
+    test.skip(test.info().project.name === 'mobile-chromium', 'Desktop inventory acceptance')
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/')
+
+    const statusCounts = page.getByRole('group', { name: 'Fleet status counts' })
+    const search = page.getByRole('searchbox', { name: 'Search nodes' })
+    const statusFilter = page.getByRole('combobox', { name: 'Filter by status' })
+    const fleetMetrics = page.getByRole('region', { name: 'Fleet metrics' })
+
+    for (const status of ['Online', 'Degraded', 'Offline']) {
+      await expect(statusCounts.getByRole('button', { name: `${status}, 1` })).toBeVisible()
+    }
+    await expect(fleetMetrics.getByText('Simulated data', { exact: true })).toBeVisible()
+    await expect(fleetMetrics.getByText('65.5 ms', { exact: true })).toBeVisible()
+    await expect(fleetMetrics.getByText('4.2%', { exact: true })).toBeVisible()
+    await expect(fleetMetrics.getByText('3/3 nodes', { exact: true })).toBeVisible()
+
+    await search.fill('Branch Gateway')
+    await expect(page.getByText('Showing 1 of 3 nodes')).toBeVisible()
+    await expect(page.getByRole('link', { name: 'View metrics for Branch Gateway' })).toBeVisible()
+    for (const status of ['Online', 'Degraded', 'Offline']) {
+      await expect(statusCounts.getByRole('button', { name: `${status}, 1` })).toBeVisible()
+    }
+
+    await search.clear()
+    const onlineCount = statusCounts.getByRole('button', { name: 'Online, 1' })
+    await onlineCount.focus()
+    await expectVisibleKeyboardFocus(onlineCount)
+    await page.keyboard.press('Enter')
+
+    await expect(onlineCount).toHaveAttribute('aria-pressed', 'true')
+    await expect(statusFilter).toHaveValue('online')
+    await expect(page.getByText('Showing 1 of 3 nodes')).toBeVisible()
+    await expect(page.getByRole('link', { name: 'View metrics for Core Router' })).toBeVisible()
+
+    await statusFilter.selectOption('offline')
+    await expect(statusCounts.getByRole('button', { name: 'Offline, 1' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(page.getByRole('link', { name: 'View metrics for Branch Gateway' })).toBeVisible()
+
+    await statusCounts.getByRole('button', { name: 'Offline, 1' }).click()
+    await expect(statusFilter).toHaveValue('offline')
+    await statusFilter.selectOption('all')
+    await expect(page.getByText('Showing 3 of 3 nodes')).toBeVisible()
+    await expect(statusCounts.getByRole('button', { name: 'Offline, 1' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+  })
+
   test('shows complete metric ranges without horizontal overflow', async ({ page }) => {
     const projectName = test.info().project.name
     const viewport =

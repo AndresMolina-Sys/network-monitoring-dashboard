@@ -82,7 +82,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** La interfaz del resumen se lee sin solapamientos en escritorio y a 390 × 844 píxeles, y el navegador no presenta desbordamiento horizontal.
 
-- [ ] **T-011 — Verificar E2E de inventario en escritorio**
+- [x] **T-011 — Verificar E2E de inventario en escritorio**
 
   **Estimación:** 25 min · **Dependencias:** T-007, T-008, T-009 · **RF:** RF-1, RF-2, RF-3, RF-5, RF-6
 
