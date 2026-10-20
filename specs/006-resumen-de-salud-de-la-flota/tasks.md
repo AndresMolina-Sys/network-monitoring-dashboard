@@ -34,7 +34,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Las pruebas demuestran que solicitudes canceladas o antiguas no actualizan los KPI ni la cobertura de la población vigente.
 
-- [ ] **T-005 — Reintentar solo nodos fallidos**
+- [x] **T-005 — Reintentar solo nodos fallidos**
 
   **Estimación:** 25 min · **Dependencias:** T-003, T-004 · **RF:** RF-8, RF-9
 

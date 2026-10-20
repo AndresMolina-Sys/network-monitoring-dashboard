@@ -96,6 +96,205 @@ describe('useFleetHealthSummary', () => {
     ])
   })
 
+  it('retries only failed nodes and preserves the current summary until the retry settles', async () => {
+    const retryMetrics = createDeferred<NodeMetrics>()
+    let failedNodeAttempts = 0
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) => {
+      if (nodeId === NODES[1].id) {
+        failedNodeAttempts += 1
+        return failedNodeAttempts === 1
+          ? Promise.reject(new Error('Metrics request failed'))
+          : retryMetrics.promise
+      }
+
+      const latency = nodeId === NODES[0].id ? 10 : 30
+      const loss = nodeId === NODES[0].id ? 1 : 5
+
+      return Promise.resolve(
+        createMetricsWithValues(nodeId, Array(4).fill(latency), Array(4).fill(loss)),
+      )
+    })
+    const service = createService(getNodeMetrics)
+    const { result } = renderHook(() => useFleetHealthSummary(NODES, service))
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+    const initialMetrics = result.current.metrics
+    expect(result.current.summary).toEqual({ averageLatencyMs: 20, peakPacketLossPercent: 5 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 2, totalNodeCount: 3 })
+
+    act(() => {
+      void result.current.retry()
+    })
+
+    await waitFor(() => expect(getNodeMetrics).toHaveBeenCalledTimes(NODES.length + 1))
+    expect(getNodeMetrics).toHaveBeenLastCalledWith(NODES[1].id, '1h', expect.anything())
+    expect(getNodeMetrics.mock.calls.slice(NODES.length).map(([nodeId]) => nodeId)).toEqual([
+      NODES[1].id,
+    ])
+    expect(result.current.summary).toEqual({ averageLatencyMs: 20, peakPacketLossPercent: 5 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 2, totalNodeCount: 3 })
+    expect(result.current.failedNodeIds).toEqual([NODES[1].id])
+    expect(result.current.metrics).toEqual(initialMetrics)
+
+    await act(async () => {
+      retryMetrics.resolve(
+        createMetricsWithValues(NODES[1].id, Array(4).fill(50), Array(4).fill(8)),
+      )
+      await retryMetrics.promise
+    })
+
+    await waitFor(() => expect(result.current.failedNodeIds).toEqual([]))
+    expect(result.current.summary).toEqual({ averageLatencyMs: 30, peakPacketLossPercent: 8 })
+    expect(result.current.coverage).toEqual({ validNodeCount: 3, totalNodeCount: 3 })
+    expect(result.current.metrics.map((metrics) => metrics.nodeId)).toEqual(
+      NODES.map((node) => node.id),
+    )
+  })
+
+  it('keeps valid metrics and allows another retry after a retry fails', async () => {
+    const retryMetrics = createDeferred<NodeMetrics>()
+    let failedNodeAttempts = 0
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) => {
+      if (nodeId === NODES[1].id) {
+        failedNodeAttempts += 1
+        return failedNodeAttempts === 1
+          ? Promise.reject(new Error('Initial request failed'))
+          : failedNodeAttempts === 2
+            ? Promise.reject(new Error('Retry failed'))
+            : retryMetrics.promise
+      }
+
+      return Promise.resolve(createMetricsWithValues(nodeId, Array(4).fill(20), Array(4).fill(3)))
+    })
+    const service = createService(getNodeMetrics)
+    const { result } = renderHook(() => useFleetHealthSummary(NODES, service))
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+    const initialSummary = result.current.summary
+    const initialCoverage = result.current.coverage
+
+    await act(async () => {
+      await result.current.retry()
+    })
+
+    expect(result.current.summary).toEqual(initialSummary)
+    expect(result.current.coverage).toEqual(initialCoverage)
+    expect(result.current.failedNodeIds).toEqual([NODES[1].id])
+    expect(
+      getNodeMetrics.mock.calls.slice(NODES.length).map(([nodeId, range]) => [nodeId, range]),
+    ).toEqual([[NODES[1].id, '1h']])
+
+    act(() => {
+      void result.current.retry()
+    })
+    await waitFor(() => expect(getNodeMetrics).toHaveBeenCalledTimes(NODES.length + 2))
+    expect(getNodeMetrics.mock.calls.slice(NODES.length).map(([nodeId]) => nodeId)).toEqual([
+      NODES[1].id,
+      NODES[1].id,
+    ])
+
+    await act(async () => {
+      retryMetrics.resolve(
+        createMetricsWithValues(NODES[1].id, Array(4).fill(80), Array(4).fill(9)),
+      )
+      await retryMetrics.promise
+    })
+
+    await waitFor(() => expect(result.current.coverage.validNodeCount).toBe(3))
+    expect(result.current.failedNodeIds).toEqual([])
+  })
+
+  it.each(['unmount', 'node population change', 'service change'] as const)(
+    'aborts an in-flight retry on %s and ignores its late result',
+    async (change) => {
+      const retryMetrics = createDeferred<NodeMetrics>()
+      let failedNodeAttempts = 0
+      let retrySignal: AbortSignal | undefined
+      const initialGetNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>(
+        (nodeId, _range, signal) => {
+          if (nodeId === NODES[1].id) {
+            failedNodeAttempts += 1
+            if (failedNodeAttempts === 1) {
+              return Promise.reject(new Error('Initial request failed'))
+            }
+
+            retrySignal = signal!
+            return retryMetrics.promise
+          }
+
+          return Promise.resolve(
+            createMetricsWithValues(
+              nodeId,
+              Array(4).fill(nodeId === NODES[0].id ? 10 : 30),
+              Array(4).fill(nodeId === NODES[0].id ? 1 : 5),
+            ),
+          )
+        },
+      )
+      const initialService = createService(initialGetNodeMetrics)
+      const nextNodes = [NODES[0], createNode('new-edge-router')]
+      const nextService = createService((nodeId) =>
+        Promise.resolve(createMetricsWithValues(nodeId, Array(4).fill(70), Array(4).fill(9))),
+      )
+      const { result, rerender, unmount } = renderHook(
+        ({
+          nodes,
+          service,
+        }: {
+          nodes: readonly NetworkNode[]
+          service: NetworkMonitoringService
+        }) => useFleetHealthSummary(nodes, service),
+        { initialProps: { nodes: NODES, service: initialService } },
+      )
+
+      await waitFor(() => expect(result.current.status).toBe('success'))
+
+      act(() => {
+        void result.current.retry()
+      })
+      await waitFor(() => expect(failedNodeAttempts).toBe(2))
+      expect(initialGetNodeMetrics).toHaveBeenCalledTimes(NODES.length + 1)
+      expect(initialGetNodeMetrics).toHaveBeenLastCalledWith(NODES[1].id, '1h', expect.anything())
+      expect(retrySignal?.aborted).toBe(false)
+
+      if (change === 'unmount') {
+        unmount()
+      } else if (change === 'node population change') {
+        rerender({ nodes: nextNodes, service: initialService })
+        await waitFor(() =>
+          expect(result.current.coverage).toEqual({ validNodeCount: 2, totalNodeCount: 2 }),
+        )
+      } else {
+        rerender({ nodes: NODES, service: nextService })
+        await waitFor(() =>
+          expect(result.current.summary).toEqual({
+            averageLatencyMs: 70,
+            peakPacketLossPercent: 9,
+          }),
+        )
+      }
+
+      expect(retrySignal?.aborted).toBe(true)
+
+      await act(async () => {
+        retryMetrics.resolve(
+          createMetricsWithValues(NODES[1].id, Array(4).fill(200), Array(4).fill(99)),
+        )
+        await retryMetrics.promise
+      })
+
+      if (change !== 'unmount') {
+        expect(result.current.summary).not.toEqual({
+          averageLatencyMs: 200,
+          peakPacketLossPercent: 99,
+        })
+        expect(result.current.metrics.some((metrics) => metrics.nodeId === NODES[1].id)).toBe(
+          change === 'service change',
+        )
+      }
+    },
+  )
+
   it('returns no summary and zero coverage when every node response is invalid', async () => {
     const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) =>
       Promise.resolve({ ...createMetrics(nodeId), points: [] }),

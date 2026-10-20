@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { NetworkNode, NodeMetrics } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
@@ -23,6 +23,15 @@ export interface UseFleetHealthSummaryState {
   readonly failedNodeIds: readonly NetworkNode['id'][]
   readonly summary: FleetMetricsSummary | null
   readonly coverage: FleetMetricsCoverage
+  readonly retry: () => Promise<void>
+}
+
+interface FleetHealthSummaryData {
+  readonly status: FleetHealthSummaryStatus
+  readonly metrics: readonly NodeMetrics[]
+  readonly failedNodeIds: readonly NetworkNode['id'][]
+  readonly summary: FleetMetricsSummary | null
+  readonly coverage: FleetMetricsCoverage
 }
 
 const EMPTY_METRICS: readonly NodeMetrics[] = []
@@ -32,16 +41,20 @@ export function useFleetHealthSummary(
   nodes: readonly NetworkNode[],
   service: NetworkMonitoringService = networkMonitoringService,
 ): UseFleetHealthSummaryState {
-  const [state, setState] = useState<UseFleetHealthSummaryState>({
+  const [state, setState] = useState<FleetHealthSummaryData>({
     status: 'loading',
     metrics: EMPTY_METRICS,
     failedNodeIds: EMPTY_FAILED_NODE_IDS,
     summary: null,
     coverage: { validNodeCount: 0, totalNodeCount: nodes.length },
   })
+  const generationRef = useRef(0)
+  const retryControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
+    const generation = generationRef.current + 1
+    generationRef.current = generation
     let active = true
 
     setState({
@@ -94,11 +107,84 @@ export function useFleetHealthSummary(
 
     return () => {
       active = false
+      generationRef.current += 1
       controller.abort()
+      retryControllerRef.current?.abort()
+      retryControllerRef.current = null
     }
   }, [nodes, service])
 
-  return state
+  const retry = useCallback(async (): Promise<void> => {
+    if (state.failedNodeIds.length === 0) {
+      return
+    }
+
+    const generation = generationRef.current
+    retryControllerRef.current?.abort()
+    const controller = new AbortController()
+    retryControllerRef.current = controller
+    const failedNodeIds = state.failedNodeIds
+    const results = await Promise.allSettled(
+      failedNodeIds.map((nodeId) => service.getNodeMetrics(nodeId, '1h', controller.signal)),
+    )
+
+    if (controller.signal.aborted || generationRef.current !== generation) {
+      return
+    }
+
+    const retriedMetrics = new Map<NetworkNode['id'], NodeMetrics>()
+    const remainingFailedNodeIds: NetworkNode['id'][] = []
+
+    results.forEach((result, index) => {
+      const nodeId = failedNodeIds[index]
+      const node = nodes.find((candidate) => candidate.id === nodeId)
+
+      if (!node || result.status === 'rejected') {
+        remainingFailedNodeIds.push(nodeId)
+        return
+      }
+
+      try {
+        assertValidMetricsResponse(result.value, nodeId, '1h')
+        assertValidMetricPoints(result.value.points, '1h')
+        retriedMetrics.set(nodeId, result.value)
+      } catch {
+        remainingFailedNodeIds.push(nodeId)
+      }
+    })
+
+    setState((currentState) => {
+      if (controller.signal.aborted || generationRef.current !== generation) {
+        return currentState
+      }
+
+      const metricsByNodeId = new Map(
+        currentState.metrics.map((metrics) => [metrics.nodeId, metrics]),
+      )
+      retriedMetrics.forEach((metrics, nodeId) => metricsByNodeId.set(nodeId, metrics))
+
+      const metrics = nodes
+        .map((node) => metricsByNodeId.get(node.id))
+        .filter((nodeMetrics): nodeMetrics is NodeMetrics => nodeMetrics !== undefined)
+
+      return {
+        status: 'success',
+        metrics,
+        failedNodeIds: [
+          ...currentState.failedNodeIds.filter((nodeId) => !failedNodeIds.includes(nodeId)),
+          ...remainingFailedNodeIds,
+        ],
+        summary: summarizeFleetMetrics(metrics),
+        coverage: { validNodeCount: metrics.length, totalNodeCount: nodes.length },
+      }
+    })
+
+    if (retryControllerRef.current === controller) {
+      retryControllerRef.current = null
+    }
+  }, [nodes, service, state.failedNodeIds])
+
+  return { ...state, retry }
 }
 
 export function summarizeFleetMetrics(metrics: readonly NodeMetrics[]): FleetMetricsSummary | null {
