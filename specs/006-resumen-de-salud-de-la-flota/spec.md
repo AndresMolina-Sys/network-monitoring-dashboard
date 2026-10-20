@@ -1,6 +1,6 @@
 # Spec 006 — Resumen de salud de la flota
 
-Estado: Pendiente de aprobación
+Estado: Aprobado por el usuario
 
 ## Contexto y objetivo
 
