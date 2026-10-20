@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 test.describe('Network monitoring dashboard', () => {
@@ -931,6 +932,57 @@ test.describe('Network monitoring dashboard', () => {
         await expectComparisonPeriod(page, range, viewport, summaries)
       }
     }
+  })
+
+  test('downloads selected comparison rows as a CSV on desktop and mobile', async ({
+    page,
+  }, testInfo) => {
+    const viewport =
+      testInfo.project.name === 'mobile-chromium'
+        ? { width: 390, height: 844 }
+        : { width: 1440, height: 900 }
+    await page.setViewportSize(viewport)
+    await page.goto('/compare?nodes=core-router%2Caccess-switch-01&range=24h')
+
+    const table = page.getByRole('table')
+    await expect(table).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Download comparison CSV' })).toBeVisible()
+
+    const expectedRows = await table.locator('tbody tr').evaluateAll((rows) =>
+      rows.map((row) => {
+        const [node, timestamp, latency, packetLoss] = Array.from(
+          row.cells,
+          (cell) => cell.textContent?.trim() ?? '',
+        )
+        return [
+          node,
+          timestamp,
+          latency.replace(/\s*ms$/, ''),
+          packetLoss.replace(/%$/, ''),
+          'Simulated data',
+        ].join(',')
+      }),
+    )
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Download comparison CSV' }).click()
+    const download = await downloadPromise
+
+    expect(download.suggestedFilename()).toBe('network-comparison-24h.csv')
+    const downloadPath = testInfo.outputPath(download.suggestedFilename())
+    await download.saveAs(downloadPath)
+    const csv = await readFile(downloadPath, 'utf8')
+
+    expect(csv).toBe(
+      `\uFEFF${[
+        'Node,Timestamp (UTC),Latency (ms),Packet loss (%),Data source',
+        ...expectedRows,
+      ].join('\r\n')}`,
+    )
+
+    const documentWidth = await page.evaluate(
+      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+    )
+    expect(documentWidth).toBe(true)
   })
 
   test('normalizes direct comparison periods and replaces period history entries', async ({

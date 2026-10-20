@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
-import type { MetricsRange } from '../../../domain/network'
+import type { MetricsRange, NodeMetrics } from '../../../domain/network'
 import { networkMonitoringService } from '../../../services'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NodeMetricsComparisonChart } from '../components/node-metrics-comparison-chart'
@@ -131,6 +131,15 @@ export function NetworkNodeComparisonPage({
             ))}
           </div>
           <p className="network-metrics__data-label">Simulated data</p>
+          {availableMetrics.length > 0 ? (
+            <button
+              className="network-metrics__download-csv"
+              type="button"
+              onClick={() => downloadComparisonCsv(availableMetrics, selectedRange)}
+            >
+              Download comparison CSV
+            </button>
+          ) : null}
           <button className="network-metrics__copy-link" type="button" onClick={copyComparisonLink}>
             Copy comparison link
           </button>
@@ -325,4 +334,38 @@ function getComparisonHeading(range: MetricsRange): string {
     case '7d':
       return 'Last 7 days comparison (7d)'
   }
+}
+
+function downloadComparisonCsv(metrics: readonly NodeMetrics[], range: MetricsRange): void {
+  const rows = metrics.flatMap((nodeMetrics) =>
+    nodeMetrics.points.map((point) => [
+      nodeMetrics.nodeId,
+      point.timestamp,
+      point.latencyMs,
+      point.packetLossPercent,
+      'Simulated data',
+    ]),
+  )
+  const csvRows = [
+    ['Node', 'Timestamp (UTC)', 'Latency (ms)', 'Packet loss (%)', 'Data source'],
+    ...rows,
+  ]
+  const csv = `\uFEFF${csvRows.map((row) => row.map(escapeCsvField).join(',')).join('\r\n')}`
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  const objectUrl = URL.createObjectURL(blob)
+  const downloadLink = document.createElement('a')
+  const revokeObjectUrl = URL.revokeObjectURL
+
+  downloadLink.href = objectUrl
+  downloadLink.download = `network-comparison-${range}.csv`
+  downloadLink.hidden = true
+  document.body.append(downloadLink)
+  downloadLink.click()
+  downloadLink.remove()
+  window.setTimeout(() => revokeObjectUrl(objectUrl), 0)
+}
+
+function escapeCsvField(value: string | number): string {
+  const field = String(value)
+  return /[",\r\n]/.test(field) ? `"${field.replace(/"/g, '""')}"` : field
 }

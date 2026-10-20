@@ -16,7 +16,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - Spec, plan y tareas de Spec 003 están aprobados; T-001 a T-030 completas. Se verificaron accesibilidad, responsive, Vitest, build, Storybook y E2E; se corrigieron los avisos priorizados. Graphify se actualizó e inspeccionó; diagnóstico sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
-- `$feature` implementa cambios pequeños solicitados directamente, sin pasos, documento ni aprobación adicional; detiene alcance material nuevo. F-001 a F-004 están completos; F-004 habilita enlaces compartibles por nodo con fallback manual para el portapapeles.
+- `$feature` implementa cambios pequeños solicitados directamente, sin pasos, documento ni aprobación adicional; detiene alcance material nuevo. F-001 a F-004 están completos; F-004 habilita enlaces compartibles por nodo con fallback manual para el portapapeles. La exportación CSV de `/compare` incluye solo nodos válidos visibles y marca cada fila como simulada.
 - Impeccable está inicializado en `PRODUCT.md`; las superficies showcase son code-first y el detector está activado. Codex puede requerir aprobación inicial con `/hooks`.
 
 ## Decisiones (y por qué)
@@ -47,4 +47,4 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 
-- F-004 se publicó en `e610116`; el arreglo de movimiento reducido está verificado localmente y queda sin push hasta solicitud explícita.
+- La exportación CSV de comparación está implementada y verificada localmente; hacer push solo por solicitud explícita.

@@ -516,6 +516,85 @@ describe('NetworkNodeComparisonPage', () => {
     expectNodeSummary('core-router', EXPECTED_SUMMARIES['1h'].coreRouter)
     expectNodeSummary('access-switch-01', EXPECTED_SUMMARIES['1h'].accessSwitch)
   })
+
+  it.each(['1h', '24h', '7d'] as const)(
+    'downloads all visible %s measurements as a simulated-data CSV',
+    async (range) => {
+      const user = userEvent.setup()
+      const csvDownload = mockCsvDownload()
+
+      try {
+        renderComparisonPage(
+          createService(),
+          NODE_IDS,
+          `/compare?nodes=${encodeURIComponent(NODE_IDS.join(','))}&range=${range}`,
+        )
+        await screen.findByRole('table')
+
+        expect(screen.getByRole('button', { name: 'Download comparison CSV' })).toBeVisible()
+        await user.click(screen.getByRole('button', { name: 'Download comparison CSV' }))
+
+        expect(csvDownload.filename).toBe(`network-comparison-${range}.csv`)
+        expect(csvDownload.mimeType).toBe('text/csv;charset=utf-8')
+        expect(await csvDownload.hasUtf8Bom).toBe(true)
+        expect(await csvDownload.csv).toBe(await createExpectedCsv(range))
+      } finally {
+        csvDownload.restore()
+      }
+    },
+  )
+
+  it('exports only successful nodes when another selected node fails', async () => {
+    const user = userEvent.setup()
+    const csvDownload = mockCsvDownload()
+    const service = createService((nodeId, range) =>
+      nodeId === NODE_IDS[0]
+        ? Promise.reject(new Error('Connection failed'))
+        : Promise.resolve(createMetrics(range, nodeId)),
+    )
+
+    try {
+      renderComparisonPage(service)
+      await screen.findByRole('table')
+      expect(await screen.findByRole('alert')).toHaveTextContent(NODE_IDS[0])
+
+      await user.click(screen.getByRole('button', { name: 'Download comparison CSV' }))
+
+      expect(await csvDownload.csv).toBe(await createExpectedCsv('1h', [NODE_IDS[1]]))
+    } finally {
+      csvDownload.restore()
+    }
+  })
+
+  it('does not offer CSV download when no selected node has metrics', async () => {
+    const service = createService(async () => {
+      throw new Error('Connection failed')
+    })
+
+    renderComparisonPage(service)
+
+    expect(await screen.findAllByRole('alert')).toHaveLength(NODE_IDS.length)
+    expect(
+      screen.queryByRole('button', { name: 'Download comparison CSV' }),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('escapes CSV fields that contain commas and quotes', async () => {
+    const nodeIds = ['edge,"west', 'east-node'] as const
+    const user = userEvent.setup()
+    const csvDownload = mockCsvDownload()
+
+    try {
+      renderComparisonPage(createService(), nodeIds)
+      await screen.findByRole('table')
+      await user.click(screen.getByRole('button', { name: 'Download comparison CSV' }))
+
+      expect((await csvDownload.csv)?.split('\r\n')[1]).toMatch(/^"edge,""west",/)
+    } finally {
+      csvDownload.restore()
+    }
+  })
 })
 
 function expectNodeSummary(
@@ -619,6 +698,75 @@ function mockClipboard(writeText: (text: string) => Promise<void>) {
       Reflect.deleteProperty(navigator, 'clipboard')
     }
   }
+}
+
+function mockCsvDownload() {
+  let csvBlob: Blob | null = null
+  let filename = ''
+  const objectUrl = 'blob:comparison-export'
+  const createObjectUrl = vi.fn((blob: Blob) => {
+    csvBlob = blob
+    return objectUrl
+  })
+  const revokeObjectUrl = vi.fn()
+  const createObjectUrlDescriptor = Object.getOwnPropertyDescriptor(URL, 'createObjectURL')
+  const revokeObjectUrlDescriptor = Object.getOwnPropertyDescriptor(URL, 'revokeObjectURL')
+  Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: createObjectUrl })
+  Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: revokeObjectUrl })
+  const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+    this: HTMLAnchorElement,
+  ) {
+    filename = this.download
+  })
+
+  return {
+    get csv() {
+      return csvBlob?.text()
+    },
+    get mimeType() {
+      return csvBlob?.type
+    },
+    get hasUtf8Bom() {
+      return csvBlob
+        ?.arrayBuffer()
+        .then(
+          (buffer) => Array.from(new Uint8Array(buffer).slice(0, 3)).join(',') === '239,187,191',
+        )
+    },
+    get filename() {
+      return filename
+    },
+    restore() {
+      anchorClick.mockRestore()
+      restoreProperty(URL, 'createObjectURL', createObjectUrlDescriptor)
+      restoreProperty(URL, 'revokeObjectURL', revokeObjectUrlDescriptor)
+    },
+  }
+}
+
+function restoreProperty(target: object, key: string, descriptor: PropertyDescriptor | undefined) {
+  if (descriptor) {
+    Object.defineProperty(target, key, descriptor)
+  } else {
+    Reflect.deleteProperty(target, key)
+  }
+}
+
+async function createExpectedCsv(range: MetricsRange, nodeIds: readonly string[] = NODE_IDS) {
+  const rows = nodeIds.flatMap((nodeId) =>
+    createMetrics(range, nodeId).points.map((point) =>
+      [nodeId, point.timestamp, point.latencyMs, point.packetLossPercent, 'Simulated data']
+        .map(escapeExpectedCsvField)
+        .join(','),
+    ),
+  )
+
+  return ['Node,Timestamp (UTC),Latency (ms),Packet loss (%),Data source', ...rows].join('\r\n')
+}
+
+function escapeExpectedCsvField(value: string | number): string {
+  const field = String(value)
+  return /[",\r\n]/.test(field) ? `"${field.replaceAll('"', '""')}"` : field
 }
 
 function renderComparisonPage(

@@ -1427,7 +1427,8 @@ a {
   gap: 0.85rem;
 }
 
-.network-metrics__copy-link {
+.network-metrics__copy-link,
+.network-metrics__download-csv {
   min-height: 2.4rem;
   padding: 0.45rem 0.75rem;
   border: 1px solid var(--color-border-soft);
@@ -1441,12 +1442,14 @@ a {
     color var(--motion-fast);
 }
 
-.network-metrics__copy-link:hover {
+.network-metrics__copy-link:hover,
+.network-metrics__download-csv:hover {
   border-color: var(--color-action-border);
   background: var(--color-surface-raised);
 }
 
-.network-metrics__copy-link:focus-visible {
+.network-metrics__copy-link:focus-visible,
+.network-metrics__download-csv:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 3px;
 }
@@ -1810,7 +1813,8 @@ a {
     gap: 0.5rem;
   }
 
-  .network-metrics__copy-link {
+  .network-metrics__copy-link,
+  .network-metrics__download-csv {
     align-self: flex-start;
   }
 
