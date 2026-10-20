@@ -27,6 +27,8 @@ export interface UseFleetHealthSummaryState {
 }
 
 interface FleetHealthSummaryData {
+  readonly nodes: readonly NetworkNode[]
+  readonly service: NetworkMonitoringService
   readonly status: FleetHealthSummaryStatus
   readonly metrics: readonly NodeMetrics[]
   readonly failedNodeIds: readonly NetworkNode['id'][]
@@ -41,13 +43,11 @@ export function useFleetHealthSummary(
   nodes: readonly NetworkNode[],
   service: NetworkMonitoringService = networkMonitoringService,
 ): UseFleetHealthSummaryState {
-  const [state, setState] = useState<FleetHealthSummaryData>({
-    status: 'loading',
-    metrics: EMPTY_METRICS,
-    failedNodeIds: EMPTY_FAILED_NODE_IDS,
-    summary: null,
-    coverage: { validNodeCount: 0, totalNodeCount: nodes.length },
-  })
+  const [state, setState] = useState<FleetHealthSummaryData>(() =>
+    createLoadingState(nodes, service),
+  )
+  const currentState =
+    state.nodes === nodes && state.service === service ? state : createLoadingState(nodes, service)
   const generationRef = useRef(0)
   const retryControllerRef = useRef<AbortController | null>(null)
 
@@ -56,14 +56,6 @@ export function useFleetHealthSummary(
     const generation = generationRef.current + 1
     generationRef.current = generation
     let active = true
-
-    setState({
-      status: 'loading',
-      metrics: EMPTY_METRICS,
-      failedNodeIds: EMPTY_FAILED_NODE_IDS,
-      summary: null,
-      coverage: { validNodeCount: 0, totalNodeCount: nodes.length },
-    })
 
     const loadMetrics = async (): Promise<void> => {
       const results = await Promise.allSettled(
@@ -95,6 +87,8 @@ export function useFleetHealthSummary(
       })
 
       setState({
+        nodes,
+        service,
         status: 'success',
         metrics,
         failedNodeIds,
@@ -115,7 +109,7 @@ export function useFleetHealthSummary(
   }, [nodes, service])
 
   const retry = useCallback(async (): Promise<void> => {
-    if (state.failedNodeIds.length === 0) {
+    if (currentState.failedNodeIds.length === 0) {
       return
     }
 
@@ -123,7 +117,7 @@ export function useFleetHealthSummary(
     retryControllerRef.current?.abort()
     const controller = new AbortController()
     retryControllerRef.current = controller
-    const failedNodeIds = state.failedNodeIds
+    const failedNodeIds = currentState.failedNodeIds
     const results = await Promise.allSettled(
       failedNodeIds.map((nodeId) => service.getNodeMetrics(nodeId, '1h', controller.signal)),
     )
@@ -154,7 +148,12 @@ export function useFleetHealthSummary(
     })
 
     setState((currentState) => {
-      if (controller.signal.aborted || generationRef.current !== generation) {
+      if (
+        controller.signal.aborted ||
+        generationRef.current !== generation ||
+        currentState.nodes !== nodes ||
+        currentState.service !== service
+      ) {
         return currentState
       }
 
@@ -168,6 +167,7 @@ export function useFleetHealthSummary(
         .filter((nodeMetrics): nodeMetrics is NodeMetrics => nodeMetrics !== undefined)
 
       return {
+        ...currentState,
         status: 'success',
         metrics,
         failedNodeIds: [
@@ -182,9 +182,24 @@ export function useFleetHealthSummary(
     if (retryControllerRef.current === controller) {
       retryControllerRef.current = null
     }
-  }, [nodes, service, state.failedNodeIds])
+  }, [currentState.failedNodeIds, nodes, service])
 
-  return { ...state, retry }
+  return { ...currentState, retry }
+}
+
+function createLoadingState(
+  nodes: readonly NetworkNode[],
+  service: NetworkMonitoringService,
+): FleetHealthSummaryData {
+  return {
+    nodes,
+    service,
+    status: 'loading',
+    metrics: EMPTY_METRICS,
+    failedNodeIds: EMPTY_FAILED_NODE_IDS,
+    summary: null,
+    coverage: { validNodeCount: 0, totalNodeCount: nodes.length },
+  }
 }
 
 export function summarizeFleetMetrics(metrics: readonly NodeMetrics[]): FleetMetricsSummary | null {

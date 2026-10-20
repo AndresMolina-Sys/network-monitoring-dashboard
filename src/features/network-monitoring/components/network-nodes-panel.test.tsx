@@ -1,20 +1,34 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { NETWORK_NODES } from '../../../mocks/network-fixtures'
-import type { NetworkNode } from '../../../domain/network'
+import { NETWORK_NODES, NETWORK_NODE_METRICS } from '../../../mocks/network-fixtures'
+import type { NetworkNode, NodeMetrics } from '../../../domain/network'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
 import { NetworkNodesPanel } from './network-nodes-panel'
 import { MemoryRouter } from 'react-router'
 
 function createNetworkNodesService(
   nodes: readonly NetworkNode[] = NETWORK_NODES,
+  getNodeMetrics: NetworkMonitoringService['getNodeMetrics'] = vi.fn(),
 ): NetworkMonitoringService {
   return {
     listNodes: vi.fn().mockResolvedValue(nodes),
     getNode: vi.fn(),
-    getNodeMetrics: vi.fn(),
+    getNodeMetrics,
   }
+}
+
+function getFixtureMetrics(nodeId: string): Promise<NodeMetrics> {
+  return Promise.resolve(NETWORK_NODE_METRICS[nodeId])
+}
+
+function createDeferred<T>() {
+  let resolve!: (value: T) => void
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise
+  })
+
+  return { promise, resolve }
 }
 
 function expectFleetStatusCounts(statusCounts: HTMLElement) {
@@ -142,6 +156,132 @@ describe('NetworkNodesPanel', () => {
     await user.selectOptions(screen.getByRole('combobox', { name: 'Filter by status' }), 'online')
     expect(screen.getByRole('heading', { name: 'No nodes match your filters' })).toBeInTheDocument()
     expectFleetStatusCounts(statusCounts)
+  })
+
+  it('shows aggregated fleet metrics, units, complete coverage, and simulated-data disclosure', async () => {
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>(getFixtureMetrics)
+    const service = createNetworkNodesService(NETWORK_NODES, getNodeMetrics)
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={service} />
+      </MemoryRouter>,
+    )
+
+    const summary = await screen.findByRole('region', { name: 'Fleet metrics' })
+    await within(summary).findByText('3/3 nodes')
+
+    expect(within(summary).getByText('Average latency')).toBeVisible()
+    expect(within(summary).getByText('65.5 ms')).toBeVisible()
+    expect(within(summary).getByText('Peak packet loss')).toBeVisible()
+    expect(within(summary).getByText('4.2%')).toBeVisible()
+    expect(within(summary).getByText('3/3 nodes')).toBeVisible()
+    expect(within(summary).getByText('Simulated data')).toBeVisible()
+    expect(getNodeMetrics).toHaveBeenCalledTimes(NETWORK_NODES.length)
+    for (const node of NETWORK_NODES) {
+      expect(getNodeMetrics).toHaveBeenCalledWith(node.id, '1h', expect.anything())
+    }
+  })
+
+  it('keeps fleet counts visible while the initial fleet-metrics requests are pending', async () => {
+    const pendingMetrics = new Map(
+      NETWORK_NODES.map((node) => [node.id, createDeferred<NodeMetrics>()]),
+    )
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>(
+      (nodeId) => pendingMetrics.get(nodeId)!.promise,
+    )
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService(NETWORK_NODES, getNodeMetrics)} />
+      </MemoryRouter>,
+    )
+
+    const statusCounts = await screen.findByRole('group', { name: 'Fleet status counts' })
+    const summary = screen.getByRole('region', { name: 'Fleet metrics' })
+
+    expectFleetStatusCounts(statusCounts)
+    expect(within(summary).getByRole('status')).toHaveTextContent('Loading fleet metrics...')
+    expect(within(summary).getByText('Simulated data')).toBeVisible()
+    expect(within(summary).queryByText('65.5 ms')).not.toBeInTheDocument()
+  })
+
+  it('shows partial coverage and retries only the failed node while preserving valid metrics', async () => {
+    const retryMetrics = createDeferred<NodeMetrics>()
+    let accessSwitchAttempts = 0
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) => {
+      if (nodeId === 'access-switch-01') {
+        accessSwitchAttempts += 1
+        return accessSwitchAttempts === 1
+          ? Promise.reject(new Error('Metrics unavailable'))
+          : retryMetrics.promise
+      }
+
+      return getFixtureMetrics(nodeId)
+    })
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService(NETWORK_NODES, getNodeMetrics)} />
+      </MemoryRouter>,
+    )
+
+    const summary = await screen.findByRole('region', { name: 'Fleet metrics' })
+    await within(summary).findByText('2/3 nodes')
+
+    expect(within(summary).getByText('79.9 ms')).toBeVisible()
+    expect(within(summary).getByText('4.2%')).toBeVisible()
+
+    await user.click(within(summary).getByRole('button', { name: 'Retry failed nodes' }))
+
+    expect(getNodeMetrics).toHaveBeenCalledTimes(NETWORK_NODES.length + 1)
+    expect(getNodeMetrics).toHaveBeenLastCalledWith('access-switch-01', '1h', expect.anything())
+    expect(within(summary).getByText('79.9 ms')).toBeVisible()
+    expect(within(summary).getByText('2/3 nodes')).toBeVisible()
+
+    await act(async () => {
+      retryMetrics.resolve(NETWORK_NODE_METRICS['access-switch-01'])
+      await retryMetrics.promise
+    })
+
+    await within(summary).findByText('3/3 nodes')
+    expect(within(summary).getByText('65.5 ms')).toBeVisible()
+    expect(within(summary).getByText('4.2%')).toBeVisible()
+    expect(within(summary).queryByRole('button', { name: 'Retry failed nodes' })).toBeNull()
+  })
+
+  it('shows zero coverage and placeholder KPIs when all metrics fail, then recovers on retry', async () => {
+    const attemptsByNode = new Map<string, number>()
+    const getNodeMetrics = vi.fn<NetworkMonitoringService['getNodeMetrics']>((nodeId) => {
+      const attempt = (attemptsByNode.get(nodeId) ?? 0) + 1
+      attemptsByNode.set(nodeId, attempt)
+
+      return attempt === 1
+        ? Promise.reject(new Error('Metrics unavailable'))
+        : getFixtureMetrics(nodeId)
+    })
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NetworkNodesPanel service={createNetworkNodesService(NETWORK_NODES, getNodeMetrics)} />
+      </MemoryRouter>,
+    )
+
+    const summary = await screen.findByRole('region', { name: 'Fleet metrics' })
+    await within(summary).findByText('0/3 nodes')
+
+    expect(within(summary).getAllByText('—')).toHaveLength(2)
+    expect(within(summary).getByText('Simulated data')).toBeVisible()
+    expectFleetStatusCounts(screen.getByRole('group', { name: 'Fleet status counts' }))
+
+    await user.click(within(summary).getByRole('button', { name: 'Retry failed nodes' }))
+
+    await within(summary).findByText('3/3 nodes')
+    expect(getNodeMetrics).toHaveBeenCalledTimes(NETWORK_NODES.length * 2)
+    expect(within(summary).getByText('65.5 ms')).toBeVisible()
+    expect(within(summary).getByText('4.2%')).toBeVisible()
   })
 
   it.each([

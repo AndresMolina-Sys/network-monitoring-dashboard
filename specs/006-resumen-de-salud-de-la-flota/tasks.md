@@ -58,7 +58,7 @@ Estado: Aprobado por el usuario
 
   **Hecho cuando:** Las pruebas confirman que cada contador enfoca y activa el filtro correspondiente, que el selector queda sincronizado y que “All statuses” lo restablece.
 
-- [ ] **T-008 — Integrar métricas agregadas en el inventario**
+- [x] **T-008 — Integrar métricas agregadas en el inventario**
 
   **Estimación:** 25 min · **Dependencias:** T-005, T-007 · **RF:** RF-4, RF-5, RF-6, RF-7, RF-8, RF-9
 

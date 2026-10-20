@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import type { NetworkNode, NodeStatus } from '../../../domain/network'
 import type { NetworkMonitoringService } from '../../../services/network-monitoring-service'
+import { formatMetricValue } from '../metrics-summary'
+import { useFleetHealthSummary } from '../hooks/use-fleet-health-summary'
 import { useNetworkNodes } from '../hooks/use-network-nodes'
 import { NetworkNodeCard } from './network-node-card'
 import { NetworkNodesEmptyState } from './network-nodes-empty-state'
@@ -24,6 +26,7 @@ const STATUS_ORDER: readonly NodeStatus[] = ['online', 'degraded', 'offline']
 
 export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
   const { status, nodes, retry } = useNetworkNodes(service)
+  const fleetMetrics = useFleetHealthSummary(nodes, service)
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
@@ -113,6 +116,53 @@ export function NetworkNodesPanel({ service }: NetworkNodesPanelProps = {}) {
           ))}
         </dl>
       </div>
+
+      <section className="fleet-health-summary" aria-labelledby="fleet-health-summary-title">
+        <header className="fleet-health-summary__header">
+          <h3 id="fleet-health-summary-title">Fleet metrics</h3>
+          <p>Simulated data</p>
+        </header>
+
+        {fleetMetrics.status === 'loading' ? (
+          <p className="fleet-health-summary__loading" role="status">
+            Loading fleet metrics...
+          </p>
+        ) : (
+          <>
+            <dl className="fleet-health-summary__metrics">
+              <div>
+                <dt>Average latency</dt>
+                <dd>
+                  {fleetMetrics.summary
+                    ? `${formatMetricValue(fleetMetrics.summary.averageLatencyMs)} ms`
+                    : '—'}
+                </dd>
+              </div>
+              <div>
+                <dt>Peak packet loss</dt>
+                <dd>
+                  {fleetMetrics.summary
+                    ? `${formatMetricValue(fleetMetrics.summary.peakPacketLossPercent)}%`
+                    : '—'}
+                </dd>
+              </div>
+              <div>
+                <dt>Metrics coverage</dt>
+                <dd>
+                  {fleetMetrics.coverage.validNodeCount}/{fleetMetrics.coverage.totalNodeCount}{' '}
+                  nodes
+                </dd>
+              </div>
+            </dl>
+
+            {fleetMetrics.failedNodeIds.length > 0 ? (
+              <button type="button" onClick={() => void fleetMetrics.retry()}>
+                Retry failed nodes
+              </button>
+            ) : null}
+          </>
+        )}
+      </section>
 
       <div className="network-nodes-panel__filters">
         <label className="network-nodes-panel__field">
