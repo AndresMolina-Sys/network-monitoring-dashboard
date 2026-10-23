@@ -133,7 +133,7 @@ static Dictionary<string, NodeMetrics> CreateMetricsByRange(
 }
 
 var metricsByNode = new Dictionary<string, Dictionary<string, NodeMetrics>>(
-    StringComparer.OrdinalIgnoreCase
+    StringComparer.Ordinal
 )
 {
     ["core-router"] = CreateMetricsByRange(
@@ -201,7 +201,7 @@ app.MapGet("/api/nodes", () => nodes)
 app.MapGet("/api/nodes/{nodeId}", (string nodeId) =>
 {
     var node = nodes.FirstOrDefault(candidate =>
-        string.Equals(candidate.Id, nodeId, StringComparison.OrdinalIgnoreCase)
+        string.Equals(candidate.Id, nodeId, StringComparison.Ordinal)
     );
 
     return node is null

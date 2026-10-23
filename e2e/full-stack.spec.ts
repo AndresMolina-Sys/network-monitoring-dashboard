@@ -62,4 +62,30 @@ test.describe('Full-stack integration', () => {
       }),
     ).toHaveCount(0)
   })
+
+  test('rejects mixed-case node IDs consistently in the API-backed detail page', async ({
+    page,
+  }) => {
+    const nodeResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url() === `${apiUrl}/api/nodes/CORE-ROUTER` &&
+        response.request().method() === 'GET',
+    )
+    const metricsResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url() === `${apiUrl}/api/nodes/CORE-ROUTER/metrics?range=1h` &&
+        response.request().method() === 'GET',
+    )
+
+    await page.goto('/nodes/CORE-ROUTER')
+
+    const [nodeResponse, metricsResponse] = await Promise.all([
+      nodeResponsePromise,
+      metricsResponsePromise,
+    ])
+
+    expect(nodeResponse.status()).toBe(404)
+    expect(metricsResponse.status()).toBe(404)
+    await expect(page.getByRole('heading', { name: 'Node not found' })).toBeVisible()
+  })
 })

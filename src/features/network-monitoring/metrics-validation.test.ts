@@ -52,6 +52,9 @@ describe('assertValidMetricsResponse', () => {
     expect(() =>
       assertValidMetricsResponse({ ...response, nodeId: 'branch-gateway' }, NODE_ID, '1h'),
     ).toThrow()
+    expect(() =>
+      assertValidMetricsResponse({ ...response, nodeId: 'CORE-ROUTER' }, NODE_ID, '1h'),
+    ).toThrow()
     expect(() => assertValidMetricsResponse({ ...response, range: '24h' }, NODE_ID, '1h')).toThrow()
   })
 

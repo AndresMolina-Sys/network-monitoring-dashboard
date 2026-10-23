@@ -23,6 +23,17 @@ describe('MockNetworkMonitoringService', () => {
     })
   })
 
+  it('rejects mixed-case node IDs for node and metrics lookups', async () => {
+    const service = new MockNetworkMonitoringService({
+      latencyMs: 0,
+    })
+
+    await expect(service.getNode('CORE-ROUTER')).rejects.toBeInstanceOf(NetworkNodeNotFoundError)
+    await expect(service.getNodeMetrics('CORE-ROUTER', '1h')).rejects.toBeInstanceOf(
+      NetworkNodeNotFoundError,
+    )
+  })
+
   it.each([
     { range: '1h' as const, expectedCount: 4, cadenceMs: 20 * 60 * 1000 },
     { range: '24h' as const, expectedCount: 25, cadenceMs: 60 * 60 * 1000 },

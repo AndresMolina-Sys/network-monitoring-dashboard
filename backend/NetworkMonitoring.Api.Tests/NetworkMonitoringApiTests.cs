@@ -72,6 +72,16 @@ public sealed class NetworkMonitoringApiTests
     }
 
     [Fact]
+    public async Task Get_node_and_metrics_reject_mixed_case_node_ids()
+    {
+        var nodeResponse = await client.GetAsync("/api/nodes/CORE-ROUTER");
+        var metricsResponse = await client.GetAsync("/api/nodes/CORE-ROUTER/metrics?range=1h");
+
+        Assert.Equal(HttpStatusCode.NotFound, nodeResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, metricsResponse.StatusCode);
+    }
+
+    [Fact]
     public async Task Get_metrics_returns_complete_ranges_for_all_nodes()
     {
         foreach (var nodeId in NodeIds)
