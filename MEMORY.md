@@ -11,8 +11,6 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - El frontend usa la API si existe `VITE_API_BASE_URL`; sin ella, usa fixtures mock. `?demo=empty|error|slow` solo funciona en desarrollo.
 - La spec, el plan y las tareas de `specs/001-rangos-de-metricas-simuladas/` están aprobados; T-001 a T-010 completas y periodos verificados en producción con CI/Vercel en verde. Spec 002 de gráfica de pérdida aprobada, T-001 a T-005 completas y aceptación de producción confirmada.
 - `specs/004-comparacion-de-nodos/` está aprobada y T-001 a T-017 completas. `/compare` presenta selección, gráficas, leyendas, tabla y estados responsive; sus URLs codifican nodos y periodo. En `/nodes/:nodeId`, el periodo también se codifica en la URL. Ambas vistas normalizan rangos ausentes o inválidos a `1h`, reemplazan el historial al cambiar rango y copian enlaces limpios sin parámetros de demo. Graphify quedó actualizado con 795 nodos/1.125 relaciones sin endpoints huérfanos.
-- Spec 005 tiene spec, plan y tareas aprobados; T-001 a T-008 completas. Vitest 205/205, Playwright 34/34, lint, formato y build en verde. Graphify actualizado e inspeccionado: 787 nodos y 1.140 relaciones; diagnóstico sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
-- Spec 006 — Spec, plan y tareas aprobados; T-001 a T-016 completas: formato/lint, Vitest 250/250, build y Playwright (42 pasan; 2 skips por viewport) en verde. Graphify: 837 nodos/1.212 relaciones, diagnóstico limpio.
 - Spec, plan y tareas de Spec 003 están aprobados; T-001 a T-030 completas. Se verificaron accesibilidad, responsive, Vitest, build, Storybook y E2E; se corrigieron los avisos priorizados. Graphify se actualizó e inspeccionó; diagnóstico sin enlaces huérfanos, endpoints faltantes, bucles ni colapsos.
 - `$sdd` clasifica y enruta a `$feature` o `$sdd-coordinator`; las fases SDD tienen skills separadas y perfiles de proyecto versionados en `.codex/agents/`.
 - El coordinador principal conserva preguntas y aprobaciones; un revisor hace QA de solo lectura de cada spec antes de presentarla. La aprobación sigue siendo del usuario.
@@ -22,6 +20,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 ## Decisiones (y por qué)
 
 - Mantener `NetworkMonitoringService` como límite entre UI y datos para poder alternar mock/API y probar componentes con servicios inyectados.
+- El servicio HTTP limita cada solicitud completa, incluida la lectura JSON, a 30 s; valida la forma de los nodos y conserva la cancelación del caller para que timeout o deriva de esquema terminen en el estado de error recuperable existente.
 - Tratar los IDs canónicos de nodos como sensibles a mayúsculas en API y mocks; las variantes de capitalización deben terminar en no encontrado de forma consistente.
 - Mantener “Simulated data” junto al selector, visible sin hover en carga, éxito, vacío y error; no prometer uptime, alertas, autenticación o telemetría en tiempo real.
 - Para Spec 003, usar “Applied Research Journal”: jerarquía editorial para escanear nodos y evidencia. “Evidence Margin” es la composición aprobada para `/nodes/:nodeId`: latencia protagonista con pérdida y evidencia lateral; responsive y otros estados se validan en tareas posteriores. La brief oficial enlaza y registra ambos HTML con `related_targets`.
